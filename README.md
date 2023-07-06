@@ -1,6 +1,6 @@
 # Kusillo
 
-An application to manage rocket tournaments.
+An application to manage racket tournaments.
 
 
 
