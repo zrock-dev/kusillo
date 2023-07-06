@@ -7,12 +7,12 @@ use crate::registration::player_repository::PlayersRepository;
 use crate::registration::team_builder::TeamBuilder;
 
 #[derive(Debug)]
-pub struct TeamRegistrator<'a>{
-    team_builder: TeamBuilder<'a>,
-    players_repository: PlayersRepository<'a>,
+pub struct TeamRegistrator{
+    team_builder: TeamBuilder,
+    players_repository: PlayersRepository,
 }
 
-impl TeamRegistrator<'_>{
+impl TeamRegistrator{
     pub fn new() -> Self{
         TeamRegistrator{
             team_builder: TeamBuilder::new(),
@@ -21,7 +21,7 @@ impl TeamRegistrator<'_>{
     }
 
     pub fn save_player(&mut self, first_name: &str, last_name: &str){
-       self.players_repository.register_player(first_name, last_name);
+       self.players_repository.register_player(first_name.to_string(), last_name.to_string());
     }
 
     pub fn set_category(&mut self, category: &str){
@@ -29,7 +29,7 @@ impl TeamRegistrator<'_>{
     }
 
     pub fn set_name(&mut self, name: &str){
-       self.team_builder.name(name);
+       self.team_builder.name(name.to_string());
     }
 
     pub fn store(&mut self){
@@ -42,5 +42,6 @@ impl TeamRegistrator<'_>{
     }
 
     fn persist_store(&mut self){
+        dbg!(self.team_builder.build());
     }
 }

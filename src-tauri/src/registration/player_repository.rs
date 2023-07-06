@@ -1,18 +1,18 @@
 use crate::registration::data::Player;
 
 #[derive(Debug)]
-pub struct PlayersRepository<'a> {
-    players: Vec<Player<'a>>,
+pub struct PlayersRepository {
+    players: Vec<Player>,
 }
 
-impl PlayersRepository<'_> {
+impl PlayersRepository {
     pub fn new() -> Self{
         PlayersRepository{
             players: Vec::new()
         }
     }
 
-    pub fn register_player(&mut self, first_name: &str, last_name: &str){
+    pub fn register_player(&mut self, first_name: String, last_name: String){
         self.players.push(Player{
             first_name,
             last_name,
@@ -23,7 +23,7 @@ impl PlayersRepository<'_> {
         return self.players.len()
     }
 
-    pub fn export(&self) -> &Vec<Player<'_>>{
+    pub fn export(&self) -> &Vec<Player>{
         &self.players
     }
 }

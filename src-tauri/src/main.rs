@@ -5,12 +5,6 @@ mod registration;
 
 use registration::team_registrator::TeamRegistrator;
 
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
-
 fn main() {
     // tauri::Builder::default()
     //     .invoke_handler(tauri::generate_handler![greet])
@@ -24,7 +18,6 @@ fn main() {
 
     registrator.set_category("First");
     registrator.set_name("Los reales");
-    registrator.store();
 
-    dbg!(registrator);
+    dbg!(registrator.store());
 }

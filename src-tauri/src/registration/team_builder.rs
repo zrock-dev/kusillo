@@ -1,29 +1,29 @@
 use crate::registration::data::{Player, Categories, Team};
 
 #[derive(Debug)]
-pub struct TeamBuilder<'a>{
-    name: &'a str,
-    players: &'a Vec<Player<'a>>,
+pub struct TeamBuilder{
+    name: String,
+    players: Vec<Player>,
     category: Categories
 }
 
-impl TeamBuilder<'_>{
+impl TeamBuilder{
     pub fn new() -> Self{
        TeamBuilder{
-           name: "",
-           players: &Vec::new(),
+           name: String::from(""),
+           players: Vec::new(),
            category: Categories::First
        }
     }
 
     pub fn players(&mut self, players: &Vec<Player>) -> &Self {
-        self.players = players;
-        &self
+        self.players = players.clone();
+        self
     }
 
-    pub fn name(&mut self, name: &str) -> &Self {
+    pub fn name(&mut self, name: String) -> &Self {
         self.name = name;
-        &self
+        self
     }
 
     pub fn category(&mut self, category: &str) -> &Self {
@@ -32,12 +32,12 @@ impl TeamBuilder<'_>{
             "Second" => Categories::Second,
             _ => panic!("Provided category {} is invalid", category),
         };
-        &self
+        self
     }
 
-    pub fn build(&self) -> Team {
+    pub fn build(&mut self) -> Team {
         Team {
-            name: self.name,
+            name: String::from(&self.name),
             category: self.category,
             players: self.players.clone(),
         }
