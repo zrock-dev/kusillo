@@ -15,6 +15,5 @@ pub struct Player {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Team {
     pub name: String,
-    pub players: Vec<Player>,
     pub category: Categories,
 }

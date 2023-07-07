@@ -9,9 +9,6 @@ lazy_static!{
 }
 
 pub fn save(team: Team){
-    println!("Received team ");
-    dbg!(&team);
-
     let db = GLOBAL_DB.lock().unwrap();
     let mut session = db.start_session().unwrap();
     session.start_transaction(None).unwrap();
@@ -31,7 +28,6 @@ pub fn show_all_teams(){
     let collection = db.collection::<Team>("teams");
     let teams = collection.find(None).unwrap();
 
-    println!("Team from DB");
     for team in teams {
         println!("team found");
         dbg!(team).as_ref().expect("Panic in the disco");

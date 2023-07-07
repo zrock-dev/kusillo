@@ -4,20 +4,16 @@
 mod registration;
 mod database;
 
-use registration::team_registrator::TeamRegistrator;
+use registration::team_registrator;
+use registration::players;
 
 fn main() {
-    // tauri::Builder::default()
-    //     .invoke_handler(tauri::generate_handler![greet])
-    //     .run(tauri::generate_context!())
-    //     .expect("error while running tauri application");
-
-    let mut registrator = TeamRegistrator::new();
-    registrator.save_player("Mishel", "Paz");
-    registrator.save_player("Mishel", "Preciosa");
-    registrator.save_player("Mishel", "Vuelve");
-
-    registrator.set_category("First");
-    registrator.set_name("Los reales");
-    registrator.store();
+    tauri::Builder::default()
+        .invoke_handler(tauri::generate_handler![
+            players::add,
+            team_registrator::save_team,
+            team_registrator::validate_category,
+        ])
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
 }
