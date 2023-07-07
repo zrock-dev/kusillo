@@ -1,8 +1,4 @@
-// use surrealdb::engine::remote::ws::Ws;
-// use surrealdb::opt::auth::Root;
-// use surrealdb::sql::Thing;
-// use surrealdb::Surreal;
-
+use crate::database::polodb::{save, show_all_teams};
 use crate::registration::player_repository::PlayersRepository;
 use crate::registration::team_builder::TeamBuilder;
 
@@ -42,6 +38,7 @@ impl TeamRegistrator{
     }
 
     fn persist_store(&mut self){
-        dbg!(self.team_builder.build());
+        save(self.team_builder.build());
+        show_all_teams();
     }
 }

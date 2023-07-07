@@ -2,6 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod registration;
+mod database;
 
 use registration::team_registrator::TeamRegistrator;
 
@@ -18,6 +19,5 @@ fn main() {
 
     registrator.set_category("First");
     registrator.set_name("Los reales");
-
-    dbg!(registrator.store());
+    registrator.store();
 }
