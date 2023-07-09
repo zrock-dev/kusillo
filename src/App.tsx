@@ -1,6 +1,6 @@
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import Home from "./home";
-import SignupForm from "./forms/team_registration";
+import TeamRegistrationForm from "./forms/team_registration";
 
 function App() {
 
@@ -8,7 +8,7 @@ function App() {
       <BrowserRouter>
           <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/team-form" element={<SignupForm />} />
+              <Route path="/team-form" element={<TeamRegistrationForm />} />
           </Routes>
       </BrowserRouter>
   );
