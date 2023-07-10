@@ -1,60 +1,37 @@
 import React from 'react';
-import { useFormik } from 'formik';
-import * as yup from 'yup';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
+import { Form, SubmitButton, TextField } from 'formik-material';
+import "./form.css"
+import { invoke } from "@tauri-apps/api/tauri";
 
-const validationSchema = yup.object({
-    email: yup
-        .string('Enter your email')
-        .email('Enter a valid email')
-        .required('Email is required'),
-    password: yup
-        .string('Enter your password')
-        .min(8, 'Password should be of minimum 8 characters length')
-        .required('Password is required'),
-});
+async function save_team(teamName: String, teamCategory: String){
+    await invoke("save_team", {name: teamName, category: teamCategory})
+}
 
 export default function TeamRegistrationForm()  {
-    const formik = useFormik({
-        initialValues: {
-            email: 'foobar@example.com',
-            password: 'foobar',
-        },
-        validationSchema: validationSchema,
-        onSubmit: (values) => {
-            alert(JSON.stringify(values, null, 2));
-        },
-    });
+    const initialValues = {
+        team_name: '',
+        team_category: '',
+        player_first_name: '',
+        player_last_name: '',
+    };
 
     return (
-        <div>
-            <form onSubmit={formik.handleSubmit}>
-                <TextField
-                    id="email"
-                    name="email"
-                    label="Email"
-                    value={formik.values.email}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.touched.email && Boolean(formik.errors.email)}
-                    helperText={formik.touched.email && formik.errors.email}
-                />
-                <TextField
-                    id="password"
-                    name="password"
-                    label="Password"
-                    type="password"
-                    value={formik.values.password}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.touched.password && Boolean(formik.errors.password)}
-                    helperText={formik.touched.password && formik.errors.password}
-                />
-                <Button color="primary" variant="contained" type="submit">
-                    Submit
-                </Button>
-            </form>
-        </div>
+        <Form
+            initialValues={initialValues}
+            onSubmitForm={(values, formikHelpers) => {
+                const { team_name, team_category, player_first_name, player_last_name } = values;
+                save_team(team_name, team_category)
+                formikHelpers.setSubmitting(false);
+            }}
+        >
+            <h1>Team Registration Esse</h1>
+            <TextField name="team_name" label="Team Name:" variant="outlined" />
+            <TextField name="team_category" label="Category" variant="outlined" />
+
+            <TextField name="player_first_name" label="Player First Name" variant="outlined" />
+            <TextField name="player_last_name" label="Player Last Name" variant="outlined" />
+
+            <SubmitButton>Submit</SubmitButton>
+        </Form>
     );
 };

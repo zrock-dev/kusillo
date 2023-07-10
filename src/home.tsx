@@ -1,7 +1,6 @@
 import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/tauri";
-import "./App.css";
 import Button from '@mui/material/Button';
 
 function Home() {
@@ -32,7 +31,9 @@ function Home() {
             <p>Rock es cultura</p>
 
             <div>
-                <Button variant="outlined">You are so smart I love you forever</Button>
+                <Button variant="outlined">
+                    You are so smart I love you forever
+                </Button>
             </div>
         </div>
     );
