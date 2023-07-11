@@ -3,20 +3,23 @@
 
 mod registration;
 mod database;
+mod utils;
 
-use registration::team_registrator;
-use registration::players;
-
-fn start_database(){
-    database::creation::create_persistent_db().expect("Could not start persistent database");
-    database::creation::create_temporal_db().expect("Could not start temporal database");
-}
+use database::teams;
+use database::players;
 
 fn main() {
-    start_database();
+    database::creation::create_persistent_db().expect("Could not create database");
+
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
-            team_registrator::save_team,
+            teams::add_team,
+            teams::cancel_registration,
+            teams::is_category_valid,
+            teams::save_team,
+            players::add_player,
+            players::remove_player,
+            players::can_add
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
