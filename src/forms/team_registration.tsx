@@ -1,37 +1,90 @@
 import React from 'react';
-import { Form, SubmitButton, TextField } from 'formik-material';
+import { useFormik } from 'formik';
+import {Button, MenuItem, Select} from '@mui/material';
+import { TextField } from '@mui/material';
 import "./form.css"
 import { invoke } from "@tauri-apps/api/tauri";
+import {validationSchema} from "./validation_scheme";
 
 async function save_team(teamName: String, teamCategory: String){
     await invoke("save_team", {name: teamName, category: teamCategory})
 }
 
-export default function TeamRegistrationForm()  {
-    const initialValues = {
-        team_name: '',
-        team_category: '',
-        player_first_name: '',
-        player_last_name: '',
-    };
+const TeamRegistrationForm = () => {
+    const {values, handleBlur, touched, errors, handleSubmit, handleChange} = useFormik({
+        initialValues: {
+            teamName: '',
+            teamCategory: '',
+            playerFirstName: '',
+            playerLastName: ''
+        },
+        validationSchema: validationSchema,
+        onSubmit: (values) => {
+            alert(JSON.stringify(values, null, 2));
+        },
+    });
 
     return (
-        <Form
-            initialValues={initialValues}
-            onSubmitForm={(values, formikHelpers) => {
-                const { team_name, team_category, player_first_name, player_last_name } = values;
-                save_team(team_name, team_category)
-                formikHelpers.setSubmitting(false);
-            }}
-        >
-            <h1>Team Registration Esse</h1>
-            <TextField name="team_name" label="Team Name:" variant="outlined" />
-            <TextField name="team_category" label="Category" variant="outlined" />
+        <div>
+            <h1>Team registration </h1>
+            <form onSubmit={handleSubmit}>
+                <TextField
+                    id="teamName"
+                    name="teamName"
+                    label="Team Name"
+                    type="text"
+                    value={values.teamName}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={touched.teamName && Boolean(errors.teamName)}
+                    helperText={touched.teamName && errors.teamName}
+                />
+                
+                <TextField
+                    id="playerFirstName"
+                    name="playerFirstName"
+                    label="Player First Name"
+                    type="text"
+                    value={values.playerFirstName}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={touched.playerFirstName && Boolean(errors.playerFirstName)}
+                    helperText={touched.playerFirstName && errors.playerFirstName}
+                />
 
-            <TextField name="player_first_name" label="Player First Name" variant="outlined" />
-            <TextField name="player_last_name" label="Player Last Name" variant="outlined" />
+                <TextField
+                    id="playerLastName"
+                    name="playerLastName"
+                    label="Player Last Name"
+                    type="text"
+                    value={values.playerLastName}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={touched.playerLastName && Boolean(errors.playerLastName)}
+                    helperText={touched.playerLastName && errors.playerLastName}
+                />
 
-            <SubmitButton>Submit</SubmitButton>
-        </Form>
+                <Select
+                    id="teamCategory"
+                    name="teamCategory"
+                    label="Category"
+                    type="text"
+                    value={values.teamCategory}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={touched.teamCategory && Boolean(errors.teamCategory)}
+                    // helperText={touched.teamCategory && errors.teamCategory}
+                >
+                    <MenuItem value={"First"}>First</MenuItem>
+                    <MenuItem value={"Second"}>Second</MenuItem>
+                </Select>
+
+                <Button color="primary" variant="contained" type="submit">
+                    Submit
+                </Button>
+            </form>
+        </div>
     );
 };
+
+export default TeamRegistrationForm;
