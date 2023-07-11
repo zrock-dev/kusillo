@@ -7,15 +7,15 @@ mod database;
 use registration::team_registrator;
 use registration::players;
 
-fn main() {
-    match database::sqlite::startup(){
-        Ok(_) => println!("Database creation Successful"),
-        Err(error) => panic!("Could not create database. \n\t {}", error)
-    }
+fn start_database(){
+    database::creation::create_persistent_db().expect("Could not start persistent database");
+    database::creation::create_temporal_db().expect("Could not start temporal database");
+}
 
+fn main() {
+    start_database();
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
-            players::add,
             team_registrator::save_team,
         ])
         .run(tauri::generate_context!())
