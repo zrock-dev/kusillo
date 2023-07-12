@@ -14,19 +14,7 @@ import PlayerRegistrationList from "./player_registration";
 import { invoke } from "@tauri-apps/api/tauri";
 
 
-
-async function getTeamId(){
-    let teamID;
-    await invoke('create_team')
-        .then((id) => {teamID = id})
-        .catch((error) => {console.error(error)})
-
-    return teamID;
-}
-
-const TeamRegistrationForm = () => {
-    const teamID = getTeamId();
-
+const TeamRegistrationForm = ({teamID}) => {
     const {values, handleBlur, touched, errors, handleSubmit, handleChange} = useFormik({
         initialValues: {
             teamName: '',
@@ -43,6 +31,11 @@ const TeamRegistrationForm = () => {
                 .catch((error) => {console.error(error)});
         },
     });
+
+    const handleCancel = () => {
+        invoke('cancel_registration', {teamId: teamID})
+            .catch((error) => {console.error(error)});
+    }
 
     return (
         <Container>
@@ -82,10 +75,13 @@ const TeamRegistrationForm = () => {
                 </Grid2>
 
                 <Grid2 xs={12}>
-                    <PlayerRegistrationList teamID={1} />
+                    <PlayerRegistrationList teamID={teamID} />
                 </Grid2>
 
-                <Grid2 xs={4}>
+                <Grid2 xs={8}>
+                    <Button  color="primary" variant="contained" onClick={handleCancel}>
+                        Cancel
+                    </Button>
                     <Button color="primary" variant="contained" type="submit">
                         Submit
                     </Button>
