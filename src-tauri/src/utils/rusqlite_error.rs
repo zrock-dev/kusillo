@@ -1,10 +1,13 @@
-use serde::ser::Serializer;
-use serde::Serialize;
+use serde::ser::{Serialize, Serializer};
+use thiserror::Error;
 
-#[derive(Debug, thiserror::Error)]
+#[derive(Debug, Error)]
 pub enum Error {
-    #[error(transparent)]
+    #[error("Rusqlite error: {0}")]
     RusqliteError(#[from] rusqlite::Error),
+
+    #[error("Custom error: {0}")]
+    CustomError(String),
 }
 
 impl Serialize for Error {

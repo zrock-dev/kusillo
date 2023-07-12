@@ -24,7 +24,6 @@ import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import {useState} from "react";
 
-
 const drawerWidth = 240;
 
 const Main = ({ open }) => {
@@ -38,6 +37,9 @@ const Main = ({ open }) => {
             }}
         >
             <div style={{ marginTop: '64px' }}>
+                <script>
+                    console.log("Here");
+                </script>
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/team-form" element={<TeamRegistrationForm />} />

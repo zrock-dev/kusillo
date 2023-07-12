@@ -15,11 +15,11 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             teams::create_team,
             teams::cancel_registration,
-            teams::is_category_valid,
             teams::update_team,
+            teams::can_append_player,
+            teams::can_submit_team,
             players::insert_player,
             players::remove_player,
-            players::can_add
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
