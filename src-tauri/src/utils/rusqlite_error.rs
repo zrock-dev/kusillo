@@ -4,7 +4,7 @@ use serde::Serialize;
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error(transparent)]
-    RusqliteError(#[from] rusqlite::Error)
+    RusqliteError(#[from] rusqlite::Error),
 }
 
 impl Serialize for Error {

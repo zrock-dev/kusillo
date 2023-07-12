@@ -13,11 +13,11 @@ fn main() {
 
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
-            teams::add_team,
+            teams::insert_team,
             teams::cancel_registration,
             teams::is_category_valid,
-            teams::save_team,
-            players::add_player,
+            teams::update_team,
+            players::insert_player,
             players::remove_player,
             players::can_add
         ])
