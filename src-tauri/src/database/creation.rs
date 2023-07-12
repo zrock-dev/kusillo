@@ -13,13 +13,14 @@ pub fn create_persistent_db() -> Result<(), Error>{
             team_id INTEGER,
             first_name TEXT NULL,
             last_name TEXT NULL,
-            FOREIGN KEY (team_id) REFERENCES teams (id)
+            FOREIGN KEY (team_id) REFERENCES teams (rowid)
         )"
     )?;
 
     create_table(
         &connection,
         "CREATE TABLE IF NOT EXISTS teams (
+            rowid INTEGER NOT NULL PRIMARY KEY,
             name TEXT NULL,
             category TEXT NULL
         )"

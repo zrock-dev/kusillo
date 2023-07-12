@@ -6,7 +6,7 @@ use crate::utils::rusqlite_error::Error;
 pub fn insert_player(first_name: &str, last_name: &str, team_id: i64) -> Result<i64, Error> {
     let connection = Connection::open("team_players.db")?;
     connection.execute(
-        "INSERT INTO players VALUES (?1, '?2', '?3')",
+        "INSERT INTO players VALUES (?1, ?2, ?3)",
         params![team_id, first_name, last_name]
     )?;
 
@@ -30,7 +30,7 @@ pub fn can_add(team_id: i64) -> Result<bool, Error>{
     let connection = Connection::open("team_players.db")?;
 
     let count = connection.query_row_and_then(
-        "SELECT COUNT(*) FROM players WHERE rowid = 1?",
+        "SELECT COUNT(*) FROM players WHERE team_id = ?",
         [team_id],
         |row| {
             let count: i64 = row.get(0)?;
@@ -38,5 +38,6 @@ pub fn can_add(team_id: i64) -> Result<bool, Error>{
         },
     )?;
 
-    Ok(count <= 4)
+    println!("Total number of rows = {}", count);
+    Ok(count <= 3)
 }

@@ -5,7 +5,7 @@ use crate::utils::rusqlite_error::Error;
 #[tauri::command]
 pub fn create_team() -> Result<i64, Error> {
     let connection = Connection::open("team_players.db")?;
-    connection.execute("INSERT INTO teams VALUES (NULL, NULL)", ())?;
+    connection.execute("INSERT INTO teams (name, category) VALUES (NULL, NULL)", ())?;
 
     let id: i64 = connection.last_insert_rowid();
 
@@ -16,7 +16,7 @@ pub fn create_team() -> Result<i64, Error> {
 pub fn update_team(name: &str, category: &str, team_id: i64) -> Result<(), Error>{
     let connection = Connection::open("team_players.db")?;
 
-    let mut statement = connection.prepare("UPDATE teams SET name='?1', category='?2', WHERE rowid=?3")?;
+    let mut statement = connection.prepare("UPDATE teams SET name=1?, category=?2, WHERE rowid=?3")?;
     statement.execute(params![name, category, team_id])?;
 
     Ok(())

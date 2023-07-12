@@ -1,7 +1,6 @@
 import React from 'react';
 import { useFormik } from 'formik';
 import {Container, TextField} from '@mui/material';
-import { invoke } from "@tauri-apps/api/tauri";
 import {validationSchema} from "./validations/team_schema";
 import {
     Button,
@@ -12,12 +11,15 @@ import {
 import Grid2 from "@mui/material/Unstable_Grid2";
 import PlayerRegistrationList from "./player_registration";
 
+import { invoke } from "@tauri-apps/api/tauri";
+
+
 
 async function getTeamId(){
     let teamID;
     await invoke('create_team')
         .then((id) => {teamID = id})
-        .catch((error) => {console.log(error)})
+        .catch((error) => {console.error(error)})
 
     return teamID;
 }
@@ -32,12 +34,13 @@ const TeamRegistrationForm = () => {
         },
         validationSchema: validationSchema,
         onSubmit: (values) => {
-            let {teamName, category} = values;
-            invoke("update_team", {name: teamName, category: category, team_id: teamID})
+            let {teamName, teamCategory} = values;
+            console.log(`Team update data: name ${teamName}, category: ${teamCategory}, team id: ${teamID}`)
+            invoke("update_team", {name: teamName, category: teamCategory, teamId: teamID})
                 .then((_) => {
                     alert(JSON.stringify(values, null, 2));
                 })
-                .catch((error) => {console.log(error)});
+                .catch((error) => {console.error(error)});
         },
     });
 

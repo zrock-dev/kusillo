@@ -80,22 +80,27 @@ export default function PlayerRegistrationList({teamID}) {
     const [isDialogOpen, setOpen] = useState(false);
 
     const addPlayerToList = (firstName, lastName) => {
-        invoke('insert_player', {first_name: firstName, last_name: lastName, team_id: teamID})
+        invoke('insert_player', {firstName: firstName, lastName: lastName, teamId: teamID})
             .then((id) => {
                 const newPlayer = { id, firstName, lastName };
                 setPlayers([...players, newPlayer]);
+                handleOpenDialog()
             })
-            .catch((error) => {console.log(error)})
+            .catch((error) => {console.error(error)})
     };
 
     const handleOpenDialog = () => {
-        invoke('can_add', {team_id: teamID})
+        invoke('can_add', {teamId: teamID})
             .then((canAdd) => {
-                if (canAdd){
+                console.log(`canAdd?: ${canAdd}`)
+                if (canAdd === true){
                     setOpen(true);
+                }else {
+                    setOpen(false)
+                    console.log("Max amount of registrable players reached")
                 }
             })
-            .catch((error) => {console.log(error)})
+            .catch((error) => {console.error(error)})
     };
 
     const handleCloseDialog = () => {
@@ -108,7 +113,7 @@ export default function PlayerRegistrationList({teamID}) {
                 const updatedPlayers = players.filter((player) => player.id !== playerID);
                 setPlayers(updatedPlayers);
             })
-            .catch((error) => {console.log(error)})
+            .catch((error) => {console.error(error)})
     };
 
     return (
