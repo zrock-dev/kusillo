@@ -1,20 +1,22 @@
 import React, {useEffect, useState} from 'react';
 import { useFormik } from 'formik';
-import {Container, TextField} from '@mui/material';
 import {validationSchema} from "./validations/team_schema";
+import Grid2 from "@mui/material/Unstable_Grid2";
+import PlayerRegistrationList from "./player_registration";
+import { invoke } from "@tauri-apps/api/tauri";
+import { useNavigate } from "react-router-dom";
 import {
+    Box,
     Button,
     MenuItem,
     Select,
-    Typography
+    Typography,
+    TextField
 } from '@mui/material';
-import Grid2 from "@mui/material/Unstable_Grid2";
-import PlayerRegistrationList from "./player_registration";
-
-import { invoke } from "@tauri-apps/api/tauri";
 
 
-const TeamRegistrationForm = () => {
+export default function TeamRegistrationForm() {
+    const navigate = useNavigate();
     const [teamIdentifier, setTeamIdentifier] = useState(-1);
 
     useEffect(() => {
@@ -24,11 +26,10 @@ const TeamRegistrationForm = () => {
                 setTeamIdentifier(id);
             } catch (error) {
                 console.error(error);
-                setTeamIdentifier(-1);
+                navigate("/error")
             }
         };
         fetchData();
-        console.log(`Team ID from team_registration: ${teamIdentifier}`)
     }, []);
 
     async function submitToDatabase(values){
@@ -38,6 +39,7 @@ const TeamRegistrationForm = () => {
                 let {teamName, teamCategory} = values;
                 await invoke("update_team", {name: teamName, category: teamCategory, teamId: teamIdentifier});
                 console.log("Successful update");
+                navigate("/");
             }else {
                 console.log("The team does not meet the required amount of players")
             }
@@ -58,12 +60,15 @@ const TeamRegistrationForm = () => {
 
     const handleCancel = () => {
         invoke('cancel_registration', {teamId: teamIdentifier})
-            .then((_) => {console.log("Entry has been deleted!!!")})
+            .then((_) => {
+                console.log("Entry has been deleted!!!")
+                navigate("/");
+            })
             .catch((error) => {console.error(error)});
     }
 
     return (
-        <Container>
+        <Box sx={{ display: 'flex' }}>
             <Typography variant="h3">Team Registration Form</Typography>
             <form onSubmit={handleSubmit}>
                 <Grid2 container spacing={2}>
@@ -100,7 +105,7 @@ const TeamRegistrationForm = () => {
                 </Grid2>
 
                 <Grid2 xs={12}>
-                    <PlayerRegistrationList id = {teamIdentifier} />
+                    <PlayerRegistrationList id = { teamIdentifier } />
                 </Grid2>
 
                 <Grid2 xs={8}>
@@ -112,8 +117,6 @@ const TeamRegistrationForm = () => {
                     </Button>
                 </Grid2>
             </form>
-        </Container>
+        </Box>
     );
 };
-
-export default TeamRegistrationForm;
