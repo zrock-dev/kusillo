@@ -3,7 +3,7 @@ use crate::utils::rusqlite_error::Error;
 
 
 #[tauri::command]
-pub fn insert_team() -> Result<i64, Error> {
+pub fn create_team() -> Result<i64, Error> {
     let connection = Connection::open("team_players.db")?;
     connection.execute("INSERT INTO teams VALUES (NULL, NULL)", ())?;
 

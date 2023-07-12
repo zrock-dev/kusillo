@@ -13,11 +13,18 @@ import Grid2 from "@mui/material/Unstable_Grid2";
 import PlayerRegistrationList from "./player_registration";
 
 
-async function save_team(teamName: String, teamCategory: String){
-    await invoke("save_team", {name: teamName, category: teamCategory})
+async function getTeamId(){
+    let teamID;
+    await invoke('create_team')
+        .then((id) => {teamID = id})
+        .catch((error) => {console.log(error)})
+
+    return teamID;
 }
 
 const TeamRegistrationForm = () => {
+    const teamID = getTeamId();
+
     const {values, handleBlur, touched, errors, handleSubmit, handleChange} = useFormik({
         initialValues: {
             teamName: '',
@@ -25,7 +32,12 @@ const TeamRegistrationForm = () => {
         },
         validationSchema: validationSchema,
         onSubmit: (values) => {
-            alert(JSON.stringify(values, null, 2));
+            let {teamName, category} = values;
+            invoke("update_team", {name: teamName, category: category, team_id: teamID})
+                .then((_) => {
+                    alert(JSON.stringify(values, null, 2));
+                })
+                .catch((error) => {console.log(error)});
         },
     });
 
@@ -67,7 +79,7 @@ const TeamRegistrationForm = () => {
                 </Grid2>
 
                 <Grid2 xs={12}>
-                    <PlayerRegistrationList />
+                    <PlayerRegistrationList teamID={1} />
                 </Grid2>
 
                 <Grid2 xs={4}>

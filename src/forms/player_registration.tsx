@@ -17,6 +17,9 @@ import { useFormik } from "formik";
 import { validationSchema } from "./validations/player_schema";
 import { Delete } from '@mui/icons-material';
 
+import { invoke } from "@tauri-apps/api/tauri";
+
+
 const PlayerForm = ({ addPlayer, handleCancel }) => {
     const { values, handleBlur, touched, errors, handleSubmit, handleChange } = useFormik({
         initialValues: {
@@ -72,28 +75,40 @@ const PlayerForm = ({ addPlayer, handleCancel }) => {
     )
 };
 
-export default function PlayerRegistrationList() {
+export default function PlayerRegistrationList({teamID}) {
     const [players, setPlayers] = useState([]);
     const [isDialogOpen, setOpen] = useState(false);
 
     const addPlayerToList = (firstName, lastName) => {
-        const id = players.length + 1;
-        const newPlayer = { id, firstName, lastName };
-        setPlayers([...players, newPlayer]);
+        invoke('insert_player', {first_name: firstName, last_name: lastName, team_id: teamID})
+            .then((id) => {
+                const newPlayer = { id, firstName, lastName };
+                setPlayers([...players, newPlayer]);
+            })
+            .catch((error) => {console.log(error)})
     };
 
     const handleOpenDialog = () => {
-        setOpen(true);
+        invoke('can_add', {team_id: teamID})
+            .then((canAdd) => {
+                if (canAdd){
+                    setOpen(true);
+                }
+            })
+            .catch((error) => {console.log(error)})
     };
 
     const handleCloseDialog = () => {
         setOpen(false);
     };
 
-    const handleRemovePlayer = (id) => {
-        const updatedPlayers = players.filter((player) => player.id !== id);
-        setPlayers(updatedPlayers);
-        console.log('Delete player with ID:', id);
+    const handleRemovePlayer = (playerID) => {
+        invoke('remove_player', {id: playerID})
+            .then((_) => {
+                const updatedPlayers = players.filter((player) => player.id !== playerID);
+                setPlayers(updatedPlayers);
+            })
+            .catch((error) => {console.log(error)})
     };
 
     return (
