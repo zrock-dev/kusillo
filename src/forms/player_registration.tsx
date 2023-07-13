@@ -11,7 +11,9 @@ import {
     ListItemText,
     TextField,
     Typography,
-    Button
+    Button,
+    Stack,
+    Paper
 } from "@mui/material";
 import { useFormik } from "formik";
 import { validationSchema } from "./validations/player_schema";
@@ -19,7 +21,9 @@ import { Delete } from '@mui/icons-material';
 
 import { invoke } from "@tauri-apps/api/tauri";
 import { enqueueSnackbar } from 'notistack';
-
+import Divider from "@mui/material/Divider";
+import Box from "@mui/material/Box";
+import Grid2 from "@mui/material/Unstable_Grid2";
 
 
 const PlayerForm = ({ addPlayer, handleCancel }) => {
@@ -31,6 +35,7 @@ const PlayerForm = ({ addPlayer, handleCancel }) => {
         validationSchema: validationSchema,
         onSubmit: (values, { resetForm }) => {
             addPlayer(values.playerFirstName, values.playerLastName);
+            enqueueSnackbar(`Player ${values.playerFirstName} added`, {variant: "info"})
             resetForm();
         },
     });
@@ -41,37 +46,59 @@ const PlayerForm = ({ addPlayer, handleCancel }) => {
                 <DialogContentText>
                     Fill in the following fields to register a player.
                 </DialogContentText>
-                <TextField
-                    id="playerFirstName"
-                    name="playerFirstName"
-                    label="Player first name"
-                    type="text"
-                    value={values.playerFirstName}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={touched.playerFirstName && Boolean(errors.playerFirstName)}
-                    helperText={touched.playerFirstName && errors.playerFirstName}
-                />
+                <Divider/>
+                <Box
+                    sx={{
+                        height: 250,
+                        alignItems: 'center',
+                    }}
+                >
+                    <Stack
+                        direction="column"
+                        justifyContent="space-evenly"
+                        spacing={2}
+                    >
+                        <TextField
+                            id="playerFirstName"
+                            name="playerFirstName"
+                            label="First name"
+                            type="text"
+                            value={values.playerFirstName}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.playerFirstName && Boolean(errors.playerFirstName)}
+                            helperText={touched.playerFirstName && errors.playerFirstName}
+                        />
 
-                <TextField
-                    id="playerLastName"
-                    name="playerLastName"
-                    label="Player Last Name"
-                    type="text"
-                    value={values.playerLastName}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={touched.playerLastName && Boolean(errors.playerLastName)}
-                    helperText={touched.playerLastName && errors.playerLastName}
-                />
+                        <TextField
+                            id="playerLastName"
+                            name="playerLastName"
+                            label="Last Name"
+                            type="text"
+                            value={values.playerLastName}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.playerLastName && Boolean(errors.playerLastName)}
+                            helperText={touched.playerLastName && errors.playerLastName}
+                        />
+                    </Stack>
+                </Box>
             </DialogContent>
+            <Divider/>
             <DialogActions>
+                <Stack
+                    direction="row"
+                    justifyContent="flex-end"
+                    alignItems="center"
+                    spacing={4}
+                >
                 <Button onClick={handleCancel} variant="outlined">
-                    Cancel
+                    Close
                 </Button>
                 <Button type="submit" variant="contained" color="primary">
                     Add Player
                 </Button>
+                </Stack>
             </DialogActions>
         </form>
     )
@@ -124,38 +151,55 @@ export default function PlayerRegistrationList({ id }) {
     };
 
     return (
-        <div>
-            <Typography variant="h5">Registered Players:</Typography>
+        <Grid2>
+            <Grid2>
+                <Typography variant="h5">Registered Players:</Typography>
+                <Button variant="contained" color="primary" onClick={handleOpenDialog}>
+                    Add Player
+                </Button>
+            </Grid2>
 
-            <Button variant="contained" color="primary" onClick={handleOpenDialog}>
-                Add Player
-            </Button>
-
-            <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
+            <Dialog
+                fullWidth={true}
+                maxWidth={"sm"}
+                open={isDialogOpen}
+                onClose={handleCloseDialog}
+            >
                 <DialogTitle>Player Registration</DialogTitle>
                 <PlayerForm addPlayer={addPlayerToList} handleCancel={handleCloseDialog} />
             </Dialog>
 
-            <List>
-                {players.map((player) => (
-                    <ListItem
-                        key={player.id}
-                        secondaryAction={
-                            <IconButton
-                                edge="end"
-                                aria-label="delete"
-                                onClick={() => handleRemovePlayer(player.id)}
+            <Grid2>
+                <Box
+                    sx={{
+                        height: 500,
+                        alignItems: 'center',
+                    }}
+                >
+                    <Paper elevation={24}>
+                    <List>
+                        {players.map((player) => (
+                            <ListItem
+                                key={player.id}
+                                secondaryAction={
+                                    <IconButton
+                                        edge="end"
+                                        aria-label="delete"
+                                        onClick={() => handleRemovePlayer(player.id)}
+                                    >
+                                        <Delete />
+                                    </IconButton>
+                                }
                             >
-                                <Delete />
-                            </IconButton>
-                        }
-                    >
-                        <ListItemText
-                            primary={`${player.firstName} ${player.lastName}`}
-                        />
-                    </ListItem>
-                ))}
-            </List>
-        </div>
+                                <ListItemText
+                                    primary={`${player.firstName} ${player.lastName}`}
+                                />
+                            </ListItem>
+                        ))}
+                    </List>
+                    </Paper>
+                </Box>
+            </Grid2>
+        </Grid2>
     );
 }

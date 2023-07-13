@@ -23,7 +23,6 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import {useState} from "react";
-import {SnackbarProvider} from "notistack";
 
 
 const drawerWidth = 240;
@@ -38,7 +37,7 @@ const Main = ({ open }) => {
                 marginLeft: open ? drawerWidth : 0,
             }}
         >
-            <div style={{ marginTop: '64px' }}>
+            <div style={{ marginTop: '70px' }}>
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/team-form" element={<TeamRegistrationForm />} />
@@ -78,6 +77,30 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     ...theme.mixins.toolbar,
     justifyContent: 'flex-end',
 }));
+
+const DrawerItems = () => {
+    return (
+        <List>
+            <ListItem key={"register"} disablePadding>
+                <ListItemButton component={Link} to={"/team-form"}>
+                    <ListItemIcon>
+                        <InboxIcon />
+                    </ListItemIcon>
+                    <ListItemText primary={"Register"} />
+                </ListItemButton>
+            </ListItem>
+
+            <ListItem key={"home"} disablePadding>
+                <ListItemButton component={Link} to={"/"}>
+                    <ListItemIcon>
+                        <InboxIcon />
+                    </ListItemIcon>
+                    <ListItemText primary={"Home"} />
+                </ListItemButton>
+            </ListItem>
+        </List>
+    );
+}
 
 function App() {
     const theme = useTheme();
@@ -130,25 +153,7 @@ function App() {
                       </IconButton>
                   </DrawerHeader>
                   <Divider />
-                  <List>
-                      <ListItem key={"register"} disablePadding>
-                          <ListItemButton component={Link} to={"/team-form"}>
-                              <ListItemIcon>
-                                  <InboxIcon />
-                              </ListItemIcon>
-                              <ListItemText primary={"Register"} />
-                          </ListItemButton>
-                      </ListItem>
-
-                      <ListItem key={"home"} disablePadding>
-                          <ListItemButton component={Link} to={"/"}>
-                              <ListItemIcon>
-                                  <InboxIcon />
-                              </ListItemIcon>
-                              <ListItemText primary={"Home"} />
-                          </ListItemButton>
-                      </ListItem>
-                  </List>
+                  <DrawerItems/>
               </Drawer>
               <Main open={open} />
           </Box>

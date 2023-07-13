@@ -6,12 +6,11 @@ import PlayerRegistrationList from "./player_registration";
 import { invoke } from "@tauri-apps/api/tauri";
 import { useNavigate } from "react-router-dom";
 import {
-    Box,
     Button,
     MenuItem,
     Select,
     Typography,
-    TextField
+    TextField, Container, Stack
 } from '@mui/material';
 
 import { enqueueSnackbar } from 'notistack';
@@ -78,55 +77,67 @@ export default function TeamRegistrationForm() {
     }
 
     return (
-        <Box sx={{ display: 'flex' }}>
+        <Container>
             <Typography variant="h3">Team Registration Form</Typography>
             <form onSubmit={handleSubmit}>
-                <Grid2 container spacing={2}>
-                    <Grid2 xs={6}>
-                        <TextField
-                            fullWidth
-                            id="teamName"
-                            name="teamName"
-                            label="Team Name"
-                            type="text"
-                            value={values.teamName}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            error={touched.teamName && Boolean(errors.teamName)}
-                            helperText={touched.teamName && errors.teamName}
-                        />
-                    </Grid2>
-                    <Grid2 xs={6}>
-                        <Select
-                            id="teamCategory"
-                            name="teamCategory"
-                            label="Category"
-                            type="text"
-                            value={values.teamCategory}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            error={touched.teamCategory && Boolean(errors.teamCategory)}
-                            // helperText={touched.teamCategory && errors.teamCategory}
+                <Grid2>
+                    <Grid2 xs={12}>
+                        <Stack
+                            direction="row"
+                            justifyContent="flex-end"
+                            alignItems="center"
+                            spacing={4}
                         >
-                            <MenuItem value={"First"}>First</MenuItem>
-                            <MenuItem value={"Second"}>Second</MenuItem>
-                        </Select>
+                            <TextField
+                                fullWidth
+                                id="teamName"
+                                name="teamName"
+                                label="Team Name"
+                                type="text"
+                                value={values.teamName}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                error={touched.teamName && Boolean(errors.teamName)}
+                                helperText={touched.teamName && errors.teamName}
+                            />
+                            <Select
+                                id="teamCategory"
+                                name="teamCategory"
+                                label="Category"
+                                type="text"
+                                value={values.teamCategory}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                error={touched.teamCategory && Boolean(errors.teamCategory)}
+                                // helperText={touched.teamCategory && errors.teamCategory}
+                            >
+                                <MenuItem value={"First"}>First</MenuItem>
+                                <MenuItem value={"Second"}>Second</MenuItem>
+                            </Select>
+                        </Stack>
                     </Grid2>
-                </Grid2>
 
-                <Grid2 xs={12}>
-                    <PlayerRegistrationList id = { teamIdentifier } />
-                </Grid2>
+                    <Grid2>
+                        <PlayerRegistrationList id = { teamIdentifier } />
+                    </Grid2>
 
-                <Grid2 xs={8}>
-                    <Button  color="primary" variant="contained" onClick={handleCancel}>
-                        Cancel
-                    </Button>
-                    <Button color="primary" variant="contained" type="submit">
-                        Submit
-                    </Button>
+                    <Grid2 xs={12}>
+                        <Stack
+                            direction="row"
+                            justifyContent="flex-end"
+                            alignItems="center"
+                            spacing={4}
+                        >
+                            <Button  color="primary" variant="contained" onClick={handleCancel}>
+                                Cancel
+                            </Button>
+                            <Button color="primary" variant="contained" type="submit">
+                                Submit
+                            </Button>
+                        </Stack>
+                    </Grid2>
                 </Grid2>
             </form>
-        </Box>
+        </Container>
     );
 };
