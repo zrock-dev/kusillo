@@ -1,11 +1,12 @@
 use rusqlite::{Connection, params};
+use crate::database::registration::creation::{PERM_TEAM_PLAYERS, TEMP_TEAM_PLAYERS};
 use crate::database::utils::data::{Player};
 use crate::utils::rusqlite_error::Error;
 
 
 #[tauri::command]
 pub fn create_team() -> Result<i64, Error> {
-    let connection = Connection::open("temp_team_players.db")?;
+    let connection = Connection::open(TEMP_TEAM_PLAYERS)?;
 
     let count = connection.query_row_and_then(
         "SELECT COUNT(*) FROM teams",
@@ -29,7 +30,7 @@ pub fn create_team() -> Result<i64, Error> {
 
 #[tauri::command]
 pub fn update_team(name: &str, category: &str, team_id: isize) -> Result<(), Error>{
-    let temp_db_conn = Connection::open("temp_team_players.db")?;
+    let temp_db_conn = Connection::open(TEMP_TEAM_PLAYERS)?;
     entry_exists(&temp_db_conn, team_id)?;
 
     let mut statement = temp_db_conn.prepare("SELECT first_name, last_name FROM players WHERE team_id = ?1")?;
@@ -44,7 +45,7 @@ pub fn update_team(name: &str, category: &str, team_id: isize) -> Result<(), Err
     )?;
     cleanup(&temp_db_conn)?;
 
-    let db_conn = Connection::open("team_players.db")?;
+    let db_conn = Connection::open(PERM_TEAM_PLAYERS)?;
     db_conn.execute(
         "INSERT INTO teams (name, category) VALUES (?1, ?2)",
         [name, category]
@@ -64,7 +65,7 @@ pub fn update_team(name: &str, category: &str, team_id: isize) -> Result<(), Err
 
 #[tauri::command]
 pub fn cancel_registration(team_id: isize)-> Result<(), Error>{
-    let connection = Connection::open("temp_team_players.db")?;
+    let connection = Connection::open(TEMP_TEAM_PLAYERS)?;
 
     entry_exists(&connection, team_id)?;
     connection.execute("DELETE FROM players WHERE team_id = ?1", [team_id])?;
@@ -75,7 +76,7 @@ pub fn cancel_registration(team_id: isize)-> Result<(), Error>{
 
 #[tauri::command]
 pub fn can_append_player(team_id: isize) -> Result<bool, Error>{
-    let connection = Connection::open("temp_team_players.db")?;
+    let connection = Connection::open(TEMP_TEAM_PLAYERS)?;
     entry_exists(&connection, team_id)?;
     let players_amount = count_players(&connection, team_id)?;
     Ok(players_amount < 4) 
@@ -83,7 +84,7 @@ pub fn can_append_player(team_id: isize) -> Result<bool, Error>{
 
 #[tauri::command]
 pub fn can_submit_team(team_id: isize) -> Result<bool, Error>{
-    let connection = Connection::open("temp_team_players.db")?;
+    let connection = Connection::open(TEMP_TEAM_PLAYERS)?;
     entry_exists(&connection, team_id)?;
     let players_amount = count_players(&connection, team_id)?;
     Ok(players_amount >= 2 && players_amount <= 4)

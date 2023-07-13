@@ -1,4 +1,3 @@
-pub mod teams;
-pub mod creation;
-pub mod players;
+pub mod registration;
+
 mod utils;

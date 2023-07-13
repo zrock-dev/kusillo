@@ -1,4 +1,6 @@
 use rusqlite::{Connection, Error, Result};
+pub const TEMP_TEAM_PLAYERS : &str = "temp_team_players.db";
+pub const PERM_TEAM_PLAYERS : &str = "team_players.db";
 
 fn create_table(connection: &Connection, statement: &str) -> Result<(), Error>{
     connection.execute(statement, ())?;
