@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { useFormik } from 'formik';
 import {validationSchema} from "./validations/team_schema";
 import Grid2 from "@mui/material/Unstable_Grid2";
@@ -18,6 +18,7 @@ import {
 export default function TeamRegistrationForm() {
     const navigate = useNavigate();
     const [teamIdentifier, setTeamIdentifier] = useState(-1);
+    const hasRequested = useRef(true);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -29,12 +30,17 @@ export default function TeamRegistrationForm() {
                 navigate("/error")
             }
         };
-        fetchData();
+
+        if (hasRequested.current){
+            hasRequested.current = false;
+            fetchData();
+        }
     }, []);
 
     async function submitToDatabase(values){
         try {
             let can_submit = await invoke("can_submit_team", {teamId: teamIdentifier});
+
             if (can_submit) {
                 let {teamName, teamCategory} = values;
                 await invoke("update_team", {name: teamName, category: teamCategory, teamId: teamIdentifier});
