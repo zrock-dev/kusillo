@@ -18,6 +18,8 @@ import { validationSchema } from "./validations/player_schema";
 import { Delete } from '@mui/icons-material';
 
 import { invoke } from "@tauri-apps/api/tauri";
+import { enqueueSnackbar } from 'notistack';
+
 
 
 const PlayerForm = ({ addPlayer, handleCancel }) => {
@@ -86,22 +88,23 @@ export default function PlayerRegistrationList({ id }) {
                 setPlayers([...players, newPlayer]);
                 handleOpenDialog()
             })
-            .catch((error) => {console.error(error)})
+            .catch((error) => {
+                enqueueSnackbar(`${error}`, {variant: "error"})
+            })
     };
 
     const handleOpenDialog = () => {
-        console.log(`Team ID to verify: ${id}`)
         invoke('can_append_player', {teamId: id})
             .then((canAdd) => {
                 if (canAdd == true){
                     setOpen(true);
                 }else {
                     setOpen(false)
-                    console.log("Unable to add players")
+                    enqueueSnackbar("Max amount of players reached", {variant: "warning"})
                 }
             })
             .catch((error) => {
-                console.error(error)
+                enqueueSnackbar(`${error}`, {variant: "error"})
             })
     };
 
@@ -115,7 +118,9 @@ export default function PlayerRegistrationList({ id }) {
                 const updatedPlayers = players.filter((player) => player.id !== playerID);
                 setPlayers(updatedPlayers);
             })
-            .catch((error) => {console.error(error)})
+            .catch((error) => {
+                enqueueSnackbar(`${error}`, {variant: "error"})
+            })
     };
 
     return (

@@ -14,6 +14,8 @@ import {
     TextField
 } from '@mui/material';
 
+import { enqueueSnackbar } from 'notistack';
+
 
 export default function TeamRegistrationForm() {
     const navigate = useNavigate();
@@ -26,7 +28,7 @@ export default function TeamRegistrationForm() {
                 const id: number = await invoke('create_team');
                 setTeamIdentifier(id);
             } catch (error) {
-                console.error(error);
+                enqueueSnackbar(`${error}`, {variant: "error"})
                 navigate("/error")
             }
         };
@@ -44,14 +46,14 @@ export default function TeamRegistrationForm() {
             if (can_submit) {
                 let {teamName, teamCategory} = values;
                 await invoke("update_team", {name: teamName, category: teamCategory, teamId: teamIdentifier});
-                console.log("Successful update");
+                enqueueSnackbar(`Team: ${teamName}, has been registered`, {variant: "info"})
                 navigate("/");
             }else {
-                console.log("The team does not meet the required amount of players")
+                enqueueSnackbar("Team size is invalid", {variant: "warning"})
             }
         }
         catch (error){
-            console.error(error);
+            enqueueSnackbar(`${error}`, {variant: "error"})
         }
     }
 
@@ -67,10 +69,12 @@ export default function TeamRegistrationForm() {
     const handleCancel = () => {
         invoke('cancel_registration', {teamId: teamIdentifier})
             .then((_) => {
-                console.log("Entry has been deleted!!!")
+                enqueueSnackbar("Entry has been deleted", {variant: "warning"})
                 navigate("/");
             })
-            .catch((error) => {console.error(error)});
+            .catch((error) => {
+                enqueueSnackbar(`${error}`, {variant: "error"})
+            });
     }
 
     return (

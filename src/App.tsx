@@ -23,6 +23,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import {useState} from "react";
+import {SnackbarProvider} from "notistack";
 
 
 const drawerWidth = 240;
