@@ -5,11 +5,13 @@ mod registration;
 mod database;
 mod utils;
 
+use database::creation::create_db;
 use database::teams;
 use database::players;
 
 fn main() {
-    database::creation::create_persistent_db().expect("Could not create database");
+    create_db("temp_team_players.db");
+    create_db("team_players.db");
 
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![

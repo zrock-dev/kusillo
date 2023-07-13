@@ -1,12 +1,14 @@
-use rusqlite::{Connection, Result};
-use crate::utils::rusqlite_error::Error;
+use rusqlite::{Connection, Error, Result};
 
-fn create_table(connection: &Connection, statement: &str) -> Result<usize>{
-    connection.execute(statement, ())
+fn create_table(connection: &Connection, statement: &str) -> Result<(), Error>{
+    connection.execute(statement, ())?;
+    Ok(())
 }
 
-pub fn create_persistent_db() -> Result<(), Error>{
-    let connection = Connection::open("team_players.db")?;
+pub fn create_db(name: &str){
+    let connection = Connection::open(name)
+        .expect(&format!("Unable to create a database for: {}", name));
+    
     create_table(
         &connection,
         "CREATE TABLE IF NOT EXISTS players (
@@ -15,7 +17,7 @@ pub fn create_persistent_db() -> Result<(), Error>{
             last_name TEXT NULL,
             FOREIGN KEY (team_id) REFERENCES teams (rowid)
         )"
-    )?;
+    ).expect(&format!("Unable to create table teams for database {}", name));
 
     create_table(
         &connection,
@@ -24,7 +26,5 @@ pub fn create_persistent_db() -> Result<(), Error>{
             name TEXT NULL,
             category TEXT NULL
         )"
-    )?;
-
-    Ok(())
+    ).expect(&format!("Unable to create table players for database {}", name));
 }
