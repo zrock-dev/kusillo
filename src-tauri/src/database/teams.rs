@@ -17,8 +17,7 @@ pub fn create_team() -> Result<i64, Error> {
     )?;
 
     if count != 0 {
-        connection.execute("DELETE FROM teams", ())?;
-        connection.execute("DELETE FROM players", ())?;
+        cleanup(&connection)?;
     }
 
     connection.execute("INSERT INTO teams (name, category) VALUES (NULL, NULL)", ())?;
@@ -33,7 +32,7 @@ pub fn update_team(name: &str, category: &str, team_id: isize) -> Result<(), Err
     let temp_db_conn = Connection::open("temp_team_players.db")?;
     entry_exists(&temp_db_conn, team_id)?;
 
-    let mut statement = temp_db_conn.prepare("SELECT first_name, last_name FROM players WHERE team_id = ?")?;
+    let mut statement = temp_db_conn.prepare("SELECT first_name, last_name FROM players WHERE team_id = ?1")?;
     let players = statement.query_map(
         params![team_id],
         |row|{
@@ -43,6 +42,7 @@ pub fn update_team(name: &str, category: &str, team_id: isize) -> Result<(), Err
             })
         }
     )?;
+    cleanup(&temp_db_conn)?;
 
     let db_conn = Connection::open("team_players.db")?;
     db_conn.execute(
@@ -86,7 +86,7 @@ pub fn can_submit_team(team_id: isize) -> Result<bool, Error>{
     let connection = Connection::open("temp_team_players.db")?;
     entry_exists(&connection, team_id)?;
     let players_amount = count_players(&connection, team_id)?;
-    Ok(players_amount >= 2 && players_amount <= 4) 
+    Ok(players_amount >= 2 && players_amount <= 4)
 }
 
 fn entry_exists(connection: &Connection, team_id: isize) -> Result<bool, Error>{
@@ -106,7 +106,7 @@ fn entry_exists(connection: &Connection, team_id: isize) -> Result<bool, Error>{
     }
 }
 
-fn count_players(connection: &Connection, team_id: isize)-> Result<i64, Error>{
+fn count_players(connection: &Connection, team_id: isize) -> Result<i64, Error>{
     let count = connection.query_row_and_then(
         "SELECT COUNT(*) FROM players WHERE team_id = ?",
         [team_id],
@@ -118,3 +118,9 @@ fn count_players(connection: &Connection, team_id: isize)-> Result<i64, Error>{
 
     Ok(count)
 }
+
+fn cleanup(connection: &Connection) -> Result<(), Error>{
+    connection.execute("DELETE FROM players", ())?;
+    connection.execute("DELETE FROM teams", ())?;
+    Ok(())
+} 
