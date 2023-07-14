@@ -100,12 +100,12 @@ const DrawerItems = () => {
                 </ListItemButton>
             </ListItem>
 
-            <ListItem key={"home"} disablePadding>
+            <ListItem key={"match"} disablePadding>
                 <ListItemButton component={Link} to={"/match"}>
                     <ListItemIcon>
                         <InboxIcon />
                     </ListItemIcon>
-                    <ListItemText primary={"Home"} />
+                    <ListItemText primary={"Match"} />
                 </ListItemButton>
             </ListItem>
         </List>

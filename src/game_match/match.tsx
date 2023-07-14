@@ -45,7 +45,7 @@ export default function Match(){
             .catch((error) => {
                 console.error(error);
                 enqueueSnackbar(`${error.toString()}`, {variant: "error"})
-                navigate("/error")
+                // navigate("/error")
             })
     }
 
@@ -53,7 +53,7 @@ export default function Match(){
     return(
         <Side
             team_id={teamAId}
-            handleSetUpdate={handleStageUpdate}
+            handleStageUpdate={handleStageUpdate}
         />
     );
 }

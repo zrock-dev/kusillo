@@ -1,17 +1,19 @@
 import * as React from 'react';
-import { ReactElement, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { enqueueSnackbar } from "notistack";
 import { useNavigate } from "react-router-dom";
 import { invoke } from "@tauri-apps/api/tauri";
 import { Button, ButtonGroup, Container } from "@mui/material";
 import Box from "@mui/material/Box";
 
-function checkButtons(buttons, checkFn, currentScore) {
-    for (let interaction = 1; interaction < 4; interaction++) {
-        if (!checkFn(interaction, currentScore)) {
-            buttons[interaction](false);
+function checkButtons(buttonEnabledSetters, checkFn, currentScore) {
+    buttonEnabledSetters.forEach((buttonEnabledFn) => {
+        for (let interaction = 1; interaction < 4; interaction++) {
+            if (!checkFn(interaction, currentScore)) {
+                buttonEnabledFn(false);
+            }
         }
-    }
+    });
 }
 
 function createButtons(variants, interactionFn) {
@@ -20,8 +22,10 @@ function createButtons(variants, interactionFn) {
             key={index}
             disabled={isDisabled}
             onClick={() => interactionFn(value)}
-            data-value={value} // Save the value as a data attribute
-        />
+            data-value={value}
+        >
+            {value}
+        </Button>
     ));
 }
 
@@ -29,8 +33,7 @@ function ButtonGroupWrapper({ buttons, interactionFn }) {
     return (
         <ButtonGroup
             orientation="vertical"
-            aria-label="vertical contained button group"
-            variant="text"
+            variant="contained"
         >
             {createButtons(buttons, interactionFn)}
         </ButtonGroup>
@@ -75,7 +78,6 @@ export default function Side({ team_id, handleStageUpdate }) {
             .catch((error) => {
                 console.error(error);
                 enqueueSnackbar(`${error.toString()}`, { variant: "error" });
-                navigate("/error");
             });
     }, [score]);
 
@@ -102,9 +104,9 @@ export default function Side({ team_id, handleStageUpdate }) {
             <ButtonGroupWrapper buttons={upButtons} interactionFn={handleInteraction} />
             <ButtonGroupWrapper buttons={downButtons} interactionFn={handleInteraction} />
 
-            <Box>{score}</Box>
-            <Box>{stage}</Box>
-            
+            <Box>SCORE: {score}</Box>
+            <Box>SET: {stage}</Box>
+
         </Container>
     );
 }
