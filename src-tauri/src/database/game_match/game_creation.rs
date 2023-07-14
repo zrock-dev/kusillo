@@ -8,25 +8,29 @@ pub fn create_game_db(){
     
     create_table(
         &connection,
-        "CREATE TABLE IF NOT EXISTS match (team_a_id INTEGER NOT NULL, team_b_id INTEGER NOT NULL)"
+        "CREATE TABLE IF NOT EXISTS game (
+                    rowid INTEGER NOT NULL PRIMARY KEY,
+                    team_a_id INTEGER NOT NULL,
+                    team_b_id INTEGER NOT NULL
+                )"
     );
 
     create_table(
         &connection,
         "CREATE TABLE IF NOT EXISTS score (
-                    match_id INTEGER NOT NULL,
+                    game_id INTEGER NOT NULL,
                     set_number INTEGER NOT NULL,
                     score_points INTEGER NOT NULL,
                     team_id INTEGER NOT NULL,
                     timestamp datetime NOT NULL,
-                    FOREIGN KEY(match_id) REFERENCES match(rowid)  	
+                    FOREIGN KEY (game_id) REFERENCES game (rowid)
                 )"
     );
 
     create_table(
         &connection,
         "CREATE TABLE IF NOT EXISTS winners (
-            match_id integer NOT NULL,
+            game_id integer NOT NULL,
             team_id integer NOT NULL
         )"
     );
