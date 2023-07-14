@@ -1,5 +1,5 @@
 use rusqlite::{Connection, params};
-use crate::database::registration::creation::{PERM_TEAM_PLAYERS, TEMP_TEAM_PLAYERS};
+use crate::database::registration::table_player_creation::{PERM_TEAM_PLAYERS, TEMP_TEAM_PLAYERS};
 use crate::database::utils::data::{Player};
 use crate::utils::rusqlite_error::Error;
 

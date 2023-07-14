@@ -1,5 +1,5 @@
 use rusqlite::Connection;
-use crate::database::game_match::creation::GAME_DATABASE;
+use crate::database::game_match::game_creation::GAME_DATABASE;
 use crate::utils::rusqlite_error::Error;
 
 #[derive(serde::Serialize)]

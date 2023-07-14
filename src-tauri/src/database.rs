@@ -1,6 +1,6 @@
-use crate::database::registration::creation::{PERM_TEAM_PLAYERS, TEMP_TEAM_PLAYERS};
-use crate::database::registration::creation::create_db;
-use crate::database::game_match::creation::create_game_db;
+use crate::database::registration::table_player_creation::{PERM_TEAM_PLAYERS, TEMP_TEAM_PLAYERS};
+use crate::database::registration::table_player_creation::create_db;
+use crate::database::game_match::game_creation::create_game_db;
 
 pub mod registration;
 pub mod game_match;

@@ -1,4 +1,3 @@
-use std::fmt::format;
 use rusqlite::Connection;
 use crate::database::utils::create_table;
 
@@ -20,7 +19,7 @@ pub fn create_game_db(){
                     set_number INTEGER NOT NULL,
                     score_points INTEGER NOT NULL,
                     team_id INTEGER NOT NULL,
-                    timestamp datetime NOT NULL
+                    timestamp datetime NOT NULL,
                     FOREIGN KEY(match_id) REFERENCES match(rowid)  	
                 )"
     );
