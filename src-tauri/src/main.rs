@@ -6,7 +6,7 @@ mod utils;
 
 use database::registration::teams;
 use database::registration::players;
-use database::game_match::game;
+use database::game_match::game_commands;
 
 
 fn main() {
@@ -21,10 +21,11 @@ fn main() {
             teams::can_submit_team,
             players::insert_player,
             players::remove_player,
-            game::make_match,
-            game::request_contenders,
-            game::record_interaction,
-            game::request_configuration
+            game_commands::make_match,
+            game_commands::request_contenders,
+            game_commands::record_interaction,
+            game_commands::request_configuration,
+            game_commands::is_game_won
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

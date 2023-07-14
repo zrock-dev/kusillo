@@ -23,5 +23,12 @@ pub fn create_game_db(){
                     FOREIGN KEY(match_id) REFERENCES match(rowid)  	
                 )"
     );
-}
 
+    create_table(
+        &connection,
+        "CREATE TABLE IF NOT EXISTS winners (
+            match_id integer NOT NULL,
+            team_id integer NOT NULL
+        )"
+    );
+}
