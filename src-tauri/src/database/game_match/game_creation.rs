@@ -1,3 +1,4 @@
+use std::fmt::format;
 use rusqlite::Connection;
 use crate::database::utils::create_table;
 
@@ -10,7 +11,7 @@ pub fn create_game_db(){
     create_table(
         &connection,
         "CREATE TABLE IF NOT EXISTS match (team_a_id INTEGER NOT NULL, team_b_id INTEGER NOT NULL)"
-    ).expect(&format!("Unable to create table match for database {}", GAME_DATABASE));
+    );
 
     create_table(
         &connection,
@@ -22,5 +23,6 @@ pub fn create_game_db(){
                     timestamp datetime NOT NULL
                     FOREIGN KEY(match_id) REFERENCES match(rowid)  	
                 )"
-    ).expect(&format!("Unable to create table game for database {}", GAME_DATABASE));
+    );
 }
+

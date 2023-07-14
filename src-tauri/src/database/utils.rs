@@ -7,3 +7,4 @@ pub fn create_table(connection: &Connection, statement: &str) -> Result<(), Erro
     connection.execute(statement, ())?;
     Ok(())
 }
+

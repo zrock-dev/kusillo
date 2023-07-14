@@ -46,3 +46,4 @@ pub fn record_interaction(set_number: i64, team_id: i64, score_points: i64) -> R
 
     Ok(())
 }
+

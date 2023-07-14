@@ -17,7 +17,7 @@ pub fn create_db(name: &str){
             last_name TEXT NULL,
             FOREIGN KEY (team_id) REFERENCES teams (rowid)
         )"
-    ).expect(&format!("Unable to create table teams for database {}", name));
+    );
 
     create_table(
         &connection,
@@ -26,6 +26,7 @@ pub fn create_db(name: &str){
             name TEXT NULL,
             category TEXT NULL
         )"
-    ).expect(&format!("Unable to create table players for database {}", name));
+    );
 }
+
 

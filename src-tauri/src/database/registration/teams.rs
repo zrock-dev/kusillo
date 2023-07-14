@@ -125,3 +125,4 @@ fn cleanup(connection: &Connection) -> Result<(), Error>{
     connection.execute("DELETE FROM teams", ())?;
     Ok(())
 } 
+

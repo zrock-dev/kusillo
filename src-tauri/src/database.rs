@@ -11,3 +11,4 @@ pub fn startup(){
     create_db(PERM_TEAM_PLAYERS);
     create_game_db();
 }
+
