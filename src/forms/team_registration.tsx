@@ -19,7 +19,7 @@ import { enqueueSnackbar } from 'notistack';
 export default function TeamRegistrationForm() {
     const navigate = useNavigate();
     const [teamIdentifier, setTeamIdentifier] = useState(-1);
-    const hasRequested = useRef(true);
+    const hasRequested = useRef(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -32,8 +32,8 @@ export default function TeamRegistrationForm() {
             }
         };
 
-        if (hasRequested.current){
-            hasRequested.current = false;
+        if (!hasRequested.current){
+            hasRequested.current = true;
             fetchData();
         }
     }, []);

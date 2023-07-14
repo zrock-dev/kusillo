@@ -1,5 +1,4 @@
 use rusqlite::Connection;
-use crate::database::game_match::game_creation::GAME_DATABASE;
 use crate::utils::rusqlite_error::Error;
 
 pub fn get_score_color(score_points: i64) -> String{

@@ -1,11 +1,10 @@
 use rusqlite::Connection;
 use crate::database::utils::create_table;
-
-pub const GAME_DATABASE: &str = "game_matches.db";
+use crate::database::registration::table_player_creation::PERM_TEAM_PLAYERS;
 
 pub fn create_game_db(){
-    let connection = Connection::open(GAME_DATABASE)
-        .expect(&format!("Unable to create a database for: {}", GAME_DATABASE));
+    let connection = Connection::open(PERM_TEAM_PLAYERS)
+        .expect(&format!("Unable to create a database for: {}", PERM_TEAM_PLAYERS));
     
     create_table(
         &connection,

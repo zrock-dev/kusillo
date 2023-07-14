@@ -1,5 +1,5 @@
 use rusqlite::Connection;
-use crate::database::game_match::game_creation::GAME_DATABASE;
+use crate::database::registration::table_player_creation::PERM_TEAM_PLAYERS;
 use crate::database::game_match::utils::{get_max_score, get_score_color, record_winner};
 use crate::utils::rusqlite_error::Error;
 
@@ -19,7 +19,7 @@ pub struct Configuration {
 
 #[tauri::command]
 pub fn make_match(team_a_id: i64, team_b_id: i64) -> Result<(), Error>{
-    let connection = Connection::open(GAME_DATABASE)?;
+    let connection = Connection::open(PERM_TEAM_PLAYERS)?;
     connection.execute(
         "INSERT INTO match VALUES (?1, ?2)",
     [team_a_id, team_b_id])?;
@@ -29,7 +29,7 @@ pub fn make_match(team_a_id: i64, team_b_id: i64) -> Result<(), Error>{
 
 #[tauri::command]
 pub fn request_contenders() -> Result<Contestants, Error>{
-    let connection = Connection::open(GAME_DATABASE)?;
+    let connection = Connection::open(PERM_TEAM_PLAYERS)?;
 
     let contestants = connection.query_row_and_then(
         "SELECT rowid, team_a_id, team_b_id FROM match ORDER BY rowid DESC LIMIT 1",
@@ -48,7 +48,7 @@ pub fn request_contenders() -> Result<Contestants, Error>{
 
 #[tauri::command]
 pub fn record_interaction(set_number: i64, team_id: i64, score_points: i64) -> Result<(), Error>{
-    let connection = Connection::open(GAME_DATABASE)?;
+    let connection = Connection::open(PERM_TEAM_PLAYERS)?;
     connection.execute(
         "INSERT INTO score VALUES ((SELECT rowid FROM match ORDER BY rowid DESC LIMIT 1), ?1, ?2, ?3, (SELECT DATETIME()))",
         [set_number, score_points, team_id]
@@ -71,7 +71,7 @@ pub fn request_configuration(set_number: i64, score_points: i64) -> Configuratio
 #[tauri::command]
 pub fn is_game_won() -> Result<bool, Error>{
     let contenders = request_contenders()?;
-    let connection = Connection::open(GAME_DATABASE)?;
+    let connection = Connection::open(PERM_TEAM_PLAYERS)?;
     
     let team_a_set_number = connection.query_row_and_then(
         "SELECT set_number FROM score WHERE team_id = ?1 ORDER BY rowid DESC LIMIT 1",

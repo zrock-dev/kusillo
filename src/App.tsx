@@ -23,6 +23,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import {useState} from "react";
+import Match from "./game_match/match";
 
 
 const drawerWidth = 240;
@@ -41,7 +42,7 @@ const Main = ({ open }) => {
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/team-form" element={<TeamRegistrationForm />} />
-                    <Route path="*" element={<ErrorPage />} />
+                    <Route path="/match" element={<Match />} />
                 </Routes>
             </div>
         </main>
@@ -92,6 +93,15 @@ const DrawerItems = () => {
 
             <ListItem key={"home"} disablePadding>
                 <ListItemButton component={Link} to={"/"}>
+                    <ListItemIcon>
+                        <InboxIcon />
+                    </ListItemIcon>
+                    <ListItemText primary={"Home"} />
+                </ListItemButton>
+            </ListItem>
+
+            <ListItem key={"home"} disablePadding>
+                <ListItemButton component={Link} to={"/match"}>
                     <ListItemIcon>
                         <InboxIcon />
                     </ListItemIcon>
