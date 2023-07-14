@@ -1,15 +1,13 @@
-use rusqlite::{Connection, Error, Result};
+use rusqlite::{Connection};
+use crate::database::utils::create_table;
+
 pub const TEMP_TEAM_PLAYERS : &str = "temp_team_players.db";
 pub const PERM_TEAM_PLAYERS : &str = "team_players.db";
 
-fn create_table(connection: &Connection, statement: &str) -> Result<(), Error>{
-    connection.execute(statement, ())?;
-    Ok(())
-}
 
 pub fn create_db(name: &str){
-    let connection = Connection::open(name)
-        .expect(&format!("Unable to create a database for: {}", name));
+        let connection = Connection::open(name)
+            .expect(&format!("Unable to create a database for: {}", name));
     
     create_table(
         &connection,
@@ -30,3 +28,4 @@ pub fn create_db(name: &str){
         )"
     ).expect(&format!("Unable to create table players for database {}", name));
 }
+
