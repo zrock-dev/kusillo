@@ -8,6 +8,12 @@ pub struct TupleHelper {
     item_b: i64
 }
 
+#[derive(serde::Serialize)]
+pub struct Configuration {
+    max_score: i64,
+    score_color: String
+}
+
 #[tauri::command]
 pub fn make_match(team_a_id: i64, team_b_id: i64) -> Result<(), Error>{
     let connection = Connection::open(GAME_DATABASE)?;
@@ -47,3 +53,28 @@ pub fn record_interaction(set_number: i64, team_id: i64, score_points: i64) -> R
     Ok(())
 }
 
+#[tauri::command]
+pub fn request_configuration(set_number: i64, score_points: i64) -> Configuration{
+    Configuration{
+        max_score: get_max_score(set_number),
+        score_color: get_score_color(score_points)
+    }
+}
+
+fn get_score_color(score_points: i64) -> String{
+    match score_points {
+        points if points < 16 => String::from("white"),
+        points if points == 16 => String::from("orange"),
+        points if points == 18 => String::from("pink"),
+        points if points == 17 => String::from("red"),
+        _ => panic!()
+    }
+}
+
+fn get_max_score(set_number: i64) -> i64{
+    match set_number {
+        number if number < 3 && number > 0 => 20,
+        number if number == 3 => 18,
+        _ => panic!()
+    }
+}

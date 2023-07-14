@@ -23,7 +23,8 @@ fn main() {
             players::remove_player,
             game::make_match,
             game::request_contenders,
-            game::record_interaction
+            game::record_interaction,
+            game::request_configuration
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
