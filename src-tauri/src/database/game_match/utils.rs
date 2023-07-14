@@ -27,3 +27,17 @@ pub fn record_winner(connection: &Connection, team_id: &i64, match_id: &i64) -> 
     
     Ok(())
 }
+
+pub fn get_set_number(connection: &Connection, team_id: &i64, match_id: &i64) -> Result<i64, Error>{
+    let set_number = connection.query_row_and_then(
+        "SELECT set_number FROM score WHERE match_id = ?1 AND team_id = ?2 ORDER BY rowid DESC LIMIT 1",
+        [match_id, team_id],
+        |row| {
+            Ok::<i64, Error>(
+                row.get(0)?
+            )
+        },
+    )?;
+
+    Ok(set_number)
+}

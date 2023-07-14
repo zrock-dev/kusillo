@@ -1,6 +1,7 @@
 use rusqlite::Connection;
 use crate::database::registration::table_player_creation::PERM_TEAM_PLAYERS;
-use crate::database::game_match::utils::{get_max_score, get_score_color, record_winner};
+use crate::database::game_match::utils::{get_max_score, get_score_color, get_set_number, record_winner};
+use crate::database::utils::is_table_empty;
 use crate::utils::rusqlite_error::Error;
 
 #[derive(serde::Serialize)]
@@ -70,40 +71,30 @@ pub fn request_configuration(set_number: i64, score_points: i64) -> Configuratio
 
 #[tauri::command]
 pub fn is_game_won() -> Result<bool, Error>{
-    let contenders = request_contenders()?;
     let connection = Connection::open(PERM_TEAM_PLAYERS)?;
-    
-    let team_a_set_number = connection.query_row_and_then(
-        "SELECT set_number FROM score WHERE team_id = ?1 ORDER BY rowid DESC LIMIT 1",
-        [contenders.team_a_id],
-        |row| {
-            Ok::<i64, Error>(
-                row.get(0)?
-            )
-        },
-    )?;
 
-    let team_b_set_number = connection.query_row_and_then(
-        "SELECT set_number FROM score WHERE match_id = ?1 AND team_id = ?2 ORDER BY rowid DESC LIMIT 1",
-        [contenders.match_id, contenders.team_b_id],
-        |row| {
-            Ok::<i64, Error>(
-                row.get(0)?
-            )
-        },
-    )?;
-    
+    let empty_score = is_table_empty(&connection, "score")?;
+    if empty_score  {
+        return Ok(false)
+    }
+
+    let contenders = request_contenders()?;
+    let match_id = contenders.match_id;
+    let team_a_set_number = get_set_number(&connection, &match_id, &contenders.team_a_id)?;
+    let team_b_set_number = get_set_number(&connection, &match_id, &contenders.team_b_id)?;
+
+
     if team_a_set_number == 3 {
-        record_winner(&connection, &contenders.match_id, &contenders.team_a_id)?;
+        record_winner(&connection, &match_id, &contenders.team_a_id)?;
         Ok(true)
     }else if team_b_set_number == 3 {
-        record_winner(&connection, &contenders.match_id, &contenders.team_b_id)?;
+        record_winner(&connection, &match_id, &contenders.team_b_id)?;
         Ok(true)
     }else if team_a_set_number == 2 && team_b_set_number == 0 {
-        record_winner(&connection, &contenders.match_id, &contenders.team_a_id)?;
+        record_winner(&connection, &match_id, &contenders.team_a_id)?;
         Ok(true)
     }else if team_b_set_number == 2 && team_a_set_number == 0 {
-        record_winner(&connection, &contenders.match_id, &contenders.team_b_id)?;
+        record_winner(&connection, &match_id, &contenders.team_b_id)?;
         Ok(true)
     }else {
         Ok(false)
