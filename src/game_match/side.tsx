@@ -1,10 +1,14 @@
 import * as React from 'react';
 import { useEffect, useState } from "react";
-import { enqueueSnackbar } from "notistack";
 import { useNavigate } from "react-router-dom";
 import { invoke } from "@tauri-apps/api/tauri";
-import { Button, ButtonGroup, Container } from "@mui/material";
-import Box from "@mui/material/Box";
+import {
+    Box,
+    Button,
+    ButtonGroup,
+    Typography
+} from "@mui/material";
+import Grid2 from "@mui/material/Unstable_Grid2";
 
 function checkButtons(buttonEnabledSetters, validationFn) {
     buttonEnabledSetters.forEach((button) => {
@@ -41,11 +45,14 @@ function ButtonGroupWrapper({ buttons, interactionFn }) {
     );
 }
 
+
 export default function Side({ team_id: teamId, handleStageUpdate }) {
     const navigate = useNavigate();
+
     const [stage, setStage] = useState(1);
     const [score, setScore] = useState(0);
     const [scoreColor, setScoreColor] = useState("");
+    const teamName = requestTeamName(teamId);
 
     const [canScoreUp3, setCanScoreUp3] = useState(true);
     const [canScoreUp2, setCanScoreUp2] = useState(true);
@@ -102,14 +109,52 @@ export default function Side({ team_id: teamId, handleStageUpdate }) {
         setScore(score + value);
     }
 
+    function requestTeamName(teamId: number): string{
+        let teamName = "";
+        invoke('get_team_name', {teamId: teamId})
+            .then((name) => {
+                // @ts-ignore
+                return teamName = name;
+            })
+            .catch((error => {
+                console.log(error)
+                navigate("/error")
+            }))
+
+        return teamName;
+    }
     return (
-        <Container>
-            <ButtonGroupWrapper buttons={upButtons} interactionFn={handleInteraction} />
-            <ButtonGroupWrapper buttons={downButtons} interactionFn={handleInteraction} />
+        <Grid2 container spacing={2}>
+            <Grid2>
+                <Typography variant="h2" gutterBottom>{teamName}</Typography>
+            </Grid2>
 
-            <Box>SCORE: {score}</Box>
-            <Box>SET: {stage - 1}</Box>
+            <Grid2>
+                <Box
+                    sx={{
+                        width: 60,
+                        height: 60,
+                        backgroundColor: 'lime.lime',
+                    }}
+                >
+                    <Typography variant="h4" gutterBottom>STAGE</Typography>
+                    <Typography variant="h3" gutterBottom>{stage - 1}</Typography>
+                </Box>
+            </Grid2>
 
-        </Container>
+            <Grid2>
+                <ButtonGroupWrapper buttons={upButtons} interactionFn={handleInteraction} />
+                <Box
+                    sx={{
+                        width: 201,
+                        height: 190,
+                        backgroundColor: 'lime.lime',
+                    }}
+                >
+                    <Typography variant="h1" gutterBottom>{score}</Typography>
+                </Box>
+                <ButtonGroupWrapper buttons={downButtons} interactionFn={handleInteraction} />
+            </Grid2>
+        </Grid2>
     );
 }

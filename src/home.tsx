@@ -4,6 +4,7 @@ import {useNavigate} from "react-router-dom";
 import {
     Box,
     Button,
+    Container,
     Typography
 } from '@mui/material';
 
@@ -15,18 +16,20 @@ export default function Home() {
             .then(() => (navigate("/match")))
             .catch((error) => {
                 console.log(error)
+                navigate("/error")
             })
     }
 
     return (
-        <Box sx={{ display: 'flex' }}>
-            <Typography variant="h2" component="div">
-                Kusillo
-            </Typography>
-
+        <Container>
+            <Box sx={{ display: 'flex' }}>
+                <Typography variant="h2" component="div">
+                    Kusillo
+                </Typography>
+            </Box>
             <Button onClick={handleOnMatch}>
                 Match
             </Button>
-        </Box>
+        </Container>
     );
 }

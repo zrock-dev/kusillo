@@ -43,6 +43,7 @@ const Main = ({ open }) => {
                     <Route path="/" element={<Home />} />
                     <Route path="/team-form" element={<TeamRegistrationForm />} />
                     <Route path="/match" element={<Match />} />
+                    <Route path="/error" element={<ErrorPage />} />
                 </Routes>
             </div>
         </main>
