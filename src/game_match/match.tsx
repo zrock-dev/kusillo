@@ -4,8 +4,6 @@ import {useEffect, useRef, useState} from "react";
 import {enqueueSnackbar} from "notistack";
 import {useNavigate} from "react-router-dom";
 import Side from "./side";
-import {bool} from "yup";
-
 
 export default function Match(){
     const [teamAId, setTeamAId] = useState(-1);
@@ -16,10 +14,11 @@ export default function Match(){
     useEffect(() => {
         const fetchData = async () => {
             try {
-                let {team_a_id, team_b_id} = await invoke('request_contenders');
-                setTeamAId(team_a_id)
-                setTeamBId(team_b_id)
-                console.debug(`Fetched match contenders | ${team_a_id} VS ${team_b_id}`)
+                let object = await invoke('request_contenders');
+                let teamBId = object.team_b_id;
+                let teamAId = object.team_a_id;
+                setTeamAId(teamAId)
+                setTeamBId(teamBId)
 
             }catch (error){
                 console.error(error);
@@ -37,15 +36,16 @@ export default function Match(){
     const handleStageUpdate = () => {
         invoke('is_game_won')
             .then((isGameWon) => {
+                console.log(`Game won status: ${isGameWon}`)
                 if (isGameWon){
                     enqueueSnackbar("The game has been won", {variant:"success"})
-                    navigate("/")
+                    navigate("/home")
                 }
             })
             .catch((error) => {
                 console.error(error);
                 enqueueSnackbar(`${error.toString()}`, {variant: "error"})
-                // navigate("/error")
+                navigate("/error")
             })
     }
 

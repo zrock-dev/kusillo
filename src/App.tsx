@@ -99,15 +99,6 @@ const DrawerItems = () => {
                     <ListItemText primary={"Home"} />
                 </ListItemButton>
             </ListItem>
-
-            <ListItem key={"match"} disablePadding>
-                <ListItemButton component={Link} to={"/match"}>
-                    <ListItemIcon>
-                        <InboxIcon />
-                    </ListItemIcon>
-                    <ListItemText primary={"Match"} />
-                </ListItemButton>
-            </ListItem>
         </List>
     );
 }

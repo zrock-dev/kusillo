@@ -6,12 +6,13 @@ import { invoke } from "@tauri-apps/api/tauri";
 import { Button, ButtonGroup, Container } from "@mui/material";
 import Box from "@mui/material/Box";
 
-function checkButtons(buttonEnabledSetters, checkFn, currentScore) {
-    buttonEnabledSetters.forEach((buttonEnabledFn) => {
-        for (let interaction = 1; interaction < 4; interaction++) {
-            if (!checkFn(interaction, currentScore)) {
-                buttonEnabledFn(false);
-            }
+function checkButtons(buttonEnabledSetters, validationFn) {
+    buttonEnabledSetters.forEach((button) => {
+        let {value, setter: disableButton} = button
+        if (validationFn(value)) {
+            disableButton(true)
+        }else {
+            disableButton(false)
         }
     });
 }
@@ -40,7 +41,7 @@ function ButtonGroupWrapper({ buttons, interactionFn }) {
     );
 }
 
-export default function Side({ team_id, handleStageUpdate }) {
+export default function Side({ team_id: teamId, handleStageUpdate }) {
     const navigate = useNavigate();
     const [stage, setStage] = useState(1);
     const [score, setScore] = useState(0);
@@ -54,22 +55,20 @@ export default function Side({ team_id, handleStageUpdate }) {
     const [canScoreDown2, setCanScoreDown2] = useState(true);
     const [canScoreDown1, setCanScoreDown1] = useState(true);
 
-    const upMap = [setCanScoreUp3, setCanScoreUp2, setCanScoreUp1];
-    const downMap = [setCanScoreDown3, setCanScoreDown2, setCanScoreDown1];
-
     const upButtons = [
-        { isDisabled: canScoreUp1, value: 1 },
-        { isDisabled: canScoreUp2, value: 2 },
-        { isDisabled: canScoreUp3, value: 3 },
+        { isDisabled: canScoreUp1, value: +1, setter: setCanScoreUp1},
+        { isDisabled: canScoreUp2, value: +2, setter: setCanScoreUp2 },
+        { isDisabled: canScoreUp3, value: +3, setter: setCanScoreUp3 },
     ];
 
     const downButtons = [
-        { isDisabled: canScoreDown1, value: -1 },
-        { isDisabled: canScoreDown2, value: -2 },
-        { isDisabled: canScoreDown3, value: -3 },
+        { isDisabled: canScoreDown1, value: -1, setter: setCanScoreDown1 },
+        { isDisabled: canScoreDown2, value: -2, setter: setCanScoreDown2 },
+        { isDisabled: canScoreDown3, value: -3, setter: setCanScoreDown3 },
     ];
 
     useEffect(() => {
+        console.log(`Current stage: ${stage}`)
         handleStageUpdate();
     }, [stage]);
 
@@ -77,21 +76,25 @@ export default function Side({ team_id, handleStageUpdate }) {
         handleScoreUpdate()
             .catch((error) => {
                 console.error(error);
-                enqueueSnackbar(`${error.toString()}`, { variant: "error" });
+                navigate("/error")
             });
     }, [score]);
 
     async function handleScoreUpdate() {
-        let { maxScore, scoreColor, isSetWon } = await invoke('request_configuration', { setNumber: stage, scorePoints: score });
+        let value = await invoke('request_configuration', { setNumber: stage, scorePoints: score });
+        let maxScore = value.max_score;
+        let isSetWon = value.is_set_won;
+        let scoreColor = value.score_color;
 
         if (isSetWon) {
             setScore(0);
             setScoreColor("");
             setStage(stage + 1)
         } else {
-            checkButtons(upMap, (a, b): boolean => { return a + b === maxScore }, score);
-            checkButtons(downMap, (a, b): boolean => { return a - b === maxScore }, score);
+            checkButtons(upButtons, (value): boolean => { return (score + value ) > maxScore });
+            checkButtons(downButtons, (value): boolean => { return (score + value) < 0 });
             setScoreColor(scoreColor);
+            await invoke('record_interaction', {setNumber: stage, teamId: teamId, scorePoints: score})
         }
     }
 
@@ -105,7 +108,7 @@ export default function Side({ team_id, handleStageUpdate }) {
             <ButtonGroupWrapper buttons={downButtons} interactionFn={handleInteraction} />
 
             <Box>SCORE: {score}</Box>
-            <Box>SET: {stage}</Box>
+            <Box>SET: {stage - 1}</Box>
 
         </Container>
     );

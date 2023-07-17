@@ -21,9 +21,20 @@ pub struct Configuration {
 #[tauri::command]
 pub fn make_match(team_a_id: i64, team_b_id: i64) -> Result<(), Error>{
     let connection = Connection::open(PERM_TEAM_PLAYERS)?;
+
     connection.execute(
-        "INSERT INTO game VALUES (?1, ?2)",
+        "INSERT INTO game (team_a_id, team_b_id) VALUES (?1, ?2)",
     [team_a_id, team_b_id])?;
+
+    let game_id = connection.last_insert_rowid();
+    connection.execute(
+        "INSERT INTO score VALUES(?1, 0, 0, ?2, (SELECT DATETIME()))",
+        [game_id, team_a_id]
+    )?;
+    connection.execute(
+        "INSERT INTO score VALUES(?1, 0, 0, ?2, (SELECT DATETIME()))",
+        [game_id, team_b_id]
+    )?;
 
     Ok(())
 }
@@ -79,16 +90,10 @@ pub fn request_configuration(set_number: i64, score_points: i64) -> Configuratio
 pub fn is_game_won() -> Result<bool, Error>{
     let connection = Connection::open(PERM_TEAM_PLAYERS)?;
 
-    let empty_score = is_table_empty(&connection, "score")?;
-    if empty_score  {
-        return Ok(false)
-    }
-
     let contenders = request_contenders()?;
     let game_id = contenders.game_id;
     let team_a_set_number = get_set_number(&connection, &game_id, &contenders.team_a_id)?;
     let team_b_set_number = get_set_number(&connection, &game_id, &contenders.team_b_id)?;
-
 
     if team_a_set_number == 3 {
         record_winner(&connection, &game_id, &contenders.team_a_id)?;

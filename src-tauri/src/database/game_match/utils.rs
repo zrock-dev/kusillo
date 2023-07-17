@@ -19,16 +19,15 @@ pub fn get_max_score(set_number: i64) -> i64{
     }
 }
 
-pub fn record_winner(connection: &Connection, team_id: &i64, match_id: &i64) -> Result<(), Error>{
+pub fn record_winner(connection: &Connection, match_id: &i64, team_id: &i64) -> Result<(), Error>{
     connection.execute(
         "INSERT INTO winners VALUES (?1, ?2)",
         [match_id, team_id]
     )?;
-    
     Ok(())
 }
 
-pub fn get_set_number(connection: &Connection, team_id: &i64, match_id: &i64) -> Result<i64, Error>{
+pub fn get_set_number(connection: &Connection, match_id: &i64, team_id: &i64) -> Result<i64, Error>{
     let set_number = connection.query_row_and_then(
         "SELECT set_number FROM score WHERE game_id = ?1 AND team_id = ?2 ORDER BY rowid DESC LIMIT 1",
         [match_id, team_id],
