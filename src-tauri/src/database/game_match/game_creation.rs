@@ -23,7 +23,8 @@ pub fn create_game_db(){
                     score_points INTEGER NOT NULL,
                     team_id INTEGER NOT NULL,
                     timestamp datetime NOT NULL,
-                    FOREIGN KEY (game_id) REFERENCES game (rowid)
+                    FOREIGN KEY (game_id) REFERENCES game (rowid),
+                    FOREIGN KEY (team_id) REFERENCES teams (rowid)
                 )"
     );
 

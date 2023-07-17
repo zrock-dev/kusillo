@@ -1,7 +1,6 @@
 use rusqlite::Connection;
 use crate::database::registration::table_player_creation::PERM_TEAM_PLAYERS;
 use crate::database::game_match::utils::{get_max_score, get_score_color, get_set_number, record_winner};
-use crate::database::utils::is_table_empty;
 use crate::utils::rusqlite_error::Error;
 
 #[derive(serde::Serialize)]
@@ -110,4 +109,21 @@ pub fn is_game_won() -> Result<bool, Error>{
     }else {
         Ok(false)
     }
+}
+
+#[tauri::command]
+pub fn get_team_name(team_id: i64) -> Result<String, Error>{
+    let connection = Connection::open(PERM_TEAM_PLAYERS)?;
+
+    let team_name = connection.query_row_and_then(
+        "SELECT name FROM teams WHERE rowid = ?1",
+        [team_id],
+        |row| {
+            Ok::<String, Error>(
+                row.get(0)?
+            )
+        },
+    )?;
+
+    Ok(team_name)
 }

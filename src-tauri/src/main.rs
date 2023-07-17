@@ -25,7 +25,8 @@ fn main() {
             game_commands::request_contenders,
             game_commands::record_interaction,
             game_commands::request_configuration,
-            game_commands::is_game_won
+            game_commands::is_game_won,
+            game_commands::get_team_name
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
