@@ -40,7 +40,7 @@ const Main = ({ open }) => {
         >
             <div style={{ marginTop: '70px' }}>
                 <Routes>
-                    <Route path="/" element={<Home />} />
+                    <Route path="/home" element={<Home />} />
                     <Route path="/team-form" element={<TeamRegistrationForm />} />
                     <Route path="/match" element={<Match />} />
                     <Route path="/error" element={<ErrorPage />} />
@@ -93,7 +93,7 @@ const DrawerItems = () => {
             </ListItem>
 
             <ListItem key={"home"} disablePadding>
-                <ListItemButton component={Link} to={"/"}>
+                <ListItemButton component={Link} to={"/home"}>
                     <ListItemIcon>
                         <InboxIcon />
                     </ListItemIcon>

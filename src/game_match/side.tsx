@@ -46,13 +46,13 @@ function ButtonGroupWrapper({ buttons, interactionFn }) {
 }
 
 
-export default function Side({ team_id: teamId, handleStageUpdate }) {
+export default function Side({ teamId, handleStageUpdate }) {
     const navigate = useNavigate();
 
     const [stage, setStage] = useState(1);
     const [score, setScore] = useState(0);
     const [scoreColor, setScoreColor] = useState("");
-    const teamName = requestTeamName(teamId);
+    const [teamName, setTeamName] = useState("");
 
     const [canScoreUp3, setCanScoreUp3] = useState(true);
     const [canScoreUp2, setCanScoreUp2] = useState(true);
@@ -75,7 +75,6 @@ export default function Side({ team_id: teamId, handleStageUpdate }) {
     ];
 
     useEffect(() => {
-        console.log(`Current stage: ${stage}`)
         handleStageUpdate();
     }, [stage]);
 
@@ -87,8 +86,9 @@ export default function Side({ team_id: teamId, handleStageUpdate }) {
             });
     }, [score]);
 
+
     async function handleScoreUpdate() {
-        let value = await invoke('request_configuration', { setNumber: stage, scorePoints: score });
+        let value: any = await invoke('request_configuration', { setNumber: stage, scorePoints: score });
         let maxScore = value.max_score;
         let isSetWon = value.is_set_won;
         let scoreColor = value.score_color;
@@ -109,51 +109,71 @@ export default function Side({ team_id: teamId, handleStageUpdate }) {
         setScore(score + value);
     }
 
-    function requestTeamName(teamId: number): string{
-        let teamName = "";
+    useEffect(() => {
+        console.debug("Requesting team name")
         invoke('get_team_name', {teamId: teamId})
-            .then((name) => {
-                // @ts-ignore
-                return teamName = name;
+            .then((name: any) => {
+                setTeamName(name)
             })
             .catch((error => {
-                console.log(error)
+                console.error(error)
                 navigate("/error")
             }))
+    }, [])
 
-        return teamName;
-    }
     return (
         <Grid2 container spacing={2}>
-            <Grid2>
+            <Grid2 xs={12}>
                 <Typography variant="h2" gutterBottom>{teamName}</Typography>
             </Grid2>
 
-            <Grid2>
+            <Grid2 xs={12}>
+                <Typography variant="h6" gutterBottom>STAGE</Typography>
                 <Box
                     sx={{
                         width: 60,
                         height: 60,
+                        display: 'flex',
                         backgroundColor: 'lime.lime',
                     }}
                 >
-                    <Typography variant="h4" gutterBottom>STAGE</Typography>
                     <Typography variant="h3" gutterBottom>{stage - 1}</Typography>
                 </Box>
             </Grid2>
 
-            <Grid2>
-                <ButtonGroupWrapper buttons={upButtons} interactionFn={handleInteraction} />
-                <Box
-                    sx={{
-                        width: 201,
-                        height: 190,
-                        backgroundColor: 'lime.lime',
-                    }}
-                >
-                    <Typography variant="h1" gutterBottom>{score}</Typography>
+            <Grid2 xs>
+                <Box position="relative">
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                        }}
+                    >
+                        <ButtonGroupWrapper buttons={upButtons} interactionFn={handleInteraction} />
+                    </Box>
+                    <Box
+                        sx={{
+                            width: 201,
+                            height: 190,
+                            backgroundColor: 'primary.main',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}
+                    >
+                        <Typography variant="h1">{score}</Typography>
+                    </Box>
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            bottom: 0,
+                            right: 0,
+                        }}
+                    >
+                        <ButtonGroupWrapper buttons={downButtons} interactionFn={handleInteraction} />
+                    </Box>
                 </Box>
-                <ButtonGroupWrapper buttons={downButtons} interactionFn={handleInteraction} />
             </Grid2>
         </Grid2>
     );
