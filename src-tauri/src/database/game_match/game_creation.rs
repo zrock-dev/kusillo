@@ -11,7 +11,8 @@ pub fn create_game_db(){
         "CREATE TABLE IF NOT EXISTS game (
                     rowid INTEGER NOT NULL PRIMARY KEY,
                     team_a_id INTEGER NOT NULL,
-                    team_b_id INTEGER NOT NULL
+                    team_b_id INTEGER NOT NULL,
+                    set_number INTEGER NOT NULL
                 )"
     );
 

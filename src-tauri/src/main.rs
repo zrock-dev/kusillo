@@ -1,13 +1,12 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use database::game_match::game_commands;
+use database::registration::players;
+use database::registration::teams;
+
 mod database;
 mod utils;
-
-use database::registration::teams;
-use database::registration::players;
-use database::game_match::game_commands;
-
 
 fn main() {
     database::startup();
@@ -26,7 +25,8 @@ fn main() {
             game_commands::record_interaction,
             game_commands::request_configuration,
             game_commands::is_game_won,
-            game_commands::get_team_name
+            game_commands::get_team_name,
+            game_commands::update_stage_number
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
