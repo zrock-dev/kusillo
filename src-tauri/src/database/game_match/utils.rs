@@ -40,7 +40,6 @@ pub fn retrieve_game_set(connection: &Connection, game_id: &i64) -> Result<i64, 
 
 pub fn update_game_set(connection: &Connection, &game_id: &i64) -> Result<(), Error>{
    let set_number  = retrieve_game_set(connection, &game_id)?;
-
     connection.execute(
         "UPDATE game SET set_number = ?1 WHERE rowid = ?2",
         [set_number + 1, game_id]
@@ -63,4 +62,18 @@ pub fn retrieve_contenders(connection: &Connection, game_id: &i64) -> Result<Con
     )?;
 
     Ok(contestants)
+}
+pub fn record (connection: &Connection, game_id: &i64, team_id: &i64, score_points: &i64, current_stage: &i64) -> Result<(), Error>{
+
+    connection.execute(
+        "INSERT INTO
+            score (game_id, set_number, score_points, team_id, timestamp)
+            VALUES (
+                 ?1, ?2, ?3, ?4,
+                 (SELECT DATETIME())
+            )",
+        [game_id, current_stage, score_points, team_id],
+    )?;
+
+    Ok(())
 }

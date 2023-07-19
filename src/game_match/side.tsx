@@ -45,7 +45,7 @@ export default function Side({ gameId, teamId, updateMatch, score, setScore }) {
                         backgroundColor: 'lime.lime',
                     }}
                 >
-                    <Typography variant="h3" gutterBottom>{stage}</Typography>
+                    <Typography variant="h3"> {stage}</Typography>
                 </Box>
             </Grid2>
 

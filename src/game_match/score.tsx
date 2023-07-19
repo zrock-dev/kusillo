@@ -76,15 +76,15 @@ export default function Score ({ gameId, teamId, setStage, updateMatch, score, s
     ];
 
     useEffect(() => {
+        recordInteraction(score)
         invoke('request_configuration', {gameId: gameId, teamId: teamId})
             .then((payload: any) => {
-                updateMatch(payload.isGameWon as boolean, payload.isStageWon as boolean)
-                setMaxScore(payload.maxScore as number)
-                setScoreColor(translateColor(payload.scoreColor as string))
-                let stage = payload.currentStage as number;
-                setStage(stage)
+                console.debug(payload)
+                updateMatch(payload.is_game_won as boolean, payload.is_stage_won as boolean)
+                setMaxScore(payload.max_score as number)
+                setScoreColor(translateColor(payload.score_color as string))
+                setStage(payload.current_stage as number)
                 checkInteractions()
-                recordInteraction(stage)
             })
             .catch((error => {
                 console.error(error)
@@ -105,8 +105,8 @@ export default function Score ({ gameId, teamId, setStage, updateMatch, score, s
         setScore(score + value);
     }
 
-    function recordInteraction(stage: number){
-        invoke('record_interaction', {setNumber: stage, teamId: teamId, scorePoints: score})
+    function recordInteraction(score: number){
+        invoke('record_interaction', {teamId: teamId, gameId: gameId, scorePoints: score})
             .catch((error => {
                 console.error(error)
                 navigate("/error")

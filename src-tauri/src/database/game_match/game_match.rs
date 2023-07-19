@@ -1,6 +1,6 @@
 use rusqlite::Connection;
 
-use crate::database::game_match::utils::{retrieve_contenders, retrieve_game_set, retrieve_score_value, update_game_set};
+use crate::database::game_match::utils::{record, retrieve_contenders, retrieve_game_set, retrieve_score_value, update_game_set};
 use crate::database::game_match::verifications::{at_three, at_two, verify_help};
 use crate::database::registration::table_player_creation::PERM_TEAM_PLAYERS;
 use crate::utils::rusqlite_error::Error;
@@ -14,7 +14,7 @@ pub struct Configuration {
     pub is_stage_won: bool,
 }
 
-pub fn is_game_won(game_id: i64) -> Result<bool, Error> {
+pub fn check_for_game_won(game_id: i64) -> Result<bool, Error> {
     let connection = Connection::open(PERM_TEAM_PLAYERS)?;
     let contenders = retrieve_contenders(&connection, &game_id)?;
     let team_a_id = contenders.team_a_id;
@@ -44,14 +44,15 @@ pub fn is_game_won(game_id: i64) -> Result<bool, Error> {
 }
 
 
-pub fn update_stage_number(connection: &Connection, team_id: &i64, game_id: &i64) -> Result<i64, Error> {
+pub fn update_stage_number(connection: &Connection, team_id: &i64, game_id: &i64) -> Result<(), Error> {
     let tmp_set_number = retrieve_score_value(&connection,"set_number", &game_id, &team_id)?;
     let set_number = tmp_set_number + 1;
 
-    println!("\n\n\n\nSET UPDATE | Game ID: {} | TEAM ID {}\n\tFROM {} -> {}", game_id, team_id, tmp_set_number, set_number);
+    println!("\nSET UPDATE | Game ID: {} | TEAM ID {}\nFROM {} -> {}", game_id, team_id, tmp_set_number, set_number);
     update_game_set(&connection, &game_id)?;
+    record(&connection, &game_id, &team_id, &0, &set_number)?;
 
-    Ok(set_number)
+    Ok(())
 }
 
 pub fn get_max_score(game_set: i64) -> i64{
