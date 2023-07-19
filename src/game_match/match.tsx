@@ -1,6 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {invoke} from '@tauri-apps/api/tauri';
-import {enqueueSnackbar} from 'notistack';
 import {useLocation, useNavigate} from 'react-router-dom';
 import Side from './side';
 import {Box, Stack} from '@mui/material';
@@ -14,6 +13,9 @@ export default function Match() {
     const [teamBId, setTeamBId] = useState(-1);
     const hasFetchedContenders = useRef(false);
 
+    const [scoreA, setScoreA] = useState(0);
+    const [scoreB, setScoreB] = useState(0);
+
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -25,9 +27,10 @@ export default function Match() {
 
     const updateMatch = (isGameWon: boolean, isStageWon: boolean) => {
         if (isGameWon){
-           // reset scores go home
+            resetScores()
+            navigate('/home');
         }else if (isStageWon){
-            // reset scores
+            resetScores()
         }
     };
 
@@ -44,6 +47,11 @@ export default function Match() {
             .finally(() => setIsLoading(false));
     }
 
+    function resetScores(){
+        setScoreA(0)
+        setScoreB(0)
+    }
+
     if (isLoading) {
         return <div>Loading...</div>;
     }
@@ -51,8 +59,21 @@ export default function Match() {
     return (
         <Box>
             <Stack direction="row" spacing={5}>
-                <Side gameId={gameId} teamId={teamAId} handleStageUpdate={updateMatch}/>
-                <Side gameId={gameId} teamId={teamBId} handleStageUpdate={updateMatch}/>
+                <Side
+                    gameId={gameId}
+                    teamId={teamAId}
+                    updateMatch={updateMatch}
+                    score={scoreA}
+                    setScore={setScoreA}
+                />
+
+                <Side
+                    gameId={gameId}
+                    teamId={teamBId}
+                    updateMatch={updateMatch}
+                    score={scoreB}
+                    setScore={setScoreB}
+                />
             </Stack>
         </Box>
     );

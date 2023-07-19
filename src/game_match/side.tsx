@@ -8,7 +8,7 @@ import {useNavigate} from "react-router-dom";
 
 
 // @ts-ignore
-export default function Side({ gameId, teamId, updateMatch }) {
+export default function Side({ gameId, teamId, updateMatch, score, setScore }) {
     const navigate = useNavigate();
     const [stage, setStage] = useState(0);
     const [teamName, setTeamName] = useState("");
@@ -55,6 +55,8 @@ export default function Side({ gameId, teamId, updateMatch }) {
                     teamId={teamId}
                     setStage={setStage}
                     updateMatch={updateMatch}
+                    score={score}
+                    setScore={setScore}
                 />
             </Grid2>
         </Grid2>

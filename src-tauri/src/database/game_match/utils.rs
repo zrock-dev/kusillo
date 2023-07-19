@@ -1,23 +1,6 @@
 use rusqlite::Connection;
+use crate::database::game_match::game_commands::Contestants;
 use crate::utils::rusqlite_error::Error;
-
-pub fn get_score_color(score_points: i64) -> String{
-    match score_points {
-        points if points < 16 => String::from("white"),
-        points if points == 16 => String::from("orange"),
-        points if points == 17 => String::from("pink"),
-        points if points >= 18 => String::from("red"),
-        _ => panic!("Score {} is outside of bounds", score_points)
-    }
-}
-
-pub fn get_max_score(game_set: i64) -> i64{
-    match game_set {
-        number if number < 3 && number >= 0 => 20,
-        number if number == 3 => 18,
-        _ => panic!("Set #{} outside of bounds", game_set)
-    }
-}
 
 pub fn record_winner(connection: &Connection, game_id: &i64, team_id: &i64) -> Result<(), Error>{
     connection.execute(
@@ -27,9 +10,10 @@ pub fn record_winner(connection: &Connection, game_id: &i64, team_id: &i64) -> R
     Ok(())
 }
 
-pub fn retrieve_team_set(connection: &Connection, game_id: &i64, team_id: &i64) -> Result<i64, Error>{
+pub fn retrieve_score_value(connection: &Connection, value_name: &str, game_id: &i64, team_id: &i64) -> Result<i64, Error>{
+    let query = format!("SELECT {} FROM score WHERE game_id = ?1 AND team_id = ?2 ORDER BY rowid DESC LIMIT 1", value_name);
     let set_number = connection.query_row_and_then(
-        "SELECT set_number FROM score WHERE game_id = ?1 AND team_id = ?2 ORDER BY rowid DESC LIMIT 1",
+        query.as_str(),
         [game_id, team_id],
         |row| {
             Ok::<i64, Error>(
@@ -63,4 +47,20 @@ pub fn update_game_set(connection: &Connection, &game_id: &i64) -> Result<(), Er
     )?;
 
     Ok(())
+}
+
+pub fn retrieve_contenders(connection: &Connection, game_id: &i64) -> Result<Contestants, Error>{
+    let contestants = connection.query_row_and_then(
+        "SELECT rowid, team_a_id, team_b_id FROM game WHERE rowid = ?1",
+        [game_id],
+        |row| {
+            Ok::<Contestants, Error>(Contestants {
+                game_id: row.get(0)?,
+                team_a_id: row.get(1)?,
+                team_b_id: row.get(2)?,
+            })
+        },
+    )?;
+
+    Ok(contestants)
 }

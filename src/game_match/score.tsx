@@ -52,11 +52,10 @@ function translateColor(color: string): string{
 }
 
 // @ts-ignore
-export default function Score ({ gameId, teamId, setStage, updateMatch }){
+export default function Score ({ gameId, teamId, setStage, updateMatch, score, setScore}){
     const navigate = useNavigate();
 
     const [maxScore, setMaxScore] = useState(3);
-    const [score, setScore] = useState(0);
     const [scoreColor, setScoreColor] = useState("");
 
     const [canScoreUp3, setCanScoreUp3] = useState(true);
@@ -80,8 +79,8 @@ export default function Score ({ gameId, teamId, setStage, updateMatch }){
         invoke('request_configuration', {gameId: gameId, teamId: teamId})
             .then((payload: any) => {
                 updateMatch(payload.isGameWon as boolean, payload.isStageWon as boolean)
-                setMaxScore(payload.score as number)
-                setScoreColor(translateColor(payload.color as string))
+                setMaxScore(payload.maxScore as number)
+                setScoreColor(translateColor(payload.scoreColor as string))
                 let stage = payload.currentStage as number;
                 setStage(stage)
                 checkInteractions()
