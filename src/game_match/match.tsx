@@ -3,6 +3,7 @@ import {invoke} from '@tauri-apps/api/tauri';
 import {useLocation, useNavigate} from 'react-router-dom';
 import Side from './side';
 import {Box, Stack} from '@mui/material';
+import { enqueueSnackbar } from 'notistack';
 
 export default function Match() {
     const navigate = useNavigate();
@@ -28,6 +29,7 @@ export default function Match() {
 
     const updateMatch = (isGameWon: boolean, isStageWon: boolean) => {
         if (isGameWon){
+            enqueueSnackbar("Game won", {variant: "success"})
             navigate('/home');
         }else if (isStageWon){
             resetScores()

@@ -112,7 +112,5 @@ pub fn request_configuration(game_id: i64, team_id: i64, max_score: i64) -> Resu
 pub fn request_max_score(game_id: i64) -> Result<i64, Error> {
     let connection = Connection::open(PERM_TEAM_PLAYERS)?;
     let game_set = retrieve_game_set(&connection, &game_id)?;
-    let max_score = get_max_score(game_set);
-    dbg!(max_score);
-    Ok(max_score)
+    Ok(get_max_score(game_set))
 }

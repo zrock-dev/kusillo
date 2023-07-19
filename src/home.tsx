@@ -19,7 +19,6 @@ export default function Home() {
             invoke('make_match', {teamAId: 1, teamBId: 2})
                 .then((id) => {
                     setGameId(id as number);
-                    console.debug(`Requested game ID: ${id}`)
                 })
                 .catch((error) => {
                     console.log(error)

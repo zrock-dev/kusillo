@@ -2,7 +2,7 @@ import * as React from 'react';
 import {useEffect, useState} from 'react';
 import {useNavigate} from "react-router-dom";
 import {invoke} from "@tauri-apps/api/tauri";
-import {Box, Button, ButtonGroup, Typography} from "@mui/material";
+import {Box, Button, ButtonGroup, Paper, Typography} from "@mui/material";
 
 function checkButtons(buttonEnabledSetters: any, validationFn: any) {
     buttonEnabledSetters.forEach((button: any) => {
@@ -30,7 +30,7 @@ function createButtons(variants: any, interactionFn: any) {
 }
 
 // @ts-ignore
-function ButtonGroupWrapper({ buttons, interactionFn }) {
+function ButtonGroupWrapper({buttons, interactionFn}) {
     return (
         <ButtonGroup
             orientation="vertical"
@@ -41,20 +41,24 @@ function ButtonGroupWrapper({ buttons, interactionFn }) {
     );
 }
 
-function translateColor(color: string): string{
+function translateColor(color: string): string {
     switch (color) {
-        case "blue": return '0000ff';
-        case "orange": return 'ffa500';
-        case "pink": return 'ffc0cb';
-        case "red": return 'ff0000';
-        default: return '0000ff';
+        case "blue":
+            return 'info.light';
+        case "orange":
+            return 'warning.light';
+        case "pink":
+            return 'secondary.light';
+        case "red":
+            return 'error.light';
+        default:
+            return 'info.light';
     }
 }
 
 // @ts-ignore
-export default function Score ({ gameId, teamId, setStage, updateMatch, score, setScore, maxScore}){
+export default function Score({gameId, teamId, setStage, updateMatch, score, setScore, maxScore}) {
     const navigate = useNavigate();
-
     const [scoreColor, setScoreColor] = useState("");
 
     const [canScoreUp3, setCanScoreUp3] = useState(true);
@@ -79,10 +83,11 @@ export default function Score ({ gameId, teamId, setStage, updateMatch, score, s
         invoke('request_configuration', {gameId: gameId, teamId: teamId, maxScore: maxScore})
             .then((payload: any) => {
                 let isStageWon = payload.is_stage_won;
-                if (isStageWon){
+                if (isStageWon) {
                     updateMatch(payload.is_game_won as boolean, isStageWon)
                     setStage(payload.current_stage)
                 }
+                console.debug(payload.score_color)
                 setScoreColor(translateColor(payload.score_color as string))
                 checkInteractions()
             })
@@ -90,7 +95,7 @@ export default function Score ({ gameId, teamId, setStage, updateMatch, score, s
                 console.error(error)
                 navigate("/error")
             }))
-    },[score])
+    }, [score])
 
     function checkInteractions() {
         checkButtons(upButtons, (value: number): boolean => {
@@ -105,7 +110,7 @@ export default function Score ({ gameId, teamId, setStage, updateMatch, score, s
         setScore(score + value);
     }
 
-    function recordInteraction(score: number){
+    function recordInteraction(score: number) {
         invoke('record_interaction', {teamId: teamId, gameId: gameId, scorePoints: score})
             .catch((error => {
                 console.error(error)
@@ -114,20 +119,29 @@ export default function Score ({ gameId, teamId, setStage, updateMatch, score, s
     }
 
     return (
-        <Box>
+        <Box
+            sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+            }}
+        >
             <ButtonGroupWrapper buttons={upButtons} interactionFn={handleInteraction}/>
-            <Box
-                sx={{
-                    width: 201,
-                    height: 190,
-                    backgroundColor: {scoreColor},
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                }}
+            <Paper
+                sx={{backgroundColor: scoreColor}}
             >
-                <Typography variant="h1">{score}</Typography>
-            </Box>
+                <Box
+                    sx={{
+                        width: 201,
+                        height: 190,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    }}
+                >
+                    <Typography variant="h1">{score}</Typography>
+                </Box>
+            </Paper>
             <ButtonGroupWrapper buttons={downButtons} interactionFn={handleInteraction}/>
         </Box>
     );

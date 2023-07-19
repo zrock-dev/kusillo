@@ -15,11 +15,6 @@ pub fn check_for_game_won(game_id: i64) -> Result<bool, Error> {
     let team_a_set_number = retrieve_score_value(&connection,"set_number", &game_id, &team_a_id)?;
     let team_b_set_number = retrieve_score_value(&connection,"set_number", &game_id, &team_b_id)?;
 
-    println!("--------------------------GAME ID: {}------------------------------------", game_id);
-    println!("SET: {}", game_set);
-    println!("Team A set number: {} \nTeam B set number: {}", team_a_set_number, team_b_set_number);
-    println!("----------------------------------------------------------------------------------");
-
     match game_set {
         1 => Ok(false),
         2 => {
@@ -38,9 +33,7 @@ pub fn update_team_set(connection: &Connection, team_id: &i64, game_id: &i64) ->
     let tmp_set_number = retrieve_score_value(&connection,"set_number", &game_id, &team_id)?;
     let set_number = tmp_set_number + 1;
 
-    println!("\nSET UPDATE | Game ID: {} | TEAM ID {}\nFROM {} -> {}", game_id, team_id, tmp_set_number, set_number);
     record(&connection, &game_id, &team_id, &0, &set_number)?;
-
     Ok(set_number)
 }
 
