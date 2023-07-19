@@ -18,3 +18,4 @@ impl Serialize for Error {
         serializer.serialize_str(&format!("BACKEND ERROR: {}", self.to_string()))
     }
 }
+

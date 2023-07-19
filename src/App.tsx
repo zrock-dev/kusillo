@@ -1,29 +1,30 @@
-import {BrowserRouter, Route, Routes, Link} from "react-router-dom";
-import Home from "./home";
-import TeamRegistrationForm from "./forms/team_registration";
-import ErrorPage from "./errors/error_page";
-
+import { BrowserRouter, Route, Routes, Link } from "react-router-dom";
 import * as React from 'react';
 import { styled, useTheme } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import Drawer from '@mui/material/Drawer';
-import CssBaseline from '@mui/material/CssBaseline';
+import {
+    Box,
+    Drawer,
+    CssBaseline,
+    Toolbar,
+    List,
+    Typography,
+    Divider,
+    IconButton,
+    ListItem,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+} from '@mui/material';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
-import {useState} from "react";
-
+import { useState } from "react";
+import Match from "./game_match/match";
+import Home from "./home";
+import TeamRegistrationForm from "./forms/team_registration";
+import ErrorPage from "./errors/error_page";
 
 const drawerWidth = 240;
 
@@ -39,9 +40,10 @@ const Main = ({ open }) => {
         >
             <div style={{ marginTop: '70px' }}>
                 <Routes>
-                    <Route path="/" element={<Home />} />
+                    <Route path="/home" element={<Home />} />
                     <Route path="/team-form" element={<TeamRegistrationForm />} />
-                    <Route path="*" element={<ErrorPage />} />
+                    <Route path="/match" element={<Match />} />
+                    <Route path="/error" element={<ErrorPage />} />
                 </Routes>
             </div>
         </main>
@@ -91,7 +93,7 @@ const DrawerItems = () => {
             </ListItem>
 
             <ListItem key={"home"} disablePadding>
-                <ListItemButton component={Link} to={"/"}>
+                <ListItemButton component={Link} to={"/home"}>
                     <ListItemIcon>
                         <InboxIcon />
                     </ListItemIcon>
