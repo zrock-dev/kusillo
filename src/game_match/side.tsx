@@ -8,7 +8,7 @@ import {useNavigate} from "react-router-dom";
 
 
 // @ts-ignore
-export default function Side({ gameId, teamId, updateMatch, score, setScore }) {
+export default function Side({ gameId, teamId, updateMatch, score, setScore, maxScore, setMaxScore}) {
     const navigate = useNavigate();
     const [stage, setStage] = useState(0);
     const [teamName, setTeamName] = useState("");
@@ -16,6 +16,20 @@ export default function Side({ gameId, teamId, updateMatch, score, setScore }) {
     useEffect(() => {
         updateTeamName()
     }, [])
+
+
+    useEffect(() => {
+        console.debug("Updating max score")
+        invoke('request_max_score', {gameId: gameId})
+            .then((score: any) => {
+                setMaxScore(score)
+                console.debug(`Max score is: ${score}`)
+            })
+            .catch((error => {
+                console.error(error)
+                navigate("/error")
+            }))
+    }, [stage])
 
     function updateTeamName() {
         invoke('request_team_name', {teamId: teamId})
@@ -27,7 +41,6 @@ export default function Side({ gameId, teamId, updateMatch, score, setScore }) {
                 navigate("/error")
             }))
     }
-
 
     return (
         <Grid2 container spacing={2}>
@@ -57,6 +70,7 @@ export default function Side({ gameId, teamId, updateMatch, score, setScore }) {
                     updateMatch={updateMatch}
                     score={score}
                     setScore={setScore}
+                    maxScore={maxScore}
                 />
             </Grid2>
         </Grid2>

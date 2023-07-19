@@ -9,12 +9,13 @@ export default function Match() {
 
     const location = useLocation();
     const {gameId} = location.state;
-    const [teamAId, setTeamAId] = useState(-1);
-    const [teamBId, setTeamBId] = useState(-1);
+    const [maxScore, setMaxScore] = useState(3);
     const hasFetchedContenders = useRef(false);
 
     const [scoreA, setScoreA] = useState(0);
     const [scoreB, setScoreB] = useState(0);
+    const [teamAId, setTeamAId] = useState(-1);
+    const [teamBId, setTeamBId] = useState(-1);
 
     const [isLoading, setIsLoading] = useState(true);
 
@@ -27,7 +28,6 @@ export default function Match() {
 
     const updateMatch = (isGameWon: boolean, isStageWon: boolean) => {
         if (isGameWon){
-            resetScores()
             navigate('/home');
         }else if (isStageWon){
             resetScores()
@@ -65,6 +65,8 @@ export default function Match() {
                     updateMatch={updateMatch}
                     score={scoreA}
                     setScore={setScoreA}
+                    maxScore={maxScore}
+                    setMaxScore={setMaxScore}
                 />
 
                 <Side
@@ -73,6 +75,8 @@ export default function Match() {
                     updateMatch={updateMatch}
                     score={scoreB}
                     setScore={setScoreB}
+                    maxScore={maxScore}
+                    setMaxScore={setMaxScore}
                 />
             </Stack>
         </Box>

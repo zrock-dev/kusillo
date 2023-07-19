@@ -25,6 +25,7 @@ fn main() {
             game_commands::record_interaction,
             game_commands::request_team_name,
             game_commands::request_configuration,
+            game_commands::request_max_score,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

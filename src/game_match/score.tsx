@@ -43,19 +43,18 @@ function ButtonGroupWrapper({ buttons, interactionFn }) {
 
 function translateColor(color: string): string{
     switch (color) {
-        case "blue": return '#0000ff';
-        case "orange": return '#ffa500';
-        case "pink": return '#ffc0cb';
-        case "red": return '#ff0000';
-        default: return '#0000ff';
+        case "blue": return '0000ff';
+        case "orange": return 'ffa500';
+        case "pink": return 'ffc0cb';
+        case "red": return 'ff0000';
+        default: return '0000ff';
     }
 }
 
 // @ts-ignore
-export default function Score ({ gameId, teamId, setStage, updateMatch, score, setScore}){
+export default function Score ({ gameId, teamId, setStage, updateMatch, score, setScore, maxScore}){
     const navigate = useNavigate();
 
-    const [maxScore, setMaxScore] = useState(3);
     const [scoreColor, setScoreColor] = useState("");
 
     const [canScoreUp3, setCanScoreUp3] = useState(true);
@@ -77,13 +76,14 @@ export default function Score ({ gameId, teamId, setStage, updateMatch, score, s
 
     useEffect(() => {
         recordInteraction(score)
-        invoke('request_configuration', {gameId: gameId, teamId: teamId})
+        invoke('request_configuration', {gameId: gameId, teamId: teamId, maxScore: maxScore})
             .then((payload: any) => {
-                console.debug(payload)
-                updateMatch(payload.is_game_won as boolean, payload.is_stage_won as boolean)
-                setMaxScore(payload.max_score as number)
+                let isStageWon = payload.is_stage_won;
+                if (isStageWon){
+                    updateMatch(payload.is_game_won as boolean, isStageWon)
+                    setStage(payload.current_stage)
+                }
                 setScoreColor(translateColor(payload.score_color as string))
-                setStage(payload.current_stage as number)
                 checkInteractions()
             })
             .catch((error => {
