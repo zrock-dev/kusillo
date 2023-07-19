@@ -27,7 +27,7 @@ pub fn record_winner(connection: &Connection, game_id: &i64, team_id: &i64) -> R
     Ok(())
 }
 
-pub fn get_set_number(connection: &Connection, game_id: &i64, team_id: &i64) -> Result<i64, Error>{
+pub fn retrieve_team_set(connection: &Connection, game_id: &i64, team_id: &i64) -> Result<i64, Error>{
     let set_number = connection.query_row_and_then(
         "SELECT set_number FROM score WHERE game_id = ?1 AND team_id = ?2 ORDER BY rowid DESC LIMIT 1",
         [game_id, team_id],
@@ -41,7 +41,7 @@ pub fn get_set_number(connection: &Connection, game_id: &i64, team_id: &i64) -> 
     Ok(set_number)
 }
 
-pub fn get_game_set(connection: &Connection, game_id: &i64) -> Result<i64, Error>{
+pub fn retrieve_game_set(connection: &Connection, game_id: &i64) -> Result<i64, Error>{
     let set_number = connection.query_row_and_then(
         "SELECT set_number FROM game WHERE rowid = ?1",
         [game_id],
@@ -54,11 +54,9 @@ pub fn get_game_set(connection: &Connection, game_id: &i64) -> Result<i64, Error
     Ok(set_number)
 }
 
-pub fn cash_game_set(connection: &Connection, &game_id: &i64) -> Result<(), Error>{
-   let set_number  = get_game_set(connection, &game_id)?;
-    if set_number > 3 {
-        panic!("The game set #{} is outside of bounds", set_number)
-    }
+pub fn update_game_set(connection: &Connection, &game_id: &i64) -> Result<(), Error>{
+   let set_number  = retrieve_game_set(connection, &game_id)?;
+
     connection.execute(
         "UPDATE game SET set_number = ?1 WHERE rowid = ?2",
         [set_number + 1, game_id]

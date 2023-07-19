@@ -10,15 +10,23 @@ import {
 
 export default function Home() {
     const navigate = useNavigate();
+    const [gameId, setGameId] = React.useState(-1);
+    const hasMadeMatch = React.useRef(false);
 
-    const handleOnMatch = () => {
-        invoke('make_match', {teamAId: 1, teamBId: 2})
-            .then(() => (navigate("/match")))
-            .catch((error) => {
-                console.log(error)
-                navigate("/error")
-            })
-    }
+    React.useEffect(() => {
+        if (!hasMadeMatch.current){
+            hasMadeMatch.current = true;
+            invoke('make_match', {teamAId: 1, teamBId: 2})
+                .then((id) => {
+                    setGameId(id as number);
+                    console.debug(`Requested game ID: ${id}`)
+                })
+                .catch((error) => {
+                    console.log(error)
+                    navigate("/error")
+                })
+        }
+    }, [])
 
     return (
         <Container>
@@ -27,7 +35,7 @@ export default function Home() {
                     Kusillo
                 </Typography>
             </Box>
-            <Button onClick={handleOnMatch}>
+            <Button onClick={() => navigate("/match", {state: {gameId}}) }>
                 Match
             </Button>
         </Container>
