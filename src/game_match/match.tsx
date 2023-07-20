@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {invoke} from '@tauri-apps/api/tauri';
 import {useLocation, useNavigate} from 'react-router-dom';
 import Side from './side';
-import {Box, Stack} from '@mui/material';
+import {Box, Stack, Button} from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
 
 export default function Match() {
@@ -54,6 +54,14 @@ export default function Match() {
         setScoreB(0)
     }
 
+    function handleOpenSpectatorWindow(){
+        invoke('open_spectator_window')
+            .catch((error) => {
+                console.error(error);
+                navigate('/error');
+            })
+    }
+
     if (isLoading) {
         return <div>Loading...</div>;
     }
@@ -81,6 +89,9 @@ export default function Match() {
                     setMaxScore={setMaxScore}
                 />
             </Stack>
+            <Button onClick={handleOpenSpectatorWindow}>
+                Spectator window
+            </Button>
         </Box>
     );
 }

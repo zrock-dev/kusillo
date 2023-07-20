@@ -4,6 +4,7 @@
 use database::game_match::game_commands;
 use database::registration::players;
 use database::registration::teams;
+use database::game_match::mirror::spectator_commands;
 
 mod database;
 mod utils;
@@ -26,6 +27,7 @@ fn main() {
             game_commands::request_team_name,
             game_commands::request_configuration,
             game_commands::request_max_score,
+            spectator_commands::open_spectator_window,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

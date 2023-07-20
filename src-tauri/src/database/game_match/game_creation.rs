@@ -33,7 +33,9 @@ pub fn create_game_db(){
         &connection,
         "CREATE TABLE IF NOT EXISTS winners (
             game_id integer NOT NULL,
-            team_id integer NOT NULL
+            team_id integer NOT NULL,
+            FOREIGN KEY (game_id) REFERENCES game (rowid),
+            FOREIGN KEY (team_id) REFERENCES teams (rowid)
         )"
     );
 }
