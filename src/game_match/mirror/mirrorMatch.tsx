@@ -11,7 +11,7 @@ export default function MirrorMatch() {
     const [scoreB, setScoreB] = useState(0);
     const [stageB, setStageB] = useState(0);
 
-    const updateMatch = (isGameWon: boolean, isStageWon: boolean) => {
+    const updateMatch = (isStageWon: boolean) => {
         if (isStageWon) {
             setScoreA(0)
             setScoreB(0)
@@ -19,20 +19,20 @@ export default function MirrorMatch() {
     };
 
     return (<Box>
-            <Stack direction="row" spacing={5}>
-                <Side
-                    teamId={teamAId}
-                    updateMatch={updateMatch}
-                    score={scoreA}
-                    setScore={setScoreA}
-                />
+        <Stack direction="row" spacing={5}>
+            <Side
+                teamId={teamAId}
+                updateMatch={updateMatch}
+                score={scoreA}
+                setScore={setScoreA}
+            />
 
-                <Side
-                    teamId={teamBId}
-                    updateMatch={updateMatch}
-                    score={scoreB}
-                    setScore={setScoreB}
-                />
-            </Stack>
-        </Box>);
+            <Side
+                teamId={teamBId}
+                updateMatch={updateMatch}
+                score={scoreB}
+                setScore={setScoreB}
+            />
+        </Stack>
+    </Box>);
 }

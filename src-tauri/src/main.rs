@@ -9,7 +9,8 @@ use database::game_match::mirror::spectator_commands;
 mod database;
 mod utils;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     database::startup();
 
     tauri::Builder::default()

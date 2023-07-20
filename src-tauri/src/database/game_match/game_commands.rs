@@ -1,6 +1,7 @@
 use rusqlite::Connection;
 
 use crate::database::game_match::game_match::{get_max_score, get_score_color, check_for_game_won, update_team_set};
+use crate::database::game_match::mirror::spectator_commands::update_spectator_window;
 use crate::database::game_match::utils::{record, record_winner, retrieve_contenders, retrieve_game_set, retrieve_score_value, update_game_set};
 use crate::database::registration::table_player_creation::PERM_TEAM_PLAYERS;
 use crate::utils::rusqlite_error::Error;
@@ -12,7 +13,7 @@ pub struct Contestants {
     pub team_b_id: i64,
 }
 
-#[derive(serde::Serialize, Debug)]
+#[derive(serde::Serialize, Clone)]
 pub struct Configuration {
     score_color: String,
     current_stage: i64,
@@ -73,7 +74,7 @@ pub fn request_team_name(team_id: i64) -> Result<String, Error> {
 }
 
 #[tauri::command]
-pub fn request_configuration(game_id: i64, team_id: i64, max_score: i64) -> Result<Configuration, Error> {
+pub fn request_configuration(window: tauri::Window, game_id: i64, team_id: i64, max_score: i64) -> Result<Configuration, Error> {
     let connection = Connection::open(PERM_TEAM_PLAYERS)?;
     let score_color;
     let mut current_stage;
@@ -99,13 +100,16 @@ pub fn request_configuration(game_id: i64, team_id: i64, max_score: i64) -> Resu
             })
         }
     }
-
-    Ok(Configuration{
+    
+    let configuration = Configuration {
         score_color,
         current_stage,
         is_game_won: false,
         is_stage_won,
-    })
+    };
+
+    update_spectator_window(window, &configuration, team_id, score_points)?;
+    Ok(configuration)
 }
 
 #[tauri::command]
