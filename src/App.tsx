@@ -25,6 +25,7 @@ import Match from "./game_match/match";
 import Home from "./home";
 import TeamRegistrationForm from "./forms/team_registration";
 import ErrorPage from "./errors/error_page";
+import MirrorMatch from "./game_match/mirror/mirrorMatch";
 
 const drawerWidth = 240;
 
@@ -43,6 +44,7 @@ const Main = ({ open }) => {
                     <Route path="/home" element={<Home />} />
                     <Route path="/team-form" element={<TeamRegistrationForm />} />
                     <Route path="/match" element={<Match />} />
+                    <Route path="/mirror_match" element={<MirrorMatch />} />
                     <Route path="/error" element={<ErrorPage />} />
                 </Routes>
             </div>
