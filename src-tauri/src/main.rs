@@ -24,6 +24,7 @@ async fn main() {
             players::remove_player,
             game_commands::make_match,
             game_commands::request_contenders,
+            game_commands::request_latest_contenders,
             game_commands::record_interaction,
             game_commands::request_team_name,
             game_commands::request_configuration,

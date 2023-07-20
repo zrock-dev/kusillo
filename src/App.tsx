@@ -41,10 +41,11 @@ const Main = ({ open }) => {
         >
             <div style={{ marginTop: '70px' }}>
                 <Routes>
+                    <Route path="/" element={<Home />} />
                     <Route path="/home" element={<Home />} />
                     <Route path="/team-form" element={<TeamRegistrationForm />} />
                     <Route path="/match" element={<Match />} />
-                    <Route path="/mirror-match" element={<MirrorMatch />} />
+                    <Route path="/match-mirror" element={<MirrorMatch />} />
                     <Route path="/error" element={<ErrorPage />} />
                 </Routes>
             </div>

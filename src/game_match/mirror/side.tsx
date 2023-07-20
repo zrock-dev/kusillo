@@ -1,8 +1,10 @@
 import * as React from 'react';
 import {useEffect, useState} from 'react';
-import {Box, Typography} from "@mui/material";
+import {Box, Paper, Typography} from "@mui/material";
 import Grid2 from "@mui/material/Unstable_Grid2";
-import {tauri} from "@tauri-apps/api";
+import {listen} from '@tauri-apps/api/event'
+import {useNavigate} from "react-router-dom";
+import {invoke} from "@tauri-apps/api/tauri";
 
 function translateColor(color: string): string {
     switch (color) {
@@ -20,31 +22,44 @@ function translateColor(color: string): string {
 }
 
 // @ts-ignore
-export default function Side({ teamId, updateMatch, score, setScore }) {
+export default function Side({teamId, updateMatch, score, setScore}) {
     const [stage, setStage] = useState(0);
     const [teamName, setTeamName] = useState("");
     const [scoreColor, setScoreColor] = useState("");
+    const navigate = useNavigate();
 
     useEffect(() => {
-        tauri.promisified({
-            cmd: 'listen',
-            event: 'mirror_update',
-            handler: (payload) => {
-                console.log('Received data from backend:', payload);
-                if (payload.team_id == teamId){
-                    setStage(payload.current_stage)
-                    setScore(payload.score_points)
-                    setScoreColor(translateColor(payload.score_color))
-                    updateMatch(payload.is_stage_won)
-                }
-            },
-        });
-    }, [])
+        console.debug(`Requesting name team name for id: ${teamId}`)
+        invoke('request_team_name', {teamId: teamId})
+            .then((name: any) => {
+                setTeamName(name)
+            })
+            .catch((error => {
+                console.error(error)
+            }))
+    }, [teamId])
+
+    const matchUpdate = listen('mirror_update', (event_content) => {
+        let payload = event_content.payload
+        let configuration = payload.configuration
+
+        if (payload.team_id == teamId) {
+            setStage(configuration.current_stage)
+            setScore(payload.score_points)
+            setScoreColor(translateColor(configuration.score_color))
+            updateMatch(configuration.is_stage_won)
+        }
+    })
+
+    matchUpdate.catch((error) => {
+        console.error(error);
+        navigate('/error');
+    })
 
     return (
         <Grid2 container spacing={5}>
             <Grid2 xs={12}>
-                <Typography variant="h2">POPO {teamName}</Typography>
+                <Typography variant="h2">{teamName}</Typography>
             </Grid2>
 
             <Grid2 xs={12}>

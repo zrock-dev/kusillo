@@ -1,5 +1,5 @@
-use tauri::{Error, Window};
-use tokio::runtime::Builder;
+use tauri::{AppHandle, Error, Window};
+
 use crate::database::game_match::game_commands::Configuration;
 
 #[derive(serde::Serialize, Clone)]
@@ -12,36 +12,29 @@ struct InitPayload {
 struct UpdatePayload<'a> {
     team_id: i64,
     configuration: &'a Configuration,
-    score_points: i64
+    score_points: i64,
 }
 
 #[tauri::command]
-pub async fn open_spectator_window(handle: tauri::AppHandle, team_a_id: i32, team_b_id: i32) -> Result<(), Error> {
-    let spectator_window = tauri::WindowBuilder::new(
-        &handle,
-        "spectator",
-        tauri::WindowUrl::App("/match-mirror".into()),
-    ).build()?;
-
-    let init_payload = InitPayload {
-        team_a_id,
-        team_b_id,
-    };
-
-    spectator_window.emit("mirror_init", init_payload)?;
-
-    Ok(())
+pub async fn open_spectator_window(handle: AppHandle, team_a_id: i32, team_b_id: i32) {
+    std::thread::spawn(move || {
+        let _ = tauri::WindowBuilder::new(
+            &handle,
+            "spectator",
+            tauri::WindowUrl::App("/match-mirror".into()),
+        ).build()
+            .unwrap_or_else(|error| {
+                panic!("{}", error)
+            });
+    });
 }
 
 pub fn update_spectator_window(window: Window, configuration: &Configuration, team_id: i64, score_points: i64) -> Result<(), Error> {
-    let rt = Builder::new_current_thread().enable_all().build()?;
-    rt.block_on(async {
-        let update_payload = UpdatePayload {
-            team_id,
-            configuration,
-            score_points,
-        };
-        window.emit("mirror_update", update_payload)?;
-        Ok(())
-    })
+    let update_payload = UpdatePayload {
+        team_id,
+        configuration,
+        score_points,
+    };
+    window.emit("mirror_update", update_payload)?;
+    Ok(())
 }

@@ -18,7 +18,7 @@ export default function Home() {
             hasMadeMatch.current = true;
             invoke('make_match', {teamAId: 1, teamBId: 2})
                 .then((id) => {
-                    setGameId(id as number);
+                    setGameId(id as number)
                 })
                 .catch((error) => {
                     console.log(error)

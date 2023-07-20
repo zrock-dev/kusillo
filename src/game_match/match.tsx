@@ -55,7 +55,7 @@ export default function Match() {
     }
 
     function handleOpenSpectatorWindow(){
-        invoke('open_spectator_window')
+        invoke('open_spectator_window', {teamAId: teamAId, teamBId: teamBId})
             .catch((error) => {
                 console.error(error);
                 navigate('/error');
