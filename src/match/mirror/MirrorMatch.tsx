@@ -31,7 +31,8 @@ export default function MirrorMatch() {
         }
     };
 
-    return (<Box>
+    return (
+        <Box>
         <Stack direction="row" spacing={5}>
             <Side
                 teamId={teamAId}
@@ -47,5 +48,6 @@ export default function MirrorMatch() {
                 setScore={setScoreB}
             />
         </Stack>
-    </Box>);
+    </Box>
+    );
 }

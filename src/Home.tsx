@@ -1,7 +1,6 @@
-import {Link, Outlet, Route} from "react-router-dom";
+import {Link, Outlet} from "react-router-dom";
 import * as React from 'react';
 import {useState} from 'react';
-import {styled, useTheme} from '@mui/material/styles';
 import {
     Box,
     CssBaseline,
@@ -21,11 +20,9 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
-import ErrorPage from "./errors/error_page";
-import TeamRegistrationForm from "./forms/team_registration";
-import MatchSelect from "./match/MatchSelect";
+import {styled, useTheme} from '@mui/material/styles';
 
-const drawerWidth = 240
+const drawerWidth = 240;
 
 const Main = ({open}) => {
     return (
@@ -38,7 +35,7 @@ const Main = ({open}) => {
             }}
         >
             <div style={{marginTop: '70px'}}>
-                <Outlet />
+                <Outlet/>
             </div>
         </main>
     );
@@ -99,7 +96,7 @@ const DrawerItems = () => {
 }
 
 function Home() {
-    // const theme = useTheme();
+    const theme = useTheme();
     const [open, setOpen] = useState(true);
 
     const handleDrawerOpen = () => {
@@ -144,13 +141,12 @@ function Home() {
             >
                 <DrawerHeader>
                     <IconButton onClick={handleDrawerClose}>
-                        {/*{theme.direction === 'ltr' ? <ChevronLeftIcon/> : <ChevronRightIcon/>}*/}
+                        {theme.direction === 'ltr' ? <ChevronLeftIcon/> : <ChevronRightIcon/>}
                     </IconButton>
                 </DrawerHeader>
                 <Divider/>
                 <DrawerItems/>
             </Drawer>
-            <Typography>Hola nenas locas</Typography>
             <Main open={open}/>
         </Box>
     );

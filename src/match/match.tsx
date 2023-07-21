@@ -67,7 +67,7 @@ export default function Match() {
     }
 
     return (
-        <Box>
+        <Box sx={{display: 'grid'}}>
             <Stack direction="row" spacing={5}>
                 <Side
                     gameId={gameId}
