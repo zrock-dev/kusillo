@@ -8,7 +8,7 @@ import {
     Typography
 } from '@mui/material';
 
-export default function Home() {
+export default function MatchSelect() {
     const navigate = useNavigate();
     const [gameId, setGameId] = React.useState(-1);
     const hasMadeMatch = React.useRef(false);

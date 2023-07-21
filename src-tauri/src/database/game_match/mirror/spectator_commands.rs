@@ -16,7 +16,7 @@ struct UpdatePayload<'a> {
 }
 
 #[tauri::command]
-pub async fn open_spectator_window(handle: AppHandle, team_a_id: i32, team_b_id: i32) {
+pub async fn open_spectator_window(handle: AppHandle) {
     std::thread::spawn(move || {
         let _ = tauri::WindowBuilder::new(
             &handle,
