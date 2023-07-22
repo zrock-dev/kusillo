@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {invoke} from '@tauri-apps/api/tauri';
 import {useLocation, useNavigate} from 'react-router-dom';
 import Side from './side';
-import {Box, Stack, Button} from '@mui/material';
+import {Box, Stack, Button, Divider} from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
 import CountUpTimer from "./timer/CountUpTimer";
 
@@ -72,9 +72,10 @@ export default function Match() {
     }
 
     return (
-        <Box sx={{display: 'grid'}}>
+        <Box>
             <CountUpTimer timeoutHandler={timeOutHandler}/>
-            <Stack direction="row" spacing={5}>
+            <Divider flexItem/>
+            <Stack direction="row">
                 <Side
                     gameId={gameId}
                     teamId={teamAId}
@@ -84,7 +85,6 @@ export default function Match() {
                     maxScore={maxScore}
                     setMaxScore={setMaxScore}
                 />
-
                 <Side
                     gameId={gameId}
                     teamId={teamBId}

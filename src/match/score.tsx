@@ -87,7 +87,6 @@ export default function Score({gameId, teamId, setStage, updateMatch, score, set
                     updateMatch(payload.is_game_won as boolean, isStageWon)
                     setStage(payload.current_stage)
                 }
-                console.debug(payload.score_color)
                 setScoreColor(translateColor(payload.score_color as string))
                 checkInteractions()
             })

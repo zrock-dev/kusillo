@@ -5,6 +5,7 @@ import Grid2 from "@mui/material/Unstable_Grid2";
 import Score from "./score";
 import {invoke} from "@tauri-apps/api/tauri";
 import {useNavigate} from "react-router-dom";
+import TimeOutBox from "./timeout/TimeOutBox";
 
 // @ts-ignore
 export default function Side({gameId, teamId, updateMatch, score, setScore, maxScore, setMaxScore}) {
@@ -68,6 +69,9 @@ export default function Side({gameId, teamId, updateMatch, score, setScore, maxS
                     setScore={setScore}
                     maxScore={maxScore}
                 />
+            </Grid2>
+            <Grid2 xs={12}>
+                <TimeOutBox/>
             </Grid2>
         </Grid2>
     );
