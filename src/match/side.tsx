@@ -52,7 +52,6 @@ export default function Side({gameId, teamId, updateMatch, score, setScore, maxS
                         width: 60,
                         height: 60,
                         display: 'flex',
-                        backgroundColor: 'lime.lime',
                     }}
                 >
                     <Typography variant="h3"> {stage}</Typography>

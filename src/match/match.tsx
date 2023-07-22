@@ -4,6 +4,7 @@ import {useLocation, useNavigate} from 'react-router-dom';
 import Side from './side';
 import {Box, Stack, Button} from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
+import CountUpTimer from "./timer/CountUpTimer";
 
 export default function Match() {
     const navigate = useNavigate();
@@ -66,8 +67,13 @@ export default function Match() {
         return <div>Loading...</div>;
     }
 
+    function timeOutHandler(){
+        console.debug("Out of time")
+    }
+
     return (
         <Box sx={{display: 'grid'}}>
+            <CountUpTimer timeoutHandler={timeOutHandler}/>
             <Stack direction="row" spacing={5}>
                 <Side
                     gameId={gameId}
