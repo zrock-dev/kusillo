@@ -1,6 +1,7 @@
 use rusqlite::Connection;
 
 use crate::database::game_match::game_match::{get_max_score, get_score_color, check_for_game_won, update_team_set};
+use crate::database::game_match::mirror::spectator_commands::update_spectator_window;
 use crate::database::game_match::utils::{record, record_winner, retrieve_contenders, retrieve_game_set, retrieve_score_value, update_game_set};
 use crate::database::registration::table_player_creation::PERM_TEAM_PLAYERS;
 use crate::utils::rusqlite_error::Error;
@@ -12,7 +13,7 @@ pub struct Contestants {
     pub team_b_id: i64,
 }
 
-#[derive(serde::Serialize, Debug)]
+#[derive(serde::Serialize, Clone)]
 pub struct Configuration {
     score_color: String,
     current_stage: i64,
@@ -73,11 +74,11 @@ pub fn request_team_name(team_id: i64) -> Result<String, Error> {
 }
 
 #[tauri::command]
-pub fn request_configuration(game_id: i64, team_id: i64, max_score: i64) -> Result<Configuration, Error> {
+pub fn request_configuration(window: tauri::Window, game_id: i64, team_id: i64, max_score: i64) -> Result<Configuration, Error> {
     let connection = Connection::open(PERM_TEAM_PLAYERS)?;
     let score_color;
     let mut current_stage;
-    let is_game_won;
+    let mut is_game_won= false;
     let is_stage_won;
 
     let score_points = retrieve_score_value(&connection, "score_points", &game_id, &team_id)?;
@@ -89,23 +90,21 @@ pub fn request_configuration(game_id: i64, team_id: i64, max_score: i64) -> Resu
         current_stage = update_team_set(&connection, &team_id, &game_id)?;
         update_game_set(&connection, &game_id)?;
         is_game_won = check_for_game_won(game_id)?;
-        if is_game_won {
-            record_winner(&connection, &game_id, &team_id)?;
-            return Ok(Configuration{
-                score_color,
-                current_stage,
-                is_game_won,
-                is_stage_won,
-            })
-        }
     }
 
-    Ok(Configuration{
+    if is_game_won {
+        record_winner(&connection, &game_id, &team_id)?;
+    }
+
+    let configuration = Configuration {
         score_color,
         current_stage,
-        is_game_won: false,
+        is_game_won,
         is_stage_won,
-    })
+    };
+
+    update_spectator_window(window, &configuration, team_id, score_points)?;
+    Ok(configuration)
 }
 
 #[tauri::command]
@@ -113,4 +112,19 @@ pub fn request_max_score(game_id: i64) -> Result<i64, Error> {
     let connection = Connection::open(PERM_TEAM_PLAYERS)?;
     let game_set = retrieve_game_set(&connection, &game_id)?;
     Ok(get_max_score(game_set))
+}
+
+#[tauri::command]
+pub fn request_latest_contenders() -> Result<Contestants, Error> {
+    let connection = Connection::open(PERM_TEAM_PLAYERS)?;
+    let game_id = connection.query_row_and_then(
+        "SELECT rowid FROM game ORDER BY rowid DESC LIMIT 1",
+        [],
+        |row| {
+            Ok::<i64, Error>(
+                row.get(0)?
+            )
+        },
+    )?;
+    Ok(retrieve_contenders(&connection, &game_id)?)
 }

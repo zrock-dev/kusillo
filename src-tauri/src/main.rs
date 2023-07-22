@@ -4,11 +4,13 @@
 use database::game_match::game_commands;
 use database::registration::players;
 use database::registration::teams;
+use database::game_match::mirror::spectator_commands;
 
 mod database;
 mod utils;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     database::startup();
 
     tauri::Builder::default()
@@ -22,10 +24,12 @@ fn main() {
             players::remove_player,
             game_commands::make_match,
             game_commands::request_contenders,
+            game_commands::request_latest_contenders,
             game_commands::record_interaction,
             game_commands::request_team_name,
             game_commands::request_configuration,
             game_commands::request_max_score,
+            spectator_commands::open_spectator_window,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

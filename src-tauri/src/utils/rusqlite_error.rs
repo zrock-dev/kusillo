@@ -8,6 +8,9 @@ pub enum Error {
 
     #[error("Custom error: {0}")]
     CustomError(String),
+
+    #[error("Tauri error: {0}")]
+    TauriError(#[from] tauri::Error),
 }
 
 impl Serialize for Error {

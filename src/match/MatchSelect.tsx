@@ -8,7 +8,7 @@ import {
     Typography
 } from '@mui/material';
 
-export default function Home() {
+export default function MatchSelect() {
     const navigate = useNavigate();
     const [gameId, setGameId] = React.useState(-1);
     const hasMadeMatch = React.useRef(false);
@@ -18,7 +18,7 @@ export default function Home() {
             hasMadeMatch.current = true;
             invoke('make_match', {teamAId: 1, teamBId: 2})
                 .then((id) => {
-                    setGameId(id as number);
+                    setGameId(id as number)
                 })
                 .catch((error) => {
                     console.log(error)

@@ -1,13 +1,13 @@
 import * as React from 'react';
 import {useEffect, useState} from 'react';
-import {Box, createTheme, Typography} from "@mui/material";
+import {Box, Typography} from "@mui/material";
 import Grid2 from "@mui/material/Unstable_Grid2";
 import Score from "./score";
 import {invoke} from "@tauri-apps/api/tauri";
 import {useNavigate} from "react-router-dom";
 
 // @ts-ignore
-export default function Side({ gameId, teamId, updateMatch, score, setScore, maxScore, setMaxScore}) {
+export default function Side({gameId, teamId, updateMatch, score, setScore, maxScore, setMaxScore}) {
     const navigate = useNavigate();
     const [stage, setStage] = useState(0);
     const [teamName, setTeamName] = useState("");
@@ -42,11 +42,11 @@ export default function Side({ gameId, teamId, updateMatch, score, setScore, max
     return (
         <Grid2 container spacing={5}>
             <Grid2 xs={12}>
-                <Typography variant="h2" >{teamName}</Typography>
+                <Typography variant="h2">{teamName}</Typography>
             </Grid2>
 
             <Grid2 xs={12}>
-                <Typography variant="h6" >STAGE</Typography>
+                <Typography variant="h6">STAGE</Typography>
                 <Box
                     sx={{
                         width: 60,
