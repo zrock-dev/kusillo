@@ -14,7 +14,6 @@ export default function MirrorMatch() {
     useEffect(() => {
         invoke('request_latest_contenders')
             .then((contenders: any) => {
-                console.debug(`Requested contenders`, contenders)
                 setTeamAId(contenders.team_a_id)
                 setTeamBId(contenders.team_b_id)
             })
@@ -32,13 +31,21 @@ export default function MirrorMatch() {
     };
 
     return (
-        <Box>
+        <Box
+            sx={{
+                marginTop: '200px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+            }}
+        >
         <Stack direction="row" spacing={5}>
             <Side
                 teamId={teamAId}
                 updateMatch={updateMatch}
                 score={scoreA}
                 setScore={setScoreA}
+                stageAlign={"left"}
             />
 
             <Side
@@ -46,6 +53,7 @@ export default function MirrorMatch() {
                 updateMatch={updateMatch}
                 score={scoreB}
                 setScore={setScoreB}
+                stageAlign={"right"}
             />
         </Stack>
     </Box>

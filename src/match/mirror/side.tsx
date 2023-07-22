@@ -22,14 +22,13 @@ function translateColor(color: string): string {
 }
 
 // @ts-ignore
-export default function Side({teamId, updateMatch, score, setScore}) {
+export default function Side({teamId, updateMatch, score, setScore, stageAlign}) {
     const [stage, setStage] = useState(0);
     const [teamName, setTeamName] = useState("");
     const [scoreColor, setScoreColor] = useState("");
     const navigate = useNavigate();
 
     useEffect(() => {
-        console.debug(`Requesting name team name for id: ${teamId}`)
         invoke('request_team_name', {teamId: teamId})
             .then((name: any) => {
                 setTeamName(name)
@@ -57,41 +56,40 @@ export default function Side({teamId, updateMatch, score, setScore}) {
     })
 
     return (
-        <Grid2 container spacing={5}>
+        <Grid2 container spacing={3}>
             <Grid2 xs={12}>
-                <Typography variant="h2">{teamName}</Typography>
+                <Typography
+                    variant="h2"
+                    align={"center"}
+                >
+                    {teamName}
+                </Typography>
             </Grid2>
 
-            <Grid2 xs={12}>
-                <Typography variant="h6">STAGE</Typography>
-                <Box
-                    sx={{
-                        width: 60,
-                        height: 60,
-                        display: 'flex',
-                        backgroundColor: 'lime.lime',
-                    }}
-                >
-                    <Typography variant="h3"> {stage}</Typography>
-                </Box>
+            <Grid2 xs={12} mt={5}>
+                <Typography align={stageAlign} variant="h6">STAGE</Typography>
+                <Typography align={stageAlign} variant="h3"> {stage}</Typography>
             </Grid2>
 
-            <Grid2 xs>
-                <Box
-                    sx={{
-                        width: 201,
-                        height: 190,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                    }}
+            <Grid2 xs={12} mt={5}>
+                <Paper
+                    sx={{backgroundColor: scoreColor}}
                 >
-                    <Paper
-                        sx={{backgroundColor: scoreColor}}
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}
                     >
-                        <Typography variant="h1">{score}</Typography>
-                    </Paper>
-                </Box>
+                        <Typography
+                            align={"center"}
+                            variant="h1"
+                        >
+                            {score}
+                        </Typography>
+                    </Box>
+                </Paper>
             </Grid2>
         </Grid2>
     );
