@@ -63,8 +63,8 @@ pub fn retrieve_contenders(connection: &Connection, game_id: &i64) -> Result<Con
 
     Ok(contestants)
 }
-pub fn record (connection: &Connection, game_id: &i64, team_id: &i64, score_points: &i64, current_stage: &i64) -> Result<(), Error>{
 
+pub fn record (connection: &Connection, game_id: &i64, team_id: &i64, score_points: &i64, current_stage: &i64) -> Result<(), Error>{
     connection.execute(
         "INSERT INTO
             score (game_id, set_number, score_points, team_id, timestamp)

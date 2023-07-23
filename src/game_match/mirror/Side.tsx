@@ -38,22 +38,24 @@ export default function Side({teamId, updateMatch, score, setScore, stageAlign})
             }))
     }, [teamId])
 
-    const matchUpdate = listen('mirror_update', (event_content) => {
-        let payload = event_content.payload
-        let configuration = payload.configuration
+    listen(
+        'score_update',
+        (event_content) => {
+            let payload = event_content.payload
+            let configuration = payload.configuration
 
-        if (payload.team_id == teamId) {
-            setStage(configuration.current_stage)
-            setScore(payload.score_points)
-            setScoreColor(translateColor(configuration.score_color))
-            updateMatch(configuration.is_stage_won)
-        }
-    })
+            if (payload["team_id"] == teamId) {
+                setStage(configuration["current_stage"])
+                setScore(payload["score_points"])
+                setScoreColor(translateColor(configuration["score_color"]))
+                updateMatch(configuration["is_stage_won"])
+            }
+        })
+        .catch((error) => {
+            console.error(error);
+            navigate('/error');
+        })
 
-    matchUpdate.catch((error) => {
-        console.error(error);
-        navigate('/error');
-    })
 
     return (
         <Grid2 container spacing={3}>

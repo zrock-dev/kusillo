@@ -1,6 +1,6 @@
 use tauri::{AppHandle, Error, Window};
 
-use crate::database::game_match::game_commands::Configuration;
+use crate::database::game_match::game_commands::GameUpdate;
 
 #[derive(serde::Serialize, Clone)]
 struct InitPayload {
@@ -11,7 +11,7 @@ struct InitPayload {
 #[derive(serde::Serialize, Clone)]
 struct UpdatePayload<'a> {
     team_id: i64,
-    configuration: &'a Configuration,
+    configuration: &'a GameUpdate,
     score_points: i64,
 }
 
@@ -27,14 +27,4 @@ pub async fn open_spectator_window(handle: AppHandle) {
                 panic!("{}", error)
             });
     });
-}
-
-pub fn update_spectator_window(window: Window, configuration: &Configuration, team_id: i64, score_points: i64) -> Result<(), Error> {
-    let update_payload = UpdatePayload {
-        team_id,
-        configuration,
-        score_points,
-    };
-    window.emit("mirror_update", update_payload)?;
-    Ok(())
 }

@@ -2,13 +2,13 @@ import * as React from 'react';
 import {useEffect, useState} from 'react';
 import {Box, Typography} from "@mui/material";
 import Grid2 from "@mui/material/Unstable_Grid2";
-import Score from "./score";
+import Score from "./Score";
 import {invoke} from "@tauri-apps/api/tauri";
 import {useNavigate} from "react-router-dom";
-import TimeOutBox from "./timeout/TimeOutBox";
+import TimeOutBox from "../timeout/TimeOutBox";
 
 // @ts-ignore
-export default function Side({gameId, teamId, updateMatch, score, setScore, maxScore, setMaxScore}) {
+export default function Side({ gameId, teamId, updateMatch, score, setScore, maxScore, setMaxScore }) {
     const navigate = useNavigate();
     const [stage, setStage] = useState(0);
     const [teamName, setTeamName] = useState("");
@@ -16,7 +16,6 @@ export default function Side({gameId, teamId, updateMatch, score, setScore, maxS
     useEffect(() => {
         updateTeamName()
     }, [])
-
 
     useEffect(() => {
         invoke('request_max_score', {gameId: gameId})

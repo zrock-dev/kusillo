@@ -3,6 +3,7 @@ import {useEffect, useState} from 'react';
 import {useNavigate} from "react-router-dom";
 import {invoke} from "@tauri-apps/api/tauri";
 import {Box, Button, ButtonGroup, Paper, Typography} from "@mui/material";
+import {listen} from "@tauri-apps/api/event";
 
 function checkButtons(buttonEnabledSetters: any, validationFn: any) {
     buttonEnabledSetters.forEach((button: any) => {
@@ -80,20 +81,8 @@ export default function Score({gameId, teamId, setStage, updateMatch, score, set
 
     useEffect(() => {
         recordInteraction(score)
-        invoke('request_configuration', {gameId: gameId, teamId: teamId, maxScore: maxScore})
-            .then((payload: any) => {
-                let isStageWon = payload.is_stage_won;
-                if (isStageWon) {
-                    updateMatch(payload.is_game_won as boolean, isStageWon)
-                    setStage(payload.current_stage)
-                }
-                setScoreColor(translateColor(payload.score_color as string))
-                checkInteractions()
-            })
-            .catch((error => {
-                console.error(error)
-                navigate("/error")
-            }))
+        fireScoreUpdateEvent()
+        checkInteractions()
     }, [score])
 
     function checkInteractions() {
@@ -116,6 +105,35 @@ export default function Score({gameId, teamId, setStage, updateMatch, score, set
                 navigate("/error")
             }))
     }
+
+    function fireScoreUpdateEvent(){
+        invoke('fire_score_update', { gameId: gameId, teamId: teamId, maxScore: maxScore })
+            .catch((error => {
+                console.error(error)
+                navigate("/error")
+            }))
+    }
+
+    listen(
+        'score_update',
+        (event_content) => {
+            let payload = event_content.payload
+
+            if (payload["team_id"] == teamId) {
+                let configuration = payload["configuration"]
+                let isStageWon = configuration["is_stage_won"];
+
+                if (isStageWon) {
+                    updateMatch(configuration["is_game_won"] as boolean, isStageWon)
+                    setStage(configuration["current_stage"])
+                }
+                setScoreColor(translateColor(configuration["score_color"] as string))
+            }
+        })
+        .catch((error) => {
+            console.error(error);
+            navigate('/error');
+        })
 
     return (
         <Box

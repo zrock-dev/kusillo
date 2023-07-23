@@ -1,10 +1,10 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {invoke} from '@tauri-apps/api/tauri';
 import {useLocation, useNavigate} from 'react-router-dom';
-import Side from './side';
+import Side from './Side';
 import {Box, Stack, Button, Divider} from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
-import CountUpTimer from "./timer/CountUpTimer";
+import CountUpTimer from "../timer/CountUpTimer";
 
 export default function Match() {
     const navigate = useNavigate();
@@ -31,7 +31,7 @@ export default function Match() {
     const updateMatch = (isGameWon: boolean, isStageWon: boolean) => {
         if (isGameWon){
             enqueueSnackbar("Game won", {variant: "success"})
-            navigate('/home');
+            navigate('/');
         }else if (isStageWon){
             resetScores()
         }

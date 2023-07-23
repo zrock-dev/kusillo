@@ -1,10 +1,10 @@
-import Side from './side';
+import Side from './Side';
 import {Box, Stack} from '@mui/material';
 import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {invoke} from "@tauri-apps/api/tauri";
 
-export default function MirrorMatch() {
+export default function Match() {
     const navigate = useNavigate();
     const [teamAId, setTeamAId] = useState(-1);
     const [scoreA, setScoreA] = useState(0);
