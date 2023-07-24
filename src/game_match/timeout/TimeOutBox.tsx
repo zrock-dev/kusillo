@@ -25,7 +25,6 @@ function TimeOutDialog({isOpen, handleDialogClose}) {
     function resetTimer(){
         currentTime.seconds = 0
         updateTimeBox()
-        console.debug(`seconds restarted ${currentTime.seconds}`)
     }
 
     useEffect(() => {
@@ -33,7 +32,7 @@ function TimeOutDialog({isOpen, handleDialogClose}) {
             const intervalId = setInterval(() => {
                 currentTime.seconds = currentTime.seconds + 1
                 updateTimeBox()
-                if (currentTime.seconds >= 60) {
+                if (currentTime.seconds >= 5) {
                     resetTimer()
                     clearInterval(intervalId)
                     handleDialogClose()

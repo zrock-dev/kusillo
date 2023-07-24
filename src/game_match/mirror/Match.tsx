@@ -1,8 +1,9 @@
 import Side from './Side';
-import {Box, Stack} from '@mui/material';
-import {useEffect, useState} from "react";
+import {Box, Divider, Stack} from '@mui/material';
+import React, {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {invoke} from "@tauri-apps/api/tauri";
+import CountUpTimer from "../timer/CountUpTimer";
 
 export default function Match() {
     const navigate = useNavigate();
@@ -30,6 +31,10 @@ export default function Match() {
         }
     };
 
+    function timeOutHandler(){
+        console.debug("Out of time")
+    }
+
     return (
         <Box
             sx={{
@@ -39,23 +44,24 @@ export default function Match() {
                 justifyContent: 'center',
             }}
         >
-        <Stack direction="row" spacing={5}>
-            <Side
-                teamId={teamAId}
-                updateMatch={updateMatch}
-                score={scoreA}
-                setScore={setScoreA}
-                stageAlign={"left"}
-            />
+            <Divider flexItem/>
+            <Stack direction="row" spacing={5}>
+                <Side
+                    teamId={teamAId}
+                    updateMatch={updateMatch}
+                    score={scoreA}
+                    setScore={setScoreA}
+                    stageAlign={"left"}
+                />
 
-            <Side
-                teamId={teamBId}
-                updateMatch={updateMatch}
-                score={scoreB}
-                setScore={setScoreB}
-                stageAlign={"right"}
-            />
-        </Stack>
-    </Box>
+                <Side
+                    teamId={teamBId}
+                    updateMatch={updateMatch}
+                    score={scoreB}
+                    setScore={setScoreB}
+                    stageAlign={"right"}
+                />
+            </Stack>
+        </Box>
     );
 }

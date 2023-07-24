@@ -5,6 +5,7 @@ import Grid2 from "@mui/material/Unstable_Grid2";
 import {listen} from '@tauri-apps/api/event'
 import {useNavigate} from "react-router-dom";
 import {invoke} from "@tauri-apps/api/tauri";
+import TimeOutBox from "../timeout/TimeOutBox";
 
 function translateColor(color: string): string {
     switch (color) {

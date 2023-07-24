@@ -1,8 +1,9 @@
 import React, {useEffect, useState} from "react";
 import TimeBox from "./TimeBox";
 import {padWithZeros} from "../../Utils";
-import {invoke} from "@tauri-apps/api/tauri";
 import {useNavigate} from "react-router-dom";
+import {listen} from "@tauri-apps/api/event";
+import {invoke} from "@tauri-apps/api/tauri";
 
 const defaultElapsedTime = {
     seconds: "00",
@@ -10,7 +11,7 @@ const defaultElapsedTime = {
 }
 
 // @ts-ignore
-function CountUpTimer({ timeoutHandler }){
+function CountUpTimer() {
     const navigate = useNavigate();
     const [elapsedTime, setElapsedTime] = useState(defaultElapsedTime)
     const currentTime = {
@@ -18,47 +19,75 @@ function CountUpTimer({ timeoutHandler }){
         minutes: 0,
     }
 
+    let timerId
+
     useEffect(() => {
-       const intervalId = setInterval(() => {
-           updateCurrentTime()
-           updateTimeBox()
-           let cantContinue = verifyTimeUpdate()
-           if (!cantContinue){
-               clearInterval(intervalId)
-               timeoutHandler()
-               return
-           }
-       }, 1000)
-        return () => {clearInterval(intervalId)}
+        requestCurrentTime()
+        startTimer()
     }, [])
 
-    function updateCurrentTime(){
-        currentTime.seconds = currentTime.seconds + 1
-        if (currentTime.seconds == 60){
-            currentTime.minutes = currentTime.minutes + 1
-            currentTime.seconds = 0
-        }
-    }
-
-    function updateTimeBox(){
+    function updateTimeBox() {
         setElapsedTime({
             seconds: padWithZeros(currentTime.seconds, 2),
             minutes: padWithZeros(currentTime.minutes, 2)
         })
     }
 
-    function verifyTimeUpdate(): boolean{
-        let isOnTime = true
-        // invoke('is_on_time', {currentTime: currentTime.minutes})
-        //     .then((isItOntime) => {isOnTime = isItOntime as boolean})
-        //     .catch((error) => {
-        //         console.error(error)
-        //         navigate("/error")
-        //     })
-        return isOnTime
+    function updateCurrentTime() {
+        currentTime.seconds = currentTime.seconds + 1
+        if (currentTime.seconds == 60) {
+            currentTime.minutes = currentTime.minutes + 1
+            currentTime.seconds = 0
+        }
+        updateTimeBox()
     }
 
-    return(
+    function synchronizeClock(payload){
+        currentTime.seconds = payload["seconds"] as number
+        currentTime.minutes = payload["minutes"] as number
+    }
+
+    function requestCurrentTime() {
+        invoke('request_current_time')
+            .then((payload) => {
+                synchronizeClock(payload)
+                updateCurrentTime()
+            })
+            .catch((error) => {
+                console.error(error)
+                navigate("/error")
+            })
+    }
+
+    function startTimer() {
+        timerId = setInterval(() => {
+         updateCurrentTime()
+        }, 1000)
+    }
+
+    function stopTimer(){
+        clearInterval(timerId)
+    }
+
+    listen("time-update", timeUpdateListener)
+        .catch((error) => {
+            console.error(error)
+            navigate("/error")
+        })
+
+    function timeUpdateListener(payload) {
+        checkTimerStatus(payload)
+        synchronizeClock(payload)
+        updateCurrentTime()
+    }
+
+    function checkTimerStatus(payload){
+        if (!payload["keep_running"]){
+            stopTimer()
+        }
+    }
+
+    return (
         <TimeBox time={elapsedTime}/>
     );
 }

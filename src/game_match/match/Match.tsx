@@ -40,8 +40,8 @@ export default function Match() {
     function updateContenders(){
         invoke('request_contenders', {gameId: gameId})
             .then((contestants: any) => {
-                setTeamAId(contestants.team_a_id as number);
-                setTeamBId(contestants.team_b_id as number);
+                setTeamAId(contestants["team_a_id"] as number);
+                setTeamBId(contestants["team_b_id"] as number);
             })
             .catch((error) => {
                 console.error(error);
