@@ -39,9 +39,9 @@ pub fn update_team_set(connection: &Connection, team_id: &i64, game_id: &i64) ->
 
 pub fn get_max_score(game_set: i64) -> i64{
     if game_set < 2 {
-        20
-    }else {
         18
+    }else {
+        16
     }
 }
 
