@@ -67,7 +67,6 @@ function CountUpTimer({isMirror}) {
     }
 
     listen("time-sync", (event) => {
-        console.debug(event)
         timeUpdateListener(event.payload)
     })
         .catch((error) => {
@@ -83,7 +82,6 @@ function CountUpTimer({isMirror}) {
         })
 
     function timeUpdateListener(payload) {
-        console.debug(`Synchronized clock with ${payload.minutes}:${payload.seconds}`)
         synchronizeClock(payload)
         updateCurrentTime()
         updateTimeBox()

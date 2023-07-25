@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from "react";
 import {Box, Checkbox, Dialog, DialogContent, Stack, Typography} from "@mui/material";
 import {padWithZeros} from "../../Utils";
+import {invoke} from "@tauri-apps/api/tauri";
+import {useNavigate} from "react-router-dom";
 
 const defaultElapsedTime = {
     seconds: "00",
@@ -9,6 +11,7 @@ const defaultElapsedTime = {
 
 // @ts-ignore
 function TimeOutDialog({isOpen, handleDialogClose}) {
+    const navigate = useNavigate();
     const [elapsedTime, setElapsedTime] = useState(defaultElapsedTime)
     const currentTime = {
         seconds: 0,
@@ -29,12 +32,14 @@ function TimeOutDialog({isOpen, handleDialogClose}) {
 
     useEffect(() => {
         if (isOpen) {
+            pauseMatchTimer()
             const intervalId = setInterval(() => {
                 currentTime.seconds = currentTime.seconds + 1
                 updateTimeBox()
                 if (currentTime.seconds >= 5) {
                     resetTimer()
                     clearInterval(intervalId)
+                    resumeMatchTimer()
                     handleDialogClose()
                 }
             }, 1000)
@@ -43,6 +48,22 @@ function TimeOutDialog({isOpen, handleDialogClose}) {
             }
         }
     }, [isOpen])
+
+    function pauseMatchTimer(){
+        invoke('pause_clock')
+            .catch((error) => {
+                console.error(error)
+                navigate("/error")
+            })
+    }
+
+    function resumeMatchTimer(){
+        invoke('start_clock')
+            .catch((error) => {
+                console.error(error)
+                navigate("/error")
+            })
+    }
 
     return (
         <Dialog open={isOpen}>
