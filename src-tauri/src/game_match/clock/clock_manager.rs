@@ -7,6 +7,7 @@ use serde::Serialize;
 use tauri::AppHandle;
 
 use crate::game_match::clock::actions::is_clock_on_time;
+use crate::game_match::clock::commands::CLOCK_COMMAND_SENDER;
 use crate::game_match::clock::events::{fire_event_time_sync, fire_event_timeout};
 
 #[derive(Serialize)]
@@ -65,7 +66,7 @@ pub fn launch_clock_thread(time_sync_sender: Sender<Time>, receiver: Receiver<Cl
             ClockCommand::Start => {
                 println!("Received start command");
                 *running.lock().unwrap() = true;
-                start_counter(Arc::clone(&minutes), Arc::clone(&seconds), Arc::clone(&running), time_sync_sender)
+                start_counter(Arc::clone(&minutes), Arc::clone(&seconds), Arc::clone(&running), time_sync_sender.clone())
             }
 
             ClockCommand::Pause => {
@@ -92,15 +93,19 @@ pub fn launch_clock_thread(time_sync_sender: Sender<Time>, receiver: Receiver<Cl
     println!("The clock has terminated");
 }
 
-pub fn launch_clock_sync_thread(handle: AppHandle, time_sync_receiver: Receiver<Time>,  clock_command_sender: &Sender<ClockCommand>) {
+pub fn launch_clock_sync_thread(handle: AppHandle, time_sync_receiver: Receiver<Time>) {
     let mut sync_span_limit = 0;
-    let time = time_sync_receiver.recv().unwrap();
-    if !is_clock_on_time(&time) {
-        fire_event_timeout(&handle);
-        clock_command_sender.send(ClockCommand::Terminate).unwrap();
-    }else {
+    
+    loop {
+        let time = time_sync_receiver.recv().unwrap();
+
+        if !is_clock_on_time(&time) {
+            fire_event_timeout(handle.clone());
+            CLOCK_COMMAND_SENDER.lock().unwrap().send(ClockCommand::Terminate).unwrap();
+        }
+
         if sync_span_limit == 3 {
-            fire_event_time_sync(&time, &handle);
+            fire_event_time_sync(&time, handle.clone());
             sync_span_limit = 0;
         }else {
             sync_span_limit += 1;

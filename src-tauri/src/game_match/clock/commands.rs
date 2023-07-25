@@ -7,23 +7,23 @@ use tauri::{AppHandle, command};
 use crate::game_match::clock::clock_manager::{ClockCommand, launch_clock_sync_thread, launch_clock_thread, Time};
 
 lazy_static! {
-    static ref CLOCK_COMMAND_SENDER: Mutex<Sender<ClockCommand>> = Mutex::new(channel().0);
+    pub static ref CLOCK_COMMAND_SENDER: Mutex<Sender<ClockCommand>> = Mutex::new(channel().0);
 }
 
 #[command]
 pub fn create_clock(handle: AppHandle) {
     let (time_sync_sender, time_sync_receiver): (Sender<Time>, Receiver<Time>) = channel();
     let (clock_command_sender, clock_command_receiver): (Sender<ClockCommand>, Receiver<ClockCommand>) = channel();
+    *CLOCK_COMMAND_SENDER.lock().unwrap() = clock_command_sender;
 
     std::thread::spawn(move || {
         launch_clock_thread(time_sync_sender, clock_command_receiver);
     });
 
     std::thread::spawn(move || {
-        launch_clock_sync_thread(handle, time_sync_receiver, &clock_command_sender);
+        launch_clock_sync_thread(handle, time_sync_receiver);
     });
 
-    *CLOCK_COMMAND_SENDER.lock().unwrap() = clock_command_sender;
 }
 
 #[command]
