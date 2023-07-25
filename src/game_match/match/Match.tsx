@@ -21,7 +21,7 @@ export default function Match() {
 
     const [isLoading, setIsLoading] = useState(true);
 
-    const [canOpenSpectatorWindow, setCanOpenSpectatorWindow] = useState(true);
+    const [canOpenSpectatorWindow, setCanOpenSpectatorWindow] = useState(false);
 
     useEffect(() => {
         if (!hasFetchedContenders.current) {
@@ -63,7 +63,7 @@ export default function Match() {
                 console.error(error);
                 navigate('/error');
             })
-        setCanOpenSpectatorWindow(false)
+        setCanOpenSpectatorWindow(true)
     }
 
     function start_clock() {
@@ -80,7 +80,7 @@ export default function Match() {
 
     return (
         <Box>
-            <CountUpTimer/>
+            <CountUpTimer isMirror={false}/>
             <Divider flexItem/>
             <Stack direction="row">
                 <Side

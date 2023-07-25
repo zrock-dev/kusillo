@@ -8,10 +8,9 @@ pub fn is_clock_on_time(time: &Time) -> bool{
     let game_id = retrieve_latest_game_id(&connection).unwrap();
     let game_set = retrieve_game_set(&connection, &game_id).unwrap();
 
-    match game_set {
-        1 => {time.minutes <= 20},
-        2 => {time.minutes <= 20}
-        3 => {time.minutes <= 15}
-        _ => panic!()
+    if game_set < 2 {
+        time.minutes <= 19
+    }else {
+        time.minutes <= 14
     }
 }

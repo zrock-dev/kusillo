@@ -39,15 +39,13 @@ fn start_counter(general_minutes: Arc<Mutex<i32>>, general_seconds: Arc<Mutex<i3
             if seconds == 60 {
                 minutes += 1;
                 seconds = 0;
-
-                let time = Time {
-                    minutes,
-                    seconds,
-                };
-                sender.send(time).unwrap();
             }
 
-            println!("current time is {}:{}", minutes, seconds);
+            let time = Time {
+                minutes,
+                seconds,
+            };
+            sender.send(time).unwrap();
         }
 
         *general_minutes.lock().unwrap() = minutes;
@@ -93,22 +91,13 @@ pub fn launch_clock_thread(time_sync_sender: Sender<Time>, receiver: Receiver<Cl
     println!("The clock has terminated");
 }
 
-pub fn launch_clock_sync_thread(handle: AppHandle, time_sync_receiver: Receiver<Time>) {
-    let mut sync_span_limit = 0;
-    
+pub fn launch_clock_sync_thread(handle: AppHandle, time_sync_receiver: Receiver<Time>){
     loop {
         let time = time_sync_receiver.recv().unwrap();
-
+        fire_event_time_sync(&time, handle.clone());
         if !is_clock_on_time(&time) {
             fire_event_timeout(handle.clone());
             CLOCK_COMMAND_SENDER.lock().unwrap().send(ClockCommand::Terminate).unwrap();
-        }
-
-        if sync_span_limit == 3 {
-            fire_event_time_sync(&time, handle.clone());
-            sync_span_limit = 0;
-        }else {
-            sync_span_limit += 1;
         }
     }
 }

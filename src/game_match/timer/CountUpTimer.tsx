@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import TimeBox from "./TimeBox";
 import {padWithZeros} from "../../Utils";
 import {useNavigate} from "react-router-dom";
@@ -11,7 +11,7 @@ const defaultElapsedTime = {
 }
 
 // @ts-ignore
-function CountUpTimer() {
+function CountUpTimer({isMirror}) {
     const navigate = useNavigate();
     const [elapsedTime, setElapsedTime] = useState(defaultElapsedTime)
     const currentTime = {
@@ -20,10 +20,18 @@ function CountUpTimer() {
     }
 
     let timerId
+    const hasRequested = useRef(false)
 
     useEffect(() => {
-        requestCurrentTime()
-        startTimer()
+        if (isMirror) {
+            requestCurrentTime()
+        } else {
+            if (!hasRequested.current) {
+                hasRequested.current = !hasRequested.current;
+                startBackendTimer()
+                requestCurrentTime()
+            }
+        }
     }, [])
 
     function updateTimeBox() {
@@ -39,10 +47,9 @@ function CountUpTimer() {
             currentTime.minutes = currentTime.minutes + 1
             currentTime.seconds = 0
         }
-        updateTimeBox()
     }
 
-    function synchronizeClock(payload){
+    function synchronizeClock(payload) {
         currentTime.minutes = payload["minutes"] as number
         currentTime.seconds = payload["seconds"] as number
     }
@@ -59,31 +66,35 @@ function CountUpTimer() {
             })
     }
 
-    function startTimer() {
-        timerId = setInterval(() => {
-         updateCurrentTime()
-        }, 1000)
-    }
-
-    function stopTimer(){
-        clearInterval(timerId)
-    }
-
-    listen("time-sync", timeUpdateListener)
+    listen("time-sync", (event) => {
+        console.debug(event)
+        timeUpdateListener(event.payload)
+    })
         .catch((error) => {
             console.error(error)
             navigate("/error")
         })
 
-    listen("time-out", () => {stopTimer()})
+    listen("time-out", () => {
+    })
         .catch((error) => {
             console.error(error)
             navigate("/error")
         })
 
     function timeUpdateListener(payload) {
+        console.debug(`Synchronized clock with ${payload.minutes}:${payload.seconds}`)
         synchronizeClock(payload)
         updateCurrentTime()
+        updateTimeBox()
+    }
+
+    function startBackendTimer() {
+        invoke('start_clock')
+            .catch((error) => {
+                console.error(error)
+                navigate("/error")
+            })
     }
 
     return (

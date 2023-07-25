@@ -31,9 +31,6 @@ export default function Match() {
         }
     };
 
-    function timeOutHandler(){
-        console.debug("Out of time")
-    }
 
     return (
         <Box
@@ -44,6 +41,7 @@ export default function Match() {
                 justifyContent: 'center',
             }}
         >
+            <CountUpTimer isMirror={true}/>
             <Divider flexItem/>
             <Stack direction="row" spacing={5}>
                 <Side
