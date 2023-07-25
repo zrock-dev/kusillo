@@ -70,7 +70,9 @@ export default function Side({ gameId, teamId, updateMatch, score, setScore, max
                 />
             </Grid2>
             <Grid2 xs={12}>
-                <TimeOutBox/>
+                <TimeOutBox
+                    isMirror={false}
+                />
             </Grid2>
         </Grid2>
     );

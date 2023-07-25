@@ -1,120 +1,111 @@
-import React, {useEffect, useState} from "react";
-import {Box, Checkbox, Dialog, DialogContent, Stack, Typography} from "@mui/material";
-import {padWithZeros} from "../../Utils";
+import React, {useState} from "react";
+import {Box, Checkbox, Stack, Typography} from "@mui/material";
+import TimeOutCounter from "./TimeOutCounter";
+import TimeOutDialog from "./TimeOutDialog";
 import {invoke} from "@tauri-apps/api/tauri";
 import {useNavigate} from "react-router-dom";
-
-const defaultElapsedTime = {
-    seconds: "00",
-    minutes: "00",
-}
+import {listen} from "@tauri-apps/api/event";
 
 // @ts-ignore
-function TimeOutDialog({isOpen, handleDialogClose}) {
+function TimeOutBox({ isMirror }) {
     const navigate = useNavigate();
-    const [elapsedTime, setElapsedTime] = useState(defaultElapsedTime)
-    const currentTime = {
-        seconds: 0,
-        minutes: 0,
-    }
-
-    function updateTimeBox() {
-        setElapsedTime({
-            seconds: padWithZeros(currentTime.seconds, 2),
-            minutes: padWithZeros(currentTime.minutes, 2)
-        })
-    }
-
-    function resetTimer(){
-        currentTime.seconds = 0
-        updateTimeBox()
-    }
-
-    useEffect(() => {
-        if (isOpen) {
-            pauseMatchTimer()
-            const intervalId = setInterval(() => {
-                currentTime.seconds = currentTime.seconds + 1
-                updateTimeBox()
-                if (currentTime.seconds >= 5) {
-                    resetTimer()
-                    clearInterval(intervalId)
-                    resumeMatchTimer()
-                    handleDialogClose()
-                }
-            }, 1000)
-            return () => {
-                clearInterval(intervalId)
-            }
-        }
-    }, [isOpen])
-
-    function pauseMatchTimer(){
-        invoke('pause_clock')
-            .catch((error) => {
-                console.error(error)
-                navigate("/error")
-            })
-    }
-
-    function resumeMatchTimer(){
-        invoke('start_clock')
-            .catch((error) => {
-                console.error(error)
-                navigate("/error")
-            })
-    }
-
-    return (
-        <Dialog open={isOpen}>
-            <DialogContent>
-                <Box
-                    sx = {{
-                        width: 500,
-                        height: 200,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                    }}
-                >
-                    <Stack spacing={3}>
-                        <Typography
-                            align={"center"}
-                            variant="h3"
-                        >
-                            Timeout
-                        </Typography>
-                        <Typography
-                            align={"center"}
-                            variant="h4"
-                        >
-                            {elapsedTime.minutes}:{elapsedTime.seconds}
-                        </Typography>
-                    </Stack>
-                </Box>
-            </DialogContent>
-        </Dialog>
-    );
-}
-
-// @ts-ignore
-function TimeOutBox() {
-    const [isOpen, setIsOpen] = useState(false)
+    const [isDialogOpen, setIsOpen] = useState(false)
     const [box1Status, setBox1] = useState(false)
     const [box2Status, setBox2] = useState(false)
     const [box3Status, setBox3] = useState(false)
 
     // @ts-ignore
-    function handleTimeoutConsume(checkBoxSetter) {
+    function handleTimeoutStart(checkBoxSetter) {
         checkBoxSetter((prevValue: any) => !prevValue);
-        setIsOpen(true)
+        requestTimeOut()
     }
 
-    function handleDialogClose() {
-        setIsOpen(false)
+    function handleTimeoutFinished() {
+        requestTimeOutFinish()
     }
+
+    function requestTimeOut(){
+        invoke('request_timeout' )
+            .catch((error) => {
+                console.error(error)
+                navigate("/error")
+            })
+    }
+
+    function requestTimeOutFinish(){
+        invoke('request_timeout_finish' )
+            .catch((error) => {
+                console.error(error)
+                navigate("/error")
+            })
+    }
+
+    listen("timeout_status", (event) => {
+        console.debug(event)
+        setIsOpen(event.payload as boolean)
+    })
+        .catch((error) => {
+            console.error(error)
+            navigate("/error")
+        })
 
     const label = {inputProps: {'aria-label': 'Checkbox demo'}};
+
+    if (isMirror){
+        return (
+            <Box
+                sx={{
+                    display: 'flex',
+                    align: 'center',
+                    justifyContent: 'center',
+                }}
+            >
+                <Box
+                    sx={{
+                        border: 1,
+                        display: 'flex',
+                        align: 'center',
+                        justifyContent: 'center',
+                        width: 300,
+                    }}
+                >
+                    <Stack>
+                        <Typography variant={"h5"} align={"center"}> Time Out </Typography>
+                        <Stack direction={"row"}>
+                            <Checkbox
+                                {...label}
+                                sx={{'& .MuiSvgIcon-root': {fontSize: 30}}}
+                                disabled={box1Status}
+                                checked={box1Status}
+                                onChange={() => {
+                                    handleTimeoutStart(setBox1)
+                                }}/>
+                            <Checkbox
+                                {...label}
+                                sx={{'& .MuiSvgIcon-root': {fontSize: 30}}}
+                                disabled={box2Status}
+                                checked={box2Status}
+                                onChange={() => {
+                                    handleTimeoutStart(setBox2)
+                                }}/>
+                            <Checkbox
+                                {...label}
+                                sx={{'& .MuiSvgIcon-root': {fontSize: 30}}}
+                                disabled={box3Status}
+                                checked={box3Status}
+                                onChange={() => {
+                                    handleTimeoutStart(setBox3)
+                                }}/>
+                        </Stack>
+                    </Stack>
+                </Box>
+                <TimeOutDialog
+                    isDialogOpen={isDialogOpen}
+                />
+            </Box>
+        );
+    }
+
     return (
         <Box
             sx={{
@@ -141,7 +132,7 @@ function TimeOutBox() {
                             disabled={box1Status}
                             checked={box1Status}
                             onChange={() => {
-                                handleTimeoutConsume(setBox1)
+                                handleTimeoutStart(setBox1)
                             }}/>
                         <Checkbox
                             {...label}
@@ -149,7 +140,7 @@ function TimeOutBox() {
                             disabled={box2Status}
                             checked={box2Status}
                             onChange={() => {
-                                handleTimeoutConsume(setBox2)
+                                handleTimeoutStart(setBox2)
                             }}/>
                         <Checkbox
                             {...label}
@@ -157,14 +148,14 @@ function TimeOutBox() {
                             disabled={box3Status}
                             checked={box3Status}
                             onChange={() => {
-                                handleTimeoutConsume(setBox3)
+                                handleTimeoutStart(setBox3)
                             }}/>
                     </Stack>
                 </Stack>
             </Box>
-            <TimeOutDialog
-                isOpen={isOpen}
-                handleDialogClose={handleDialogClose}
+            <TimeOutCounter
+                isDialogOpen={isDialogOpen}
+                handleDialogClose={handleTimeoutFinished}
             />
         </Box>
     );

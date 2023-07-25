@@ -94,6 +94,12 @@ export default function Side({teamId, updateMatch, score, setScore, stageAlign})
                     </Box>
                 </Paper>
             </Grid2>
+
+            <Grid2 xs={12}>
+                <TimeOutBox
+                    isMirror={true}
+                />
+            </Grid2>
         </Grid2>
     );
 }

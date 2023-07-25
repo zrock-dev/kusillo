@@ -29,7 +29,7 @@ fn start_counter(general_minutes: Arc<Mutex<i32>>, general_seconds: Arc<Mutex<i3
         let mut seconds = *general_seconds.lock().unwrap();
 
         loop {
-            thread::sleep(Duration::from_millis(15));
+            thread::sleep(Duration::from_millis(1000));
             if !*running.lock().unwrap() {
                 println!("Stopping clock");
                 break;
