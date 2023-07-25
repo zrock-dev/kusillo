@@ -1,7 +1,7 @@
 use rusqlite::Connection;
 
 use crate::database::game_match::game_match::{get_max_score};
-use crate::database::game_match::utils::{record, retrieve_contenders, retrieve_game_set, retrieve_score_value};
+use crate::database::game_match::utils::{record_to_score_table, retrieve_contenders, retrieve_game_set, retrieve_score_value};
 use crate::database::registration::table_player_creation::PERM_TEAM_PLAYERS;
 use crate::utils::rusqlite_error::Error;
 
@@ -52,7 +52,7 @@ pub fn record_interaction(team_id: i64, game_id: i64, score_points: i64) -> Resu
     let connection = Connection::open(PERM_TEAM_PLAYERS)?;
     let current_stage = retrieve_score_value(&connection, "set_number", &game_id, &team_id)?;
 
-    record(&connection, &game_id, &team_id, &score_points, &current_stage)?;
+    record_to_score_table(&connection, &game_id, &team_id, &score_points, &current_stage)?;
     Ok(())
 }
 

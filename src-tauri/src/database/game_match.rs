@@ -3,6 +3,6 @@ pub mod game_creation;
 pub mod mirror;
 pub mod events;
 
-mod utils;
+pub mod utils;
 mod verifications;
 mod game_match;

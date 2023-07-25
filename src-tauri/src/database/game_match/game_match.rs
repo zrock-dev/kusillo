@@ -1,6 +1,6 @@
 use rusqlite::Connection;
 
-use crate::database::game_match::utils::{record, retrieve_contenders, retrieve_game_set, retrieve_score_value};
+use crate::database::game_match::utils::{record_to_score_table, retrieve_contenders, retrieve_game_set, retrieve_score_value};
 use crate::database::game_match::verifications::{at_three, at_two, verify_help};
 use crate::database::registration::table_player_creation::PERM_TEAM_PLAYERS;
 use crate::utils::rusqlite_error::Error;
@@ -33,7 +33,7 @@ pub fn update_team_set(connection: &Connection, team_id: &i64, game_id: &i64) ->
     let tmp_set_number = retrieve_score_value(&connection,"set_number", &game_id, &team_id)?;
     let set_number = tmp_set_number + 1;
 
-    record(&connection, &game_id, &team_id, &0, &set_number)?;
+    record_to_score_table(&connection, &game_id, &team_id, &0, &set_number)?;
     Ok(set_number)
 }
 
