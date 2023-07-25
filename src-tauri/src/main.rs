@@ -1,11 +1,12 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use database::game_match::events;
 use database::game_match::game_commands;
+use database::game_match::mirror::spectator_commands;
 use database::registration::players;
 use database::registration::teams;
-use database::game_match::mirror::spectator_commands;
-use database::game_match::events;
+use game_match::clock;
 
 mod database;
 mod utils;
@@ -31,7 +32,11 @@ async fn main() {
             game_commands::request_team_name,
             game_commands::request_max_score,
             spectator_commands::open_spectator_window,
-            events::fire_score_update
+            events::fire_score_update,
+            clock::commands::create_clock,
+            clock::commands::pause_clock,
+            clock::commands::start_clock,
+            clock::commands::request_current_time,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

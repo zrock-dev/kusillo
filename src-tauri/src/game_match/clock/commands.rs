@@ -11,7 +11,7 @@ lazy_static! {
 }
 
 #[command]
-pub fn create_clock(handle: AppHandle<>) {
+pub fn create_clock(handle: AppHandle) {
     let (time_sync_sender, time_sync_receiver): (Sender<Time>, Receiver<Time>) = channel();
     let (clock_command_sender, clock_command_receiver): (Sender<ClockCommand>, Receiver<ClockCommand>) = channel();
 

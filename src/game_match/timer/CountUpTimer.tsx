@@ -43,15 +43,15 @@ function CountUpTimer() {
     }
 
     function synchronizeClock(payload){
-        currentTime.seconds = payload["seconds"] as number
         currentTime.minutes = payload["minutes"] as number
+        currentTime.seconds = payload["seconds"] as number
     }
 
     function requestCurrentTime() {
         invoke('request_current_time')
             .then((payload) => {
                 synchronizeClock(payload)
-                updateCurrentTime()
+                updateTimeBox()
             })
             .catch((error) => {
                 console.error(error)
@@ -69,22 +69,21 @@ function CountUpTimer() {
         clearInterval(timerId)
     }
 
-    listen("time-update", timeUpdateListener)
+    listen("time-sync", timeUpdateListener)
+        .catch((error) => {
+            console.error(error)
+            navigate("/error")
+        })
+
+    listen("time-out", () => {stopTimer()})
         .catch((error) => {
             console.error(error)
             navigate("/error")
         })
 
     function timeUpdateListener(payload) {
-        checkTimerStatus(payload)
         synchronizeClock(payload)
         updateCurrentTime()
-    }
-
-    function checkTimerStatus(payload){
-        if (!payload["keep_running"]){
-            stopTimer()
-        }
     }
 
     return (

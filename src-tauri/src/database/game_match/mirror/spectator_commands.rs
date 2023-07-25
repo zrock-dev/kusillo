@@ -1,4 +1,4 @@
-use tauri::{AppHandle, Error, Window};
+use tauri::{AppHandle};
 
 use crate::database::game_match::game_commands::GameUpdate;
 

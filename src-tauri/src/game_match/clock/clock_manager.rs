@@ -2,12 +2,14 @@ use std::sync::{Arc, Mutex};
 use std::sync::mpsc::{Receiver, Sender};
 use std::thread;
 use std::time::Duration;
+use serde::Serialize;
 
 use tauri::AppHandle;
 
 use crate::game_match::clock::actions::is_clock_on_time;
 use crate::game_match::clock::events::{fire_event_time_sync, fire_event_timeout};
 
+#[derive(Serialize)]
 pub struct Time {
     pub minutes: i32,
     pub seconds: i32,
@@ -90,13 +92,19 @@ pub fn launch_clock_thread(time_sync_sender: Sender<Time>, receiver: Receiver<Cl
     println!("The clock has terminated");
 }
 
-pub fn launch_clock_sync_thread(handle: AppHandle<>, time_sync_receiver: Receiver<Time>,  clock_command_sender: &Sender<ClockCommand>) {
+pub fn launch_clock_sync_thread(handle: AppHandle, time_sync_receiver: Receiver<Time>,  clock_command_sender: &Sender<ClockCommand>) {
+    let mut sync_span_limit = 0;
     let time = time_sync_receiver.recv().unwrap();
     if !is_clock_on_time(&time) {
         fire_event_timeout(&handle);
         clock_command_sender.send(ClockCommand::Terminate).unwrap();
     }else {
-        fire_event_time_sync(&time, &handle);
+        if sync_span_limit == 3 {
+            fire_event_time_sync(&time, &handle);
+            sync_span_limit = 0;
+        }else {
+            sync_span_limit += 1;
+        }
     }
 }
 

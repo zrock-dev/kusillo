@@ -2,8 +2,8 @@ import React, {useEffect, useRef, useState} from 'react';
 import {invoke} from '@tauri-apps/api/tauri';
 import {useLocation, useNavigate} from 'react-router-dom';
 import Side from './Side';
-import {Box, Stack, Button, Divider} from '@mui/material';
-import { enqueueSnackbar } from 'notistack';
+import {Box, Button, Divider, Stack} from '@mui/material';
+import {enqueueSnackbar} from 'notistack';
 import CountUpTimer from "../timer/CountUpTimer";
 
 export default function Match() {
@@ -21,6 +21,8 @@ export default function Match() {
 
     const [isLoading, setIsLoading] = useState(true);
 
+    const [canOpenSpectatorWindow, setCanOpenSpectatorWindow] = useState(true);
+
     useEffect(() => {
         if (!hasFetchedContenders.current) {
             updateContenders()
@@ -29,15 +31,15 @@ export default function Match() {
     }, []);
 
     const updateMatch = (isGameWon: boolean, isStageWon: boolean) => {
-        if (isGameWon){
+        if (isGameWon) {
             enqueueSnackbar("Game won", {variant: "success"})
             navigate('/');
-        }else if (isStageWon){
+        } else if (isStageWon) {
             resetScores()
         }
     };
 
-    function updateContenders(){
+    function updateContenders() {
         invoke('request_contenders', {gameId: gameId})
             .then((contestants: any) => {
                 setTeamAId(contestants["team_a_id"] as number);
@@ -50,16 +52,25 @@ export default function Match() {
             .finally(() => setIsLoading(false));
     }
 
-    function resetScores(){
+    function resetScores() {
         setScoreA(0)
         setScoreB(0)
     }
 
-    function handleOpenSpectatorWindow(){
+    function handleOpenSpectatorWindow() {
         invoke('open_spectator_window', {teamAId: teamAId, teamBId: teamBId})
             .catch((error) => {
                 console.error(error);
                 navigate('/error');
+            })
+        setCanOpenSpectatorWindow(false)
+    }
+
+    function start_clock() {
+        invoke('start_clock')
+            .catch((error) => {
+                console.error(error)
+                navigate("/error")
             })
     }
 
@@ -67,13 +78,9 @@ export default function Match() {
         return <div>Loading...</div>;
     }
 
-    function timeOutHandler(){
-        console.debug("Out of time")
-    }
-
     return (
         <Box>
-            <CountUpTimer timeoutHandler={timeOutHandler}/>
+            <CountUpTimer/>
             <Divider flexItem/>
             <Stack direction="row">
                 <Side
@@ -95,7 +102,10 @@ export default function Match() {
                     setMaxScore={setMaxScore}
                 />
             </Stack>
-            <Button onClick={handleOpenSpectatorWindow}>
+            <Button
+                onClick={handleOpenSpectatorWindow}
+                disabled={canOpenSpectatorWindow}
+            >
                 Spectator window
             </Button>
         </Box>
