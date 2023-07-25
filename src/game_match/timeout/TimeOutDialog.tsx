@@ -27,7 +27,7 @@ function TimeOutDialog({ isDialogOpen }) {
                             align={"center"}
                             variant="h4"
                         >
-                            TIME OUT !!!
+                            Time out in process
                         </Typography>
                     </Stack>
                 </Box>

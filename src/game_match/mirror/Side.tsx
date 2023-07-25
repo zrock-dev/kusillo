@@ -6,6 +6,7 @@ import {listen} from '@tauri-apps/api/event'
 import {useNavigate} from "react-router-dom";
 import {invoke} from "@tauri-apps/api/tauri";
 import TimeOutBox from "../timeout/TimeOutBox";
+import TimeOutDialog from "../timeout/TimeOutDialog";
 
 function translateColor(color: string): string {
     switch (color) {
@@ -28,6 +29,7 @@ export default function Side({teamId, updateMatch, score, setScore, stageAlign})
     const [teamName, setTeamName] = useState("");
     const [scoreColor, setScoreColor] = useState("");
     const navigate = useNavigate();
+    const [isDialogOpen, setIsOpen] = useState(false)
 
     useEffect(() => {
         invoke('request_team_name', {teamId: teamId})
@@ -57,6 +59,13 @@ export default function Side({teamId, updateMatch, score, setScore, stageAlign})
             navigate('/error');
         })
 
+    listen("timeout_status", (event) => {
+        setIsOpen(event.payload as boolean)
+    })
+        .catch((error) => {
+            console.error(error)
+            navigate("/error")
+        })
 
     return (
         <Grid2 container spacing={3}>
@@ -96,8 +105,8 @@ export default function Side({teamId, updateMatch, score, setScore, stageAlign})
             </Grid2>
 
             <Grid2 xs={12}>
-                <TimeOutBox
-                    isMirror={true}
+                <TimeOutDialog
+                    isDialogOpen={isDialogOpen}
                 />
             </Grid2>
         </Grid2>

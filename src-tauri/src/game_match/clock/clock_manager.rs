@@ -6,7 +6,7 @@ use serde::Serialize;
 
 use tauri::AppHandle;
 
-use crate::game_match::clock::actions::is_clock_on_time;
+use crate::game_match::clock::actions::{is_clock_on_time, record_timeout};
 use crate::game_match::clock::commands::CLOCK_COMMAND_SENDER;
 use crate::game_match::clock::events::{fire_event_time_sync, fire_event_timeout};
 
@@ -29,7 +29,7 @@ fn start_counter(general_minutes: Arc<Mutex<i32>>, general_seconds: Arc<Mutex<i3
         let mut seconds = *general_seconds.lock().unwrap();
 
         loop {
-            thread::sleep(Duration::from_millis(1000));
+            thread::sleep(Duration::from_millis(50));
             if !*running.lock().unwrap() {
                 println!("Stopping clock");
                 break;
@@ -96,8 +96,9 @@ pub fn launch_clock_sync_thread(handle: AppHandle, time_sync_receiver: Receiver<
         let time = time_sync_receiver.recv().unwrap();
         fire_event_time_sync(&time, handle.clone());
         if !is_clock_on_time(&time) {
-            fire_event_timeout(handle.clone());
             CLOCK_COMMAND_SENDER.lock().unwrap().send(ClockCommand::Terminate).unwrap();
+            fire_event_timeout(handle.clone());
+            record_timeout();
         }
     }
 }

@@ -2,7 +2,7 @@ use rusqlite::Connection;
 use tauri::Manager;
 
 use crate::database::game_match::game_commands::GameUpdate;
-use crate::database::game_match::game_match::{check_for_game_won, get_score_color, update_team_set};
+use crate::database::game_match::game_match::{check_for_game_won, check_for_stage_won, get_score_color, update_team_set};
 use crate::database::game_match::utils::{record_winner, retrieve_score_value, update_game_set};
 use crate::database::registration::table_player_creation::PERM_TEAM_PLAYERS;
 use crate::utils::rusqlite_error::Error;
@@ -25,7 +25,7 @@ pub fn fire_score_update(app_handle: tauri::AppHandle, game_id: i64, team_id: i6
     let score_points = retrieve_score_value(&connection, "score_points", &game_id, &team_id)?;
     score_color = get_score_color(score_points);
     current_stage = retrieve_score_value(&connection, "set_number", &game_id, &team_id)?;
-    is_stage_won = max_score == score_points;
+    is_stage_won = check_for_stage_won(&game_id, max_score, &score_points)?;
 
     if is_stage_won {
         current_stage = update_team_set(&connection, &team_id, &game_id)?;

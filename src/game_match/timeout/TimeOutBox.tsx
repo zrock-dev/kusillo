@@ -1,13 +1,12 @@
 import React, {useState} from "react";
 import {Box, Checkbox, Stack, Typography} from "@mui/material";
 import TimeOutCounter from "./TimeOutCounter";
-import TimeOutDialog from "./TimeOutDialog";
 import {invoke} from "@tauri-apps/api/tauri";
 import {useNavigate} from "react-router-dom";
 import {listen} from "@tauri-apps/api/event";
 
 // @ts-ignore
-function TimeOutBox({ isMirror }) {
+function TimeOutBox() {
     const navigate = useNavigate();
     const [isDialogOpen, setIsOpen] = useState(false)
     const [box1Status, setBox1] = useState(false)
@@ -41,7 +40,6 @@ function TimeOutBox({ isMirror }) {
     }
 
     listen("timeout_status", (event) => {
-        console.debug(event)
         setIsOpen(event.payload as boolean)
     })
         .catch((error) => {
@@ -50,61 +48,6 @@ function TimeOutBox({ isMirror }) {
         })
 
     const label = {inputProps: {'aria-label': 'Checkbox demo'}};
-
-    if (isMirror){
-        return (
-            <Box
-                sx={{
-                    display: 'flex',
-                    align: 'center',
-                    justifyContent: 'center',
-                }}
-            >
-                <Box
-                    sx={{
-                        border: 1,
-                        display: 'flex',
-                        align: 'center',
-                        justifyContent: 'center',
-                        width: 300,
-                    }}
-                >
-                    <Stack>
-                        <Typography variant={"h5"} align={"center"}> Time Out </Typography>
-                        <Stack direction={"row"}>
-                            <Checkbox
-                                {...label}
-                                sx={{'& .MuiSvgIcon-root': {fontSize: 30}}}
-                                disabled={box1Status}
-                                checked={box1Status}
-                                onChange={() => {
-                                    handleTimeoutStart(setBox1)
-                                }}/>
-                            <Checkbox
-                                {...label}
-                                sx={{'& .MuiSvgIcon-root': {fontSize: 30}}}
-                                disabled={box2Status}
-                                checked={box2Status}
-                                onChange={() => {
-                                    handleTimeoutStart(setBox2)
-                                }}/>
-                            <Checkbox
-                                {...label}
-                                sx={{'& .MuiSvgIcon-root': {fontSize: 30}}}
-                                disabled={box3Status}
-                                checked={box3Status}
-                                onChange={() => {
-                                    handleTimeoutStart(setBox3)
-                                }}/>
-                        </Stack>
-                    </Stack>
-                </Box>
-                <TimeOutDialog
-                    isDialogOpen={isDialogOpen}
-                />
-            </Box>
-        );
-    }
 
     return (
         <Box

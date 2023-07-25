@@ -36,13 +36,13 @@ function TimeOutCounter({ isDialogOpen, handleDialogClose}) {
             const intervalId = setInterval(() => {
                 currentTime.seconds = currentTime.seconds + 1
                 updateTimeBox()
-                if (currentTime.seconds >= 5) {
+                if (currentTime.seconds >= 60) {
                     resetTimer()
                     clearInterval(intervalId)
                     resumeMatchTimer()
                     handleDialogClose()
                 }
-            }, 1000)
+            }, 100)
             return () => {
                 clearInterval(intervalId)
             }

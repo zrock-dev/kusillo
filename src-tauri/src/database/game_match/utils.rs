@@ -1,4 +1,4 @@
-use rusqlite::Connection;
+use rusqlite::{Connection, params};
 use crate::database::game_match::game_commands::Contestants;
 use crate::utils::rusqlite_error::Error;
 
@@ -10,8 +10,8 @@ pub fn record_winner(connection: &Connection, game_id: &i64, team_id: &i64) -> R
     Ok(())
 }
 
-pub fn retrieve_score_value(connection: &Connection, value_name: &str, game_id: &i64, team_id: &i64) -> Result<i64, Error>{
-    let query = format!("SELECT {} FROM score WHERE game_id = ?1 AND team_id = ?2 ORDER BY rowid DESC LIMIT 1", value_name);
+pub fn retrieve_score_value(connection: &Connection, column_name: &str, game_id: &i64, team_id: &i64) -> Result<i64, Error>{
+    let query = format!("SELECT {} FROM score WHERE game_id = ?1 AND team_id = ?2 ORDER BY rowid DESC LIMIT 1", column_name);
     let set_number = connection.query_row_and_then(
         query.as_str(),
         [game_id, team_id],
@@ -25,9 +25,10 @@ pub fn retrieve_score_value(connection: &Connection, value_name: &str, game_id: 
     Ok(set_number)
 }
 
-pub fn retrieve_game_set(connection: &Connection, game_id: &i64) -> Result<i64, Error>{
+pub fn retrieve_game_value(connection: &Connection, column_name: &str, game_id: &i64) -> Result<i64, Error>{
+    let query = format!("SELECT {} FROM game WHERE rowid = ?1", column_name);
     let set_number = connection.query_row_and_then(
-        "SELECT set_number FROM game WHERE rowid = ?1",
+        query.as_str(),
         [game_id],
         |row| {
             Ok::<i64, Error>(
@@ -39,10 +40,16 @@ pub fn retrieve_game_set(connection: &Connection, game_id: &i64) -> Result<i64, 
 }
 
 pub fn update_game_set(connection: &Connection, &game_id: &i64) -> Result<(), Error>{
-   let set_number  = retrieve_game_set(connection, &game_id)?;
+   let set_number  = retrieve_game_value(&connection,"set_number",  &game_id)?;
+    update_game_value(&connection, &game_id, "set_number", set_number + 1)?;
+    Ok(())
+}
+
+pub fn update_game_value(connection: &Connection, game_id: &i64, column_name: &str, value: i64) -> Result<(), Error>{
+    let query = format!("UPDATE game SET {} = ?1 WHERE rowid = ?2", column_name);
     connection.execute(
-        "UPDATE game SET set_number = ?1 WHERE rowid = ?2",
-        [set_number + 1, game_id]
+        query.as_str(), 
+        params![value, game_id]
     )?;
 
     Ok(())

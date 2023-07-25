@@ -12,7 +12,8 @@ pub fn create_game_db(){
                     rowid INTEGER NOT NULL PRIMARY KEY,
                     team_a_id INTEGER NOT NULL,
                     team_b_id INTEGER NOT NULL,
-                    set_number INTEGER NOT NULL
+                    set_number INTEGER NOT NULL,
+                    on_time INTEGER NOT NULL
                 )"
     );
 

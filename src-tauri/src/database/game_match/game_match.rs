@@ -1,6 +1,6 @@
 use rusqlite::Connection;
 
-use crate::database::game_match::utils::{record_to_score_table, retrieve_contenders, retrieve_game_set, retrieve_score_value};
+use crate::database::game_match::utils::{record_to_score_table, retrieve_contenders, retrieve_game_value, retrieve_score_value};
 use crate::database::game_match::verifications::{at_three, at_two, verify_help};
 use crate::database::registration::table_player_creation::PERM_TEAM_PLAYERS;
 use crate::utils::rusqlite_error::Error;
@@ -10,7 +10,7 @@ pub fn check_for_game_won(game_id: i64) -> Result<bool, Error> {
     let contenders = retrieve_contenders(&connection, &game_id)?;
     let team_a_id = contenders.team_a_id;
     let team_b_id = contenders.team_b_id;
-    let game_set = retrieve_game_set(&connection, &game_id)?;
+    let game_set = retrieve_game_value(&connection,"set_number",  &game_id)?;
 
     let team_a_set_number = retrieve_score_value(&connection,"set_number", &game_id, &team_a_id)?;
     let team_b_set_number = retrieve_score_value(&connection,"set_number", &game_id, &team_b_id)?;
@@ -18,12 +18,12 @@ pub fn check_for_game_won(game_id: i64) -> Result<bool, Error> {
     match game_set {
         1 => Ok(false),
         2 => {
-            let value = at_two(team_a_set_number, team_b_set_number);
-            Ok(verify_help(&connection, game_id, value)?)
+            let help_value = at_two(team_a_set_number, team_b_set_number);
+            Ok(verify_help(&connection, game_id, help_value)?)
         }
         3 => {
-            let value = at_three(team_a_set_number, team_b_set_number);
-            Ok(verify_help(&connection, game_id, value)?)
+            let help_value = at_three(team_a_set_number, team_b_set_number);
+            Ok(verify_help(&connection, game_id, help_value)?)
         }
         _ => panic!("Unexpected game set #{}", game_set)
     }
@@ -53,4 +53,14 @@ pub fn get_score_color(score_points: i64) -> String{
         points if points >= 18 => String::from("red"),
         _ => panic!("Score {} is outside of bounds", score_points)
     }
+}
+
+pub fn check_for_stage_won(game_id: &i64, max_score: i64, score_points: &i64) -> Result<bool, Error>{
+   if max_score == *score_points {
+       Ok(true)
+   }else {
+       let connection = Connection::open(PERM_TEAM_PLAYERS)?;
+       let on_time = retrieve_game_value(&connection, "on_time", &game_id)?;
+       Ok(on_time == 0)
+   }
 }
