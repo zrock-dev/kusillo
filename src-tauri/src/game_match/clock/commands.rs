@@ -1,6 +1,14 @@
 use std::sync::mpsc::{channel, Receiver, Sender};
+use std::sync::Mutex;
+
+use lazy_static::lazy_static;
 use tauri::{AppHandle, command};
+
 use crate::game_match::clock::clock_manager::{ClockCommand, launch_clock_sync_thread, launch_clock_thread, Time};
+
+lazy_static! {
+    static ref CLOCK_COMMAND_SENDER: Mutex<Sender<ClockCommand>> = Mutex::new(channel().0);
+}
 
 #[command]
 pub fn create_clock(handle: AppHandle<>) {
@@ -12,26 +20,25 @@ pub fn create_clock(handle: AppHandle<>) {
     });
 
     std::thread::spawn(move || {
-        launch_clock_sync_thread(handle, time_sync_receiver, clock_command_sender);
+        launch_clock_sync_thread(handle, time_sync_receiver, &clock_command_sender);
     });
+
+    *CLOCK_COMMAND_SENDER.lock().unwrap() = clock_command_sender;
 }
 
 #[command]
 pub fn pause_clock(){
-    let (clock_command_sender, clock_command_receiver): (Sender<ClockCommand>, Receiver<ClockCommand>) = channel();
-    clock_command_sender.send(ClockCommand::Pause).unwrap();
+    CLOCK_COMMAND_SENDER.lock().unwrap().send(ClockCommand::Pause).unwrap();
 }
 
 #[command]
 pub fn start_clock(){
-    let (clock_command_sender, clock_command_receiver): (Sender<ClockCommand>, Receiver<ClockCommand>) = channel();
-    clock_command_sender.send(ClockCommand::Start).unwrap();
+    CLOCK_COMMAND_SENDER.lock().unwrap().send(ClockCommand::Start).unwrap();
 }
 
 #[command]
 pub fn request_current_time() -> Time{
-    let (clock_command_sender, clock_command_receiver): (Sender<ClockCommand>, Receiver<ClockCommand>) = channel();
     let (reply_sender, reply_receiver) = channel();
-    clock_command_sender.send(ClockCommand::GetCurrentTime(reply_sender)).unwrap();
+    CLOCK_COMMAND_SENDER.lock().unwrap().send(ClockCommand::GetCurrentTime(reply_sender)).unwrap();
     reply_receiver.recv().unwrap()
 }

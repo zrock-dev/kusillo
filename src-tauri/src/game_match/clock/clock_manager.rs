@@ -90,7 +90,7 @@ pub fn launch_clock_thread(time_sync_sender: Sender<Time>, receiver: Receiver<Cl
     println!("The clock has terminated");
 }
 
-pub fn launch_clock_sync_thread(handle: AppHandle<>, time_sync_receiver: Receiver<Time>,  clock_command_sender: Sender<ClockCommand>) {
+pub fn launch_clock_sync_thread(handle: AppHandle<>, time_sync_receiver: Receiver<Time>,  clock_command_sender: &Sender<ClockCommand>) {
     let time = time_sync_receiver.recv().unwrap();
     if !is_clock_on_time(&time) {
         fire_event_timeout(&handle);
