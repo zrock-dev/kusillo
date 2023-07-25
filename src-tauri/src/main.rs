@@ -9,6 +9,7 @@ use database::game_match::events;
 
 mod database;
 mod utils;
+mod game_match;
 
 #[tokio::main]
 async fn main() {
