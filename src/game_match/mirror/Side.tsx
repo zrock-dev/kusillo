@@ -5,7 +5,6 @@ import Grid2 from "@mui/material/Unstable_Grid2";
 import {listen} from '@tauri-apps/api/event'
 import {useNavigate} from "react-router-dom";
 import {invoke} from "@tauri-apps/api/tauri";
-import TimeOutBox from "../timeout/TimeOutBox";
 import TimeOutDialog from "../timeout/TimeOutDialog";
 
 function translateColor(color: string): string {
@@ -32,12 +31,15 @@ export default function Side({teamId, updateMatch, score, setScore, stageAlign})
     const [isDialogOpen, setIsOpen] = useState(false)
 
     useEffect(() => {
-        invoke('request_team_name', {teamId: teamId})
-            .then((name: any) => {
-                setTeamName(name)
+        invoke('request_game_init_data', {teamId: teamId})
+            .then((payload: any) => {
+                setTeamName(payload["team_name"] as string)
+                setScore(payload["score"] as number)
+                setScoreColor(translateColor(payload["score_color"] as string))
             })
             .catch((error => {
                 console.error(error)
+                navigate("/error")
             }))
     }, [teamId])
 

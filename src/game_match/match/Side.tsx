@@ -6,15 +6,16 @@ import Score from "./Score";
 import {invoke} from "@tauri-apps/api/tauri";
 import {useNavigate} from "react-router-dom";
 import TimeOutBox from "../timeout/TimeOutBox";
+import {listen} from "@tauri-apps/api/event";
 
 // @ts-ignore
-export default function Side({ gameId, teamId, updateMatch, score, setScore, maxScore, setMaxScore }) {
+export default function Side({ gameId, teamId, score, setScore, maxScore, setMaxScore }) {
     const navigate = useNavigate();
     const [stage, setStage] = useState(0);
     const [teamName, setTeamName] = useState("");
 
     useEffect(() => {
-        updateTeamName()
+        initTeamData()
     }, [])
 
     useEffect(() => {
@@ -28,16 +29,31 @@ export default function Side({ gameId, teamId, updateMatch, score, setScore, max
             }))
     }, [stage])
 
-    function updateTeamName() {
-        invoke('request_team_name', {teamId: teamId})
-            .then((name: any) => {
-                setTeamName(name)
+    function initTeamData() {
+        invoke('request_game_init_data', {teamId: teamId})
+            .then((payload: any) => {
+                setTeamName(payload["team_name"] as string)
+                setMaxScore(payload["max_score"] as number)
             })
             .catch((error => {
                 console.error(error)
                 navigate("/error")
             }))
     }
+
+    listen(
+        'stage_update',
+        (event) => {
+            let payload = event.payload
+            if (payload["team_id"] == teamId) {
+                setStage(payload["stage_number"] as number)
+                setMaxScore(payload["max_score"] as number)
+            }
+        })
+        .catch((error) => {
+            console.error(error);
+            navigate('/error');
+        })
 
     return (
         <Grid2 container spacing={5}>
@@ -62,8 +78,6 @@ export default function Side({ gameId, teamId, updateMatch, score, setScore, max
                 <Score
                     gameId={gameId}
                     teamId={teamId}
-                    setStage={setStage}
-                    updateMatch={updateMatch}
                     score={score}
                     setScore={setScore}
                     maxScore={maxScore}

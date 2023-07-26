@@ -4,6 +4,7 @@ import React, {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {invoke} from "@tauri-apps/api/tauri";
 import CountUpTimer from "../clock/CountUpTimer";
+import {listen} from "@tauri-apps/api/event";
 
 export default function Match() {
     const navigate = useNavigate();
@@ -24,12 +25,16 @@ export default function Match() {
             })
     }, [])
 
-    const updateMatch = (isStageWon: boolean) => {
-        if (isStageWon) {
+    listen(
+        'reset_stage',
+        (_) => {
             setScoreA(0)
             setScoreB(0)
-        }
-    };
+        })
+        .catch((error) => {
+            console.error(error);
+            navigate('/error');
+        })
 
     return (
         <Box
@@ -46,7 +51,6 @@ export default function Match() {
                 <Stack direction="row" spacing={5}>
                     <Side
                         teamId={teamAId}
-                        updateMatch={updateMatch}
                         score={scoreA}
                         setScore={setScoreA}
                         stageAlign={"left"}
@@ -54,7 +58,6 @@ export default function Match() {
 
                     <Side
                         teamId={teamBId}
-                        updateMatch={updateMatch}
                         score={scoreB}
                         setScore={setScoreB}
                         stageAlign={"right"}

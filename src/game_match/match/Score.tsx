@@ -58,7 +58,7 @@ function translateColor(color: string): string {
 }
 
 // @ts-ignore
-export default function Score({gameId, teamId, setStage, updateMatch, score, setScore, maxScore}) {
+export default function Score({gameId, teamId, score, setScore, maxScore}) {
     const navigate = useNavigate();
     const [scoreColor, setScoreColor] = useState("");
 
@@ -81,9 +81,13 @@ export default function Score({gameId, teamId, setStage, updateMatch, score, set
 
     useEffect(() => {
         recordInteraction(score)
-        fireScoreUpdateEvent()
+        handleScoreUpdate()
         checkInteractions()
     }, [score])
+
+    useEffect(() => {
+        initTeamData()
+    }, [])
 
     function checkInteractions() {
         checkButtons(upButtons, (value: number): boolean => {
@@ -106,8 +110,8 @@ export default function Score({gameId, teamId, setStage, updateMatch, score, set
             }))
     }
 
-    function fireScoreUpdateEvent(){
-        invoke('fire_score_update', { gameId: gameId, teamId: teamId, maxScore: maxScore })
+    function handleScoreUpdate(){
+        invoke('handle_score_update', { gameId: gameId, teamId: teamId })
             .catch((error => {
                 console.error(error)
                 navigate("/error")
@@ -120,20 +124,24 @@ export default function Score({gameId, teamId, setStage, updateMatch, score, set
             let payload = event.payload
 
             if (payload["team_id"] == teamId) {
-                let configuration = payload["configuration"]
-                let isStageWon = configuration["is_stage_won"];
-
-                if (isStageWon) {
-                    updateMatch(configuration["is_game_won"] as boolean, isStageWon)
-                    setStage(configuration["current_stage"])
-                }
-                setScoreColor(translateColor(configuration["score_color"] as string))
+                setScoreColor(translateColor(payload["score_color"] as string))
             }
         })
         .catch((error) => {
             console.error(error);
             navigate('/error');
         })
+
+    function initTeamData() {
+        invoke('request_game_init_data', {teamId: teamId})
+            .then((payload: any) => {
+                setScoreColor(translateColor(payload["score_color"] as string))
+            })
+            .catch((error => {
+                console.error(error)
+                navigate("/error")
+            }))
+    }
 
     return (
         <Box

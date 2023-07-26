@@ -3,8 +3,9 @@ import {invoke} from '@tauri-apps/api/tauri';
 import {useLocation, useNavigate} from 'react-router-dom';
 import Side from './Side';
 import {Box, Button, Divider, Stack} from '@mui/material';
-import {enqueueSnackbar} from 'notistack';
 import CountUpTimer from "../clock/CountUpTimer";
+import {listen} from "@tauri-apps/api/event";
+import {enqueueSnackbar} from "notistack";
 
 export default function Match() {
     const navigate = useNavigate();
@@ -20,7 +21,6 @@ export default function Match() {
     const [teamBId, setTeamBId] = useState(-1);
 
     const [isLoading, setIsLoading] = useState(true);
-
     const [canOpenSpectatorWindow, setCanOpenSpectatorWindow] = useState(false);
 
     useEffect(() => {
@@ -30,14 +30,27 @@ export default function Match() {
         }
     }, []);
 
-    const updateMatch = (isGameWon: boolean, isStageWon: boolean) => {
-        if (isGameWon) {
+    listen(
+        'reset_stage',
+        (_) => {
+            resetScores()
+        })
+        .catch((error) => {
+            console.error(error);
+            navigate('/error');
+        })
+
+    listen(
+        'game_won',
+        (_) => {
+            resetScores()
             enqueueSnackbar("Game won", {variant: "success"})
             navigate('/match-select');
-        } else if (isStageWon) {
-            resetScores()
-        }
-    };
+        })
+        .catch((error) => {
+            console.error(error);
+            navigate('/error');
+        })
 
     function updateContenders() {
         invoke('request_contenders', {gameId: gameId})
@@ -87,7 +100,6 @@ export default function Match() {
                     <Side
                         gameId={gameId}
                         teamId={teamAId}
-                        updateMatch={updateMatch}
                         score={scoreA}
                         setScore={setScoreA}
                         maxScore={maxScore}
@@ -96,7 +108,6 @@ export default function Match() {
                     <Side
                         gameId={gameId}
                         teamId={teamBId}
-                        updateMatch={updateMatch}
                         score={scoreB}
                         setScore={setScoreB}
                         maxScore={maxScore}
