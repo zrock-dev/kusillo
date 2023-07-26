@@ -4,7 +4,7 @@ import {useLocation, useNavigate} from 'react-router-dom';
 import Side from './Side';
 import {Box, Button, Divider, Stack} from '@mui/material';
 import {enqueueSnackbar} from 'notistack';
-import CountUpTimer from "../timer/CountUpTimer";
+import CountUpTimer from "../clock/CountUpTimer";
 
 export default function Match() {
     const navigate = useNavigate();

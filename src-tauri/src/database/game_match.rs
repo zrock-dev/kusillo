@@ -5,4 +5,4 @@ pub mod events;
 
 pub mod utils;
 mod verifications;
-mod game_match;
+pub mod game_match;

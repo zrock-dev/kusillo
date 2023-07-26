@@ -6,9 +6,9 @@ use std::time::Duration;
 use serde::Serialize;
 use tauri::AppHandle;
 
-use crate::game_match::clock::actions::{is_clock_on_time, record_timeout};
+use crate::game_match::clock::actions::{is_clock_on_time, handle_timeout};
 use crate::game_match::clock::commands::CLOCK_COMMAND_SENDER;
-use crate::game_match::clock::events::{fire_event_time_sync, fire_event_timeout};
+use crate::game_match::clock::events::{fire_event_time_sync};
 
 #[derive(Serialize)]
 pub struct Time {
@@ -99,8 +99,7 @@ pub fn launch_clock_sync_thread(handle: AppHandle, time_sync_receiver: Receiver<
                 fire_event_time_sync(&time, handle.clone());
                 if !is_clock_on_time(&time) {
                     CLOCK_COMMAND_SENDER.lock().unwrap().send(ClockCommand::Pause).unwrap();
-                    fire_event_timeout(handle.clone());
-                    record_timeout();
+                    handle_timeout(&handle);
                 }
             }
             Err(_) => {break}

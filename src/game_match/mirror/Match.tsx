@@ -3,7 +3,7 @@ import {Box, Divider, Stack} from '@mui/material';
 import React, {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {invoke} from "@tauri-apps/api/tauri";
-import CountUpTimer from "../timer/CountUpTimer";
+import CountUpTimer from "../clock/CountUpTimer";
 
 export default function Match() {
     const navigate = useNavigate();
@@ -15,8 +15,8 @@ export default function Match() {
     useEffect(() => {
         invoke('request_latest_contenders')
             .then((contenders: any) => {
-                setTeamAId(contenders.team_a_id)
-                setTeamBId(contenders.team_b_id)
+                setTeamAId(contenders["team_a_id"])
+                setTeamBId(contenders["team_b_id"])
             })
             .catch((error) => {
                 console.error(error);
@@ -30,7 +30,6 @@ export default function Match() {
             setScoreB(0)
         }
     };
-
 
     return (
         <Box

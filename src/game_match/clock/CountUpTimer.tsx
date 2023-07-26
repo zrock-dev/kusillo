@@ -74,13 +74,6 @@ function CountUpTimer({isMirror}) {
             navigate("/error")
         })
 
-    listen("time-out", () => {
-    })
-        .catch((error) => {
-            console.error(error)
-            navigate("/error")
-        })
-
     function timeUpdateListener(payload) {
         synchronizeClock(payload)
         updateCurrentTime()
