@@ -56,10 +56,8 @@ pub fn launch_clock_thread(time_sync_sender: Sender<Time>, receiver: Receiver<Cl
             Ok(command) => {
                 match command {
                     ClockCommand::Start => {
-                        if !*running.lock().unwrap() {
-                            *running.lock().unwrap() = true;
-                            start_counter(Arc::clone(&minutes), Arc::clone(&seconds), Arc::clone(&running), time_sync_sender.clone());
-                        }
+                        *running.lock().unwrap() = true;
+                        start_counter(Arc::clone(&minutes), Arc::clone(&seconds), Arc::clone(&running), time_sync_sender.clone());
                     }
 
                     ClockCommand::Pause => {
@@ -69,6 +67,11 @@ pub fn launch_clock_thread(time_sync_sender: Sender<Time>, receiver: Receiver<Cl
                     ClockCommand::Reset => {
                         *minutes.lock().unwrap() = 0;
                         *seconds.lock().unwrap() = 0;
+
+                        time_sync_sender.send(Time {
+                            minutes: *minutes.lock().unwrap(),
+                            seconds: *seconds.lock().unwrap(),
+                        }).unwrap();
                     }
 
                     ClockCommand::GetCurrentTime(reply_sender) => {
@@ -86,14 +89,14 @@ pub fn launch_clock_thread(time_sync_sender: Sender<Time>, receiver: Receiver<Cl
                     }
                 }
             }
-            Err(_) => {break}
+            Err(_) => { break; }
         }
     }
 }
 
-pub fn launch_clock_sync_thread(handle: AppHandle, time_sync_receiver: Receiver<Time>){
+pub fn launch_clock_sync_thread(handle: AppHandle, time_sync_receiver: Receiver<Time>) {
     loop {
-        match time_sync_receiver.recv(){
+        match time_sync_receiver.recv() {
             Ok(time) => {
                 fire_event_time_sync(&time, handle.clone());
                 if !is_clock_on_time(&time) {
@@ -101,7 +104,7 @@ pub fn launch_clock_sync_thread(handle: AppHandle, time_sync_receiver: Receiver<
                     handle_timeout(&handle);
                 }
             }
-            Err(_) => {break}
+            Err(_) => { break; }
         }
     }
 }

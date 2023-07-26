@@ -31,7 +31,7 @@ export default function Match() {
     }, []);
 
     listen(
-        'reset_stage',
+        'stage_reset',
         (_) => {
             resetScores()
         })
