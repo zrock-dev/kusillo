@@ -11,9 +11,9 @@ pub fn is_clock_on_time(time: &Time) -> bool {
     let game_set = retrieve_game_value(&connection, "set_number", &game_id).unwrap();
 
     if game_set < 2 {
-        time.minutes <= 19
+        time.minutes <= 9
     } else {
-        time.minutes <= 14
+        time.minutes <= 7
     }
 }
 

@@ -4,9 +4,9 @@ use crate::errors::Error;
 
 pub fn get_max_score(game_set: i64) -> i64 {
     if game_set < 2 {
-        20
-    } else {
         18
+    } else {
+        16
     }
 }
 

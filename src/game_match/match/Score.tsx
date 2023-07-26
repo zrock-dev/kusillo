@@ -80,9 +80,14 @@ export default function Score({gameId, teamId, score, setScore, maxScore}) {
     ];
 
     useEffect(() => {
-        checkInteractions()
         initTeamData()
     }, [])
+
+    useEffect(() => {
+        recordInteraction(score)
+        handleScoreUpdate()
+        checkInteractions()
+    }, [score]);
 
     function checkInteractions() {
         checkButtons(upButtons, (value: number): boolean => {
@@ -94,12 +99,7 @@ export default function Score({gameId, teamId, score, setScore, maxScore}) {
     }
 
     function handleInteraction(value: number) {
-        let newScore = score + value;
-        setScore(newScore);
-
-        recordInteraction(newScore)
-        handleScoreUpdate()
-        checkInteractions()
+        setScore(score + value);
     }
 
     function recordInteraction(score: number) {
@@ -141,6 +141,17 @@ export default function Score({gameId, teamId, score, setScore, maxScore}) {
                 navigate("/error")
             }))
     }
+
+    listen(
+        'stage_reset',
+        (_) => {
+            setScore(0)
+            setScoreColor(translateColor("blue"))
+        })
+        .catch((error) => {
+            console.error(error);
+            navigate('/error');
+        })
 
     return (
         <Box

@@ -58,8 +58,8 @@ pub fn handle_score_update(handle: AppHandle, game_id: i64, team_id: i64) -> Res
 
     let is_stage_won = update_team_stage(&handle, team_id, game_id)?;
     if is_stage_won {
-        update_game_status(&handle, game_id)?;
         reset_stage(&handle, game_id)?;
+        update_game_status(&handle, game_id)?;
     }
 
     Ok(())

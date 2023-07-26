@@ -69,6 +69,29 @@ export default function Side({ teamId, score, setScore, stageAlign }) {
             navigate('/error');
         })
 
+    listen(
+        'stage_reset',
+        (_) => {
+            setScore(0)
+            setScoreColor(translateColor("blue"))
+        })
+        .catch((error) => {
+            console.error(error);
+            navigate('/error');
+        })
+
+    listen(
+        'game_won',
+        (_) => {
+            setStage(0)
+            setScore(0)
+            setScoreColor(translateColor("blue"))
+        })
+        .catch((error) => {
+            console.error(error);
+            navigate('/error');
+        })
+
     listen("timeout_status", (event) => {
         setIsOpen(event.payload as boolean)
     })

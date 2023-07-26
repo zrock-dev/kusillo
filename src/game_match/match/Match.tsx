@@ -30,20 +30,10 @@ export default function Match() {
         }
     }, []);
 
-    listen(
-        'stage_reset',
-        (_) => {
-            resetScores()
-        })
-        .catch((error) => {
-            console.error(error);
-            navigate('/error');
-        })
 
     listen(
         'game_won',
         (_) => {
-            resetScores()
             enqueueSnackbar("Game won", {variant: "success"})
             navigate('/match-select');
         })
@@ -63,11 +53,6 @@ export default function Match() {
                 navigate('/error');
             })
             .finally(() => setIsLoading(false));
-    }
-
-    function resetScores() {
-        setScoreA(0)
-        setScoreB(0)
     }
 
     function handleOpenSpectatorWindow() {

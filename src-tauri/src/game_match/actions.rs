@@ -1,6 +1,6 @@
 use rusqlite::Connection;
 use tauri::AppHandle;
-use crate::clock::commands::{reset_clock, start_clock};
+use crate::clock::commands::{reset_clock, start_clock, stop_clock};
 use crate::database::game_match_actions::{cash_team_set, retrieve_contenders, retrieve_game_value, retrieve_score_value, update_game_value};
 use crate::database::registration::table_player_creation::PERM_TEAM_PLAYERS;
 use crate::errors::Error;
@@ -69,6 +69,7 @@ pub fn update_game_status(handle: &AppHandle, game_id: i64) -> Result<(), Error>
             let successful_attempt = attempt_record_winner(&connection, game_id, help_value)?;
             if successful_attempt {
                 fire_game_won_event(handle)?;
+                stop_clock();
             }
             Ok(())
         }
@@ -77,6 +78,7 @@ pub fn update_game_status(handle: &AppHandle, game_id: i64) -> Result<(), Error>
             let successful_attempt = attempt_record_winner(&connection, game_id, help_value)?;
             if successful_attempt {
                 fire_game_won_event(handle)?;
+                stop_clock();
             }
             Ok(())
         }

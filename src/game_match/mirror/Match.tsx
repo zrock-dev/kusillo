@@ -25,16 +25,6 @@ export default function Match() {
             })
     }, [])
 
-    listen(
-        'stage_reset',
-        (_) => {
-            setScoreA(0)
-            setScoreB(0)
-        })
-        .catch((error) => {
-            console.error(error);
-            navigate('/error');
-        })
 
     return (
         <Box
