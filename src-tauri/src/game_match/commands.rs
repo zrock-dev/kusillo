@@ -75,3 +75,18 @@ pub fn request_game_init_data(team_id: i64) -> Result<GameInitData, Error> {
         max_score,
     })
 }
+
+#[tauri::command]
+pub fn request_latest_contenders() -> Result<Contestants, Error> {
+    let connection = Connection::open(PERM_TEAM_PLAYERS)?;
+    let game_id = connection.query_row_and_then(
+        "SELECT rowid FROM game ORDER BY rowid DESC LIMIT 1",
+        [],
+        |row| {
+            Ok::<i64, Error>(
+                row.get(0)?
+            )
+        },
+    )?;
+    Ok(retrieve_contenders(&connection, &game_id)?)
+}

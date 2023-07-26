@@ -36,6 +36,7 @@ async fn main() {
             game_match::commands::handle_score_update,
             game_match::commands::request_game_init_data,
             spectator_commands::open_spectator_window,
+            game_match::commands::request_latest_contenders,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

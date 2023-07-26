@@ -80,12 +80,7 @@ export default function Score({gameId, teamId, score, setScore, maxScore}) {
     ];
 
     useEffect(() => {
-        recordInteraction(score)
-        handleScoreUpdate()
         checkInteractions()
-    }, [score])
-
-    useEffect(() => {
         initTeamData()
     }, [])
 
@@ -99,7 +94,12 @@ export default function Score({gameId, teamId, score, setScore, maxScore}) {
     }
 
     function handleInteraction(value: number) {
-        setScore(score + value);
+        let newScore = score + value;
+        setScore(newScore);
+
+        recordInteraction(newScore)
+        handleScoreUpdate()
+        checkInteractions()
     }
 
     function recordInteraction(score: number) {
@@ -122,7 +122,6 @@ export default function Score({gameId, teamId, score, setScore, maxScore}) {
         'score_update',
         (event) => {
             let payload = event.payload
-
             if (payload["team_id"] == teamId) {
                 setScoreColor(translateColor(payload["score_color"] as string))
             }

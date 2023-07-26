@@ -9,7 +9,7 @@ export default function MatchSelect() {
     const hasMadeMatch = React.useRef(false);
 
     function start_match() {
-        invoke('make_match', {teamAId: 1, teamBId: 2})
+        invoke('create_new_game', {teamAId: 1, teamBId: 2})
             .then((id) => {
                 setGameId(id as number)
             })

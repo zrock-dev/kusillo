@@ -23,7 +23,7 @@ function translateColor(color: string): string {
 }
 
 // @ts-ignore
-export default function Side({teamId, updateMatch, score, setScore, stageAlign}) {
+export default function Side({ teamId, score, setScore, stageAlign }) {
     const [stage, setStage] = useState(0);
     const [teamName, setTeamName] = useState("");
     const [scoreColor, setScoreColor] = useState("");
@@ -39,21 +39,29 @@ export default function Side({teamId, updateMatch, score, setScore, stageAlign})
             })
             .catch((error => {
                 console.error(error)
-                navigate("/error")
             }))
     }, [teamId])
 
     listen(
         'score_update',
-        (event_content) => {
-            let payload = event_content.payload
-            let configuration = payload.configuration
-
+        (event) => {
+            let payload = event.payload
             if (payload["team_id"] == teamId) {
-                setStage(configuration["current_stage"])
-                setScore(payload["score_points"])
-                setScoreColor(translateColor(configuration["score_color"]))
-                updateMatch(configuration["is_stage_won"])
+                setScore(payload["score"] as number)
+                setScoreColor(translateColor(payload["score_color"] as string))
+            }
+        })
+        .catch((error) => {
+            console.error(error);
+            navigate('/error');
+        })
+
+    listen(
+        'stage_update',
+        (event) => {
+            let payload = event.payload
+            if (payload["team_id"] == teamId) {
+                setStage(payload["stage_number"] as number)
             }
         })
         .catch((error) => {

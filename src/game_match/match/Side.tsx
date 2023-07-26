@@ -18,17 +18,6 @@ export default function Side({ gameId, teamId, score, setScore, maxScore, setMax
         initTeamData()
     }, [])
 
-    useEffect(() => {
-        invoke('request_max_score', {gameId: gameId})
-            .then((score: any) => {
-                setMaxScore(score)
-            })
-            .catch((error => {
-                console.error(error)
-                navigate("/error")
-            }))
-    }, [stage])
-
     function initTeamData() {
         invoke('request_game_init_data', {teamId: teamId})
             .then((payload: any) => {
