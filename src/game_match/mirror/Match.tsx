@@ -41,24 +41,26 @@ export default function Match() {
                 justifyContent: 'center',
             }}
         >
-            <CountUpTimer isMirror={true}/>
-            <Divider flexItem/>
-            <Stack direction="row" spacing={5}>
-                <Side
-                    teamId={teamAId}
-                    updateMatch={updateMatch}
-                    score={scoreA}
-                    setScore={setScoreA}
-                    stageAlign={"left"}
-                />
+            <Stack>
+                <CountUpTimer isMirror={true}/>
+                <Divider flexItem/>
+                <Stack direction="row" spacing={5}>
+                    <Side
+                        teamId={teamAId}
+                        updateMatch={updateMatch}
+                        score={scoreA}
+                        setScore={setScoreA}
+                        stageAlign={"left"}
+                    />
 
-                <Side
-                    teamId={teamBId}
-                    updateMatch={updateMatch}
-                    score={scoreB}
-                    setScore={setScoreB}
-                    stageAlign={"right"}
-                />
+                    <Side
+                        teamId={teamBId}
+                        updateMatch={updateMatch}
+                        score={scoreB}
+                        setScore={setScoreB}
+                        stageAlign={"right"}
+                    />
+                </Stack>
             </Stack>
         </Box>
     );

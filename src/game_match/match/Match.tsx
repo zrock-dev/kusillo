@@ -80,34 +80,36 @@ export default function Match() {
 
     return (
         <Box>
-            <CountUpTimer isMirror={false}/>
-            <Divider flexItem/>
-            <Stack direction="row">
-                <Side
-                    gameId={gameId}
-                    teamId={teamAId}
-                    updateMatch={updateMatch}
-                    score={scoreA}
-                    setScore={setScoreA}
-                    maxScore={maxScore}
-                    setMaxScore={setMaxScore}
-                />
-                <Side
-                    gameId={gameId}
-                    teamId={teamBId}
-                    updateMatch={updateMatch}
-                    score={scoreB}
-                    setScore={setScoreB}
-                    maxScore={maxScore}
-                    setMaxScore={setMaxScore}
-                />
+            <Stack>
+                <CountUpTimer isMirror={false}/>
+                <Divider flexItem/>
+                <Stack direction="row">
+                    <Side
+                        gameId={gameId}
+                        teamId={teamAId}
+                        updateMatch={updateMatch}
+                        score={scoreA}
+                        setScore={setScoreA}
+                        maxScore={maxScore}
+                        setMaxScore={setMaxScore}
+                    />
+                    <Side
+                        gameId={gameId}
+                        teamId={teamBId}
+                        updateMatch={updateMatch}
+                        score={scoreB}
+                        setScore={setScoreB}
+                        maxScore={maxScore}
+                        setMaxScore={setMaxScore}
+                    />
+                </Stack>
+                <Button
+                    onClick={handleOpenSpectatorWindow}
+                    disabled={canOpenSpectatorWindow}
+                >
+                    Spectator window
+                </Button>
             </Stack>
-            <Button
-                onClick={handleOpenSpectatorWindow}
-                disabled={canOpenSpectatorWindow}
-            >
-                Spectator window
-            </Button>
         </Box>
     );
 }

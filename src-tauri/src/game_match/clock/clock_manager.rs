@@ -29,7 +29,6 @@ fn start_counter(minutes: Arc<Mutex<i32>>, seconds: Arc<Mutex<i32>>, running: Ar
         loop {
             thread::sleep(Duration::from_millis(50));
             if !*running.lock().unwrap() {
-                println!("Stopping clock");
                 break;
             }
 
@@ -61,19 +60,16 @@ pub fn launch_clock_thread(time_sync_sender: Sender<Time>, receiver: Receiver<Cl
                         if !*running.lock().unwrap() {
                             *running.lock().unwrap() = true;
                             start_counter(Arc::clone(&minutes), Arc::clone(&seconds), Arc::clone(&running), time_sync_sender.clone());
-                            println!("Received start command");
                         }
                     }
 
                     ClockCommand::Pause => {
                         *running.lock().unwrap() = false;
-                        println!("Received pause command");
                     }
 
                     ClockCommand::Restart => {
                         *minutes.lock().unwrap() = 0;
                         *seconds.lock().unwrap() = 0;
-                        println!("Received restart command");
                     }
 
                     ClockCommand::GetCurrentTime(reply_sender) => {
