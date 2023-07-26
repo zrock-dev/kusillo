@@ -19,7 +19,7 @@ pub fn get_score_color(score_points: i64) -> String {
 
 pub fn update_team_score(handle: &AppHandle, team_id: i64, game_id: i64) -> Result<(), Error> {
     let connection = Connection::open(PERM_TEAM_PLAYERS)?;
-    let score = retrieve_score_value(&connection, "set_number", &game_id, &team_id)?;
+    let score = retrieve_score_value(&connection, "score_points", &game_id, &team_id)?;
     let score_color = get_score_color(score);
 
     fire_score_update_event(
@@ -37,7 +37,7 @@ pub fn update_team_score(handle: &AppHandle, team_id: i64, game_id: i64) -> Resu
 pub fn update_team_stage(handle: &AppHandle, team_id: i64, game_id: i64) -> Result<bool, Error> {
     let connection = Connection::open(PERM_TEAM_PLAYERS)?;
 
-    if is_stage_won(&connection, team_id, game_id)? {
+    if is_stage_won(&connection, game_id, team_id)? {
         let stage_number = cash_team_set(&connection, &team_id, &game_id)?;
         let game_set = retrieve_game_value(&connection, "set_number", &game_id)?;
 

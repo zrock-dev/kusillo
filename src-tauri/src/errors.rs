@@ -18,7 +18,7 @@ impl Serialize for Error {
         where
             S: Serializer,
     {
-        serializer.serialize_str(&format!("BACKEND ERROR: {}", self.to_string()))
+        serializer.serialize_str(&format!("BACKEND ERROR: {}", self))
     }
 }
 

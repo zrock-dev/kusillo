@@ -19,7 +19,7 @@ pub fn record_winner(connection: &Connection, game_id: &i64, team_id: &i64) -> R
 
 pub fn retrieve_score_value(connection: &Connection, column_name: &str, game_id: &i64, team_id: &i64) -> Result<i64, Error> {
     let query = format!("SELECT {} FROM score WHERE game_id = ?1 AND team_id = ?2 ORDER BY rowid DESC LIMIT 1", column_name);
-    let set_number = connection.query_row_and_then(
+    let value = connection.query_row_and_then(
         query.as_str(),
         [game_id, team_id],
         |row| {
@@ -29,12 +29,12 @@ pub fn retrieve_score_value(connection: &Connection, column_name: &str, game_id:
         },
     )?;
 
-    Ok(set_number)
+    Ok(value)
 }
 
 pub fn retrieve_game_value(connection: &Connection, column_name: &str, game_id: &i64) -> Result<i64, Error> {
     let query = format!("SELECT {} FROM game WHERE rowid = ?1", column_name);
-    let set_number = connection.query_row_and_then(
+    let value = connection.query_row_and_then(
         query.as_str(),
         [game_id],
         |row| {
@@ -43,7 +43,7 @@ pub fn retrieve_game_value(connection: &Connection, column_name: &str, game_id: 
             )
         },
     )?;
-    Ok(set_number)
+    Ok(value)
 }
 
 
