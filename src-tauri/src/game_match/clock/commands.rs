@@ -42,3 +42,11 @@ pub fn request_current_time() -> Time{
     CLOCK_COMMAND_SENDER.lock().unwrap().send(ClockCommand::GetCurrentTime(reply_sender)).unwrap();
     reply_receiver.recv().unwrap()
 }
+
+pub fn restart_clock(){
+    CLOCK_COMMAND_SENDER.lock().unwrap().send(ClockCommand::Restart).unwrap();
+}
+
+pub fn terminate_clock(){
+    CLOCK_COMMAND_SENDER.lock().unwrap().send(ClockCommand::Terminate).unwrap();
+}

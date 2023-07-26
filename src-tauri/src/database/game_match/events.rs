@@ -5,6 +5,7 @@ use crate::database::game_match::game_commands::GameUpdate;
 use crate::database::game_match::game_match::{check_for_game_won, check_for_stage_won, get_score_color, update_team_set};
 use crate::database::game_match::utils::{record_winner, retrieve_score_value, update_game_set};
 use crate::database::registration::table_player_creation::PERM_TEAM_PLAYERS;
+use crate::game_match::clock::commands::restart_clock;
 use crate::utils::rusqlite_error::Error;
 
 #[derive(serde::Serialize, Clone)]
@@ -30,6 +31,7 @@ pub fn fire_score_update(app_handle: tauri::AppHandle, game_id: i64, team_id: i6
     if is_stage_won {
         current_stage = update_team_set(&connection, &team_id, &game_id)?;
         update_game_set(&connection, &game_id)?;
+        restart_clock();
         is_game_won = check_for_game_won(game_id)?;
     }
 

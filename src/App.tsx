@@ -15,8 +15,8 @@ function App() {
                     <Route path="team-form" element={<TeamRegistrationForm />} />
                     <Route path="match-select" element={<MatchSelect />} />
                     <Route path="error" element={<ErrorPage />} />
-                    <Route path="/match" element={<Match />} />
                 </Route>
+                <Route path="/match" element={<Match />} />
                 <Route path="/match-mirror" element={<MirrorMatch />} />
             </Routes>
         </BrowserRouter>

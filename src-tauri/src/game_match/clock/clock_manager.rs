@@ -2,8 +2,8 @@ use std::sync::{Arc, Mutex};
 use std::sync::mpsc::{Receiver, Sender};
 use std::thread;
 use std::time::Duration;
-use serde::Serialize;
 
+use serde::Serialize;
 use tauri::AppHandle;
 
 use crate::game_match::clock::actions::{is_clock_on_time, record_timeout};
@@ -19,15 +19,13 @@ pub struct Time {
 pub enum ClockCommand {
     Start,
     Pause,
+    Restart,
     Terminate,
     GetCurrentTime(Sender<Time>),
 }
 
-fn start_counter(general_minutes: Arc<Mutex<i32>>, general_seconds: Arc<Mutex<i32>>, running: Arc<Mutex<bool>>, sender: Sender<Time>) {
+fn start_counter(minutes: Arc<Mutex<i32>>, seconds: Arc<Mutex<i32>>, running: Arc<Mutex<bool>>, sender: Sender<Time>) {
     thread::spawn(move || {
-        let mut minutes = *general_minutes.lock().unwrap();
-        let mut seconds = *general_seconds.lock().unwrap();
-
         loop {
             thread::sleep(Duration::from_millis(50));
             if !*running.lock().unwrap() {
@@ -35,21 +33,18 @@ fn start_counter(general_minutes: Arc<Mutex<i32>>, general_seconds: Arc<Mutex<i3
                 break;
             }
 
-            seconds += 1;
-            if seconds == 60 {
-                minutes += 1;
-                seconds = 0;
+            *seconds.lock().unwrap() += 1;
+            if *seconds.lock().unwrap() == 60 {
+                *minutes.lock().unwrap() += 1;
+                *seconds.lock().unwrap() = 0;
             }
 
             let time = Time {
-                minutes,
-                seconds,
+                minutes: *minutes.lock().unwrap(),
+                seconds: *seconds.lock().unwrap(),
             };
             sender.send(time).unwrap();
         }
-
-        *general_minutes.lock().unwrap() = minutes;
-        *general_seconds.lock().unwrap() = seconds;
     });
 }
 
@@ -59,46 +54,60 @@ pub fn launch_clock_thread(time_sync_sender: Sender<Time>, receiver: Receiver<Cl
 
     let running = Arc::new(Mutex::new(false));
     loop {
-        let command = receiver.recv().unwrap();
-        match command {
-            ClockCommand::Start => {
-                println!("Received start command");
-                *running.lock().unwrap() = true;
-                start_counter(Arc::clone(&minutes), Arc::clone(&seconds), Arc::clone(&running), time_sync_sender.clone())
-            }
+        match receiver.recv() {
+            Ok(command) => {
+                match command {
+                    ClockCommand::Start => {
+                        if !*running.lock().unwrap() {
+                            *running.lock().unwrap() = true;
+                            start_counter(Arc::clone(&minutes), Arc::clone(&seconds), Arc::clone(&running), time_sync_sender.clone());
+                            println!("Received start command");
+                        }
+                    }
 
-            ClockCommand::Pause => {
-                *running.lock().unwrap() = false;
-                println!("Received pause command");
-            }
+                    ClockCommand::Pause => {
+                        *running.lock().unwrap() = false;
+                        println!("Received pause command");
+                    }
 
-            ClockCommand::Terminate => {
-                *running.lock().unwrap() = false;
-                println!("Received terminate command");
-                break;
-            }
+                    ClockCommand::Restart => {
+                        *minutes.lock().unwrap() = 0;
+                        *seconds.lock().unwrap() = 0;
+                        println!("Received restart command");
+                    }
 
-            ClockCommand::GetCurrentTime(reply_sender) => {
-                let time = Time {
-                    minutes: *minutes.lock().unwrap(),
-                    seconds: *seconds.lock().unwrap(),
-                };
+                    ClockCommand::GetCurrentTime(reply_sender) => {
+                        let time = Time {
+                            minutes: *minutes.lock().unwrap(),
+                            seconds: *seconds.lock().unwrap(),
+                        };
 
-                reply_sender.send(time).unwrap();
+                        reply_sender.send(time).unwrap();
+                    }
+
+                    ClockCommand::Terminate => {
+                        *running.lock().unwrap() = false;
+                        break;
+                    }
+                }
             }
+            Err(_) => {break}
         }
     }
-    println!("The clock has terminated");
 }
 
 pub fn launch_clock_sync_thread(handle: AppHandle, time_sync_receiver: Receiver<Time>){
     loop {
-        let time = time_sync_receiver.recv().unwrap();
-        fire_event_time_sync(&time, handle.clone());
-        if !is_clock_on_time(&time) {
-            CLOCK_COMMAND_SENDER.lock().unwrap().send(ClockCommand::Terminate).unwrap();
-            fire_event_timeout(handle.clone());
-            record_timeout();
+        match time_sync_receiver.recv(){
+            Ok(time) => {
+                fire_event_time_sync(&time, handle.clone());
+                if !is_clock_on_time(&time) {
+                    CLOCK_COMMAND_SENDER.lock().unwrap().send(ClockCommand::Pause).unwrap();
+                    fire_event_timeout(handle.clone());
+                    record_timeout();
+                }
+            }
+            Err(_) => {break}
         }
     }
 }

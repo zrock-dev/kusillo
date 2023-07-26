@@ -33,7 +33,7 @@ export default function Match() {
     const updateMatch = (isGameWon: boolean, isStageWon: boolean) => {
         if (isGameWon) {
             enqueueSnackbar("Game won", {variant: "success"})
-            navigate('/');
+            navigate('/match-select');
         } else if (isStageWon) {
             resetScores()
         }
