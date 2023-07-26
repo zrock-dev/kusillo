@@ -3,8 +3,7 @@ use std::sync::Mutex;
 
 use lazy_static::lazy_static;
 use tauri::{AppHandle, command};
-
-use crate::game_match::clock::clock_manager::{ClockCommand, launch_clock_sync_thread, launch_clock_thread, Time};
+use crate::clock::clock_manager::{ClockCommand, launch_clock_sync_thread, launch_clock_thread, Time};
 
 lazy_static! {
     pub static ref CLOCK_COMMAND_SENDER: Mutex<Sender<ClockCommand>> = Mutex::new(channel().0);
@@ -43,10 +42,10 @@ pub fn request_current_time() -> Time{
     reply_receiver.recv().unwrap()
 }
 
-pub fn restart_clock(){
-    CLOCK_COMMAND_SENDER.lock().unwrap().send(ClockCommand::Restart).unwrap();
+pub fn reset_clock(){
+    CLOCK_COMMAND_SENDER.lock().unwrap().send(ClockCommand::Reset).unwrap();
 }
 
-pub fn terminate_clock(){
-    CLOCK_COMMAND_SENDER.lock().unwrap().send(ClockCommand::Terminate).unwrap();
+pub fn stop_clock(){
+    CLOCK_COMMAND_SENDER.lock().unwrap().send(ClockCommand::Stop).unwrap();
 }

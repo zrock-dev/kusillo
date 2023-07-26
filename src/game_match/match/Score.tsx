@@ -117,7 +117,6 @@ export default function Score({gameId, teamId, setStage, updateMatch, score, set
     listen(
         'score_update',
         (event) => {
-            console.debug(event)
             let payload = event.payload
 
             if (payload["team_id"] == teamId) {

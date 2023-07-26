@@ -1,5 +1,5 @@
 use tauri::{AppHandle, command};
-use crate::game_match::timeout::events::fire_timeout_status_event;
+use crate::timeout::events::fire_timeout_status_event;
 
 #[command]
 pub fn request_timeout(handle: AppHandle){

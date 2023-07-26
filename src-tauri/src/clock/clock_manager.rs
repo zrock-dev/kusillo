@@ -5,10 +5,9 @@ use std::time::Duration;
 
 use serde::Serialize;
 use tauri::AppHandle;
-
-use crate::game_match::clock::actions::{is_clock_on_time, handle_timeout};
-use crate::game_match::clock::commands::CLOCK_COMMAND_SENDER;
-use crate::game_match::clock::events::{fire_event_time_sync};
+use crate::clock::actions::{handle_timeout, is_clock_on_time};
+use crate::clock::commands::pause_clock;
+use crate::clock::events::fire_event_time_sync;
 
 #[derive(Serialize)]
 pub struct Time {
@@ -19,8 +18,8 @@ pub struct Time {
 pub enum ClockCommand {
     Start,
     Pause,
-    Restart,
-    Terminate,
+    Reset,
+    Stop,
     GetCurrentTime(Sender<Time>),
 }
 
@@ -67,7 +66,7 @@ pub fn launch_clock_thread(time_sync_sender: Sender<Time>, receiver: Receiver<Cl
                         *running.lock().unwrap() = false;
                     }
 
-                    ClockCommand::Restart => {
+                    ClockCommand::Reset => {
                         *minutes.lock().unwrap() = 0;
                         *seconds.lock().unwrap() = 0;
                     }
@@ -81,7 +80,7 @@ pub fn launch_clock_thread(time_sync_sender: Sender<Time>, receiver: Receiver<Cl
                         reply_sender.send(time).unwrap();
                     }
 
-                    ClockCommand::Terminate => {
+                    ClockCommand::Stop => {
                         *running.lock().unwrap() = false;
                         break;
                     }
@@ -98,7 +97,7 @@ pub fn launch_clock_sync_thread(handle: AppHandle, time_sync_receiver: Receiver<
             Ok(time) => {
                 fire_event_time_sync(&time, handle.clone());
                 if !is_clock_on_time(&time) {
-                    CLOCK_COMMAND_SENDER.lock().unwrap().send(ClockCommand::Pause).unwrap();
+                    pause_clock();
                     handle_timeout(&handle);
                 }
             }

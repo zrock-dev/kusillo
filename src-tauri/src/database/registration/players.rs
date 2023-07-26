@@ -1,6 +1,6 @@
 use rusqlite::{Connection, params};
 use crate::database::registration::table_player_creation::TEMP_TEAM_PLAYERS;
-use crate::utils::rusqlite_error::Error;
+use crate::errors::Error;
 
 
 #[tauri::command]
