@@ -1,10 +1,10 @@
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import * as React from 'react';
 import Home from "./Home";
-import Match from "./match/match";
-import MirrorMatch from "./match/mirror/MirrorMatch";
+import Match from "./game_match/match/Match";
+import MirrorMatch from "./game_match/mirror/Match";
 import TeamRegistrationForm from "./forms/team_registration";
-import MatchSelect from "./match/MatchSelect";
+import MatchSelect from "./game_match/MatchSelect";
 import ErrorPage from "./errors/error_page";
 
 function App() {
@@ -15,8 +15,8 @@ function App() {
                     <Route path="team-form" element={<TeamRegistrationForm />} />
                     <Route path="match-select" element={<MatchSelect />} />
                     <Route path="error" element={<ErrorPage />} />
-                    <Route path="/match" element={<Match />} />
                 </Route>
+                <Route path="/match" element={<Match />} />
                 <Route path="/match-mirror" element={<MirrorMatch />} />
             </Routes>
         </BrowserRouter>

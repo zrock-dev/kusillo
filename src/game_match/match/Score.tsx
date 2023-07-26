@@ -3,6 +3,7 @@ import {useEffect, useState} from 'react';
 import {useNavigate} from "react-router-dom";
 import {invoke} from "@tauri-apps/api/tauri";
 import {Box, Button, ButtonGroup, Paper, Typography} from "@mui/material";
+import {listen} from "@tauri-apps/api/event";
 
 function checkButtons(buttonEnabledSetters: any, validationFn: any) {
     buttonEnabledSetters.forEach((button: any) => {
@@ -57,7 +58,7 @@ function translateColor(color: string): string {
 }
 
 // @ts-ignore
-export default function Score({gameId, teamId, setStage, updateMatch, score, setScore, maxScore}) {
+export default function Score({gameId, teamId, score, setScore, maxScore}) {
     const navigate = useNavigate();
     const [scoreColor, setScoreColor] = useState("");
 
@@ -79,23 +80,14 @@ export default function Score({gameId, teamId, setStage, updateMatch, score, set
     ];
 
     useEffect(() => {
+        initTeamData()
+    }, [])
+
+    useEffect(() => {
         recordInteraction(score)
-        invoke('request_configuration', {gameId: gameId, teamId: teamId, maxScore: maxScore})
-            .then((payload: any) => {
-                let isStageWon = payload.is_stage_won;
-                if (isStageWon) {
-                    updateMatch(payload.is_game_won as boolean, isStageWon)
-                    setStage(payload.current_stage)
-                }
-                console.debug(payload.score_color)
-                setScoreColor(translateColor(payload.score_color as string))
-                checkInteractions()
-            })
-            .catch((error => {
-                console.error(error)
-                navigate("/error")
-            }))
-    }, [score])
+        handleScoreUpdate()
+        checkInteractions()
+    }, [score]);
 
     function checkInteractions() {
         checkButtons(upButtons, (value: number): boolean => {
@@ -117,6 +109,49 @@ export default function Score({gameId, teamId, setStage, updateMatch, score, set
                 navigate("/error")
             }))
     }
+
+    function handleScoreUpdate(){
+        invoke('handle_score_update', { gameId: gameId, teamId: teamId })
+            .catch((error => {
+                console.error(error)
+                navigate("/error")
+            }))
+    }
+
+    listen(
+        'score_update',
+        (event) => {
+            let payload = event.payload
+            if (payload["team_id"] == teamId) {
+                setScoreColor(translateColor(payload["score_color"] as string))
+            }
+        })
+        .catch((error) => {
+            console.error(error);
+            navigate('/error');
+        })
+
+    function initTeamData() {
+        invoke('request_game_init_data', {teamId: teamId})
+            .then((payload: any) => {
+                setScoreColor(translateColor(payload["score_color"] as string))
+            })
+            .catch((error => {
+                console.error(error)
+                navigate("/error")
+            }))
+    }
+
+    listen(
+        'stage_reset',
+        (_) => {
+            setScore(0)
+            setScoreColor(translateColor("blue"))
+        })
+        .catch((error) => {
+            console.error(error);
+            navigate('/error');
+        })
 
     return (
         <Box

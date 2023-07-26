@@ -1444,6 +1444,7 @@ dependencies = [
 name = "kusillo"
 version = "0.0.0"
 dependencies = [
+ "lazy_static",
  "rusqlite",
  "serde",
  "serde_json",
