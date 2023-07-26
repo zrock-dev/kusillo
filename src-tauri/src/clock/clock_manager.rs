@@ -2,12 +2,15 @@ use std::sync::{Arc, Mutex};
 use std::sync::mpsc::{Receiver, Sender};
 use std::thread;
 use std::time::Duration;
+use rusqlite::Connection;
 
 use serde::Serialize;
 use tauri::AppHandle;
 use crate::clock::actions::{handle_timeout, is_clock_on_time};
 use crate::clock::commands::pause_clock;
 use crate::clock::events::fire_event_time_sync;
+use crate::database::game_match_actions::retrieve_latest_game_id;
+use crate::database::registration::table_player_creation::PERM_TEAM_PLAYERS;
 
 #[derive(Serialize)]
 pub struct Time {
@@ -26,7 +29,7 @@ pub enum ClockCommand {
 fn start_counter(minutes: Arc<Mutex<i32>>, seconds: Arc<Mutex<i32>>, running: Arc<Mutex<bool>>, sender: Sender<Time>) {
     thread::spawn(move || {
         loop {
-            thread::sleep(Duration::from_millis(50));
+            thread::sleep(Duration::from_millis(1000));
             if !*running.lock().unwrap() {
                 break;
             }
@@ -95,11 +98,15 @@ pub fn launch_clock_thread(time_sync_sender: Sender<Time>, receiver: Receiver<Cl
 }
 
 pub fn launch_clock_sync_thread(handle: AppHandle, time_sync_receiver: Receiver<Time>) {
+    let connection = Connection::open(PERM_TEAM_PLAYERS).unwrap();
+    let game_id = retrieve_latest_game_id(&connection).unwrap();
+    let mut old_minute = 0;
     loop {
         match time_sync_receiver.recv() {
             Ok(time) => {
                 fire_event_time_sync(&time, handle.clone());
-                if !is_clock_on_time(&time) {
+                if old_minute != *&time.minutes && !is_clock_on_time(&connection, game_id, &time) {
+                    old_minute = *&time.minutes;
                     pause_clock();
                     handle_timeout(&handle);
                 }

@@ -42,7 +42,7 @@ function TimeOutCounter({ isDialogOpen, handleDialogClose}) {
                     resumeMatchTimer()
                     handleDialogClose()
                 }
-            }, 100)
+            }, 1000)
             return () => {
                 clearInterval(intervalId)
             }
