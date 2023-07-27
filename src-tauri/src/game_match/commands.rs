@@ -4,7 +4,7 @@ use tauri::{AppHandle, command};
 use crate::database::game_match_actions::{Contestants, insert_into_score, retrieve_contenders, retrieve_score_value};
 
 use crate::database::registration::table_player_creation::PERM_TEAM_PLAYERS;
-use crate::database::registration::utils::retrieve_team_name;
+use crate::database::registration::utils::{retrieve_team_name, retrieve_teams, Team};
 use crate::errors::Error;
 use crate::game_match::actions::{get_score_color, reset_stage, update_game_status, update_team_score, update_team_stage};
 use crate::game_match::utils::get_max_score;
@@ -76,7 +76,7 @@ pub fn request_game_init_data(team_id: i64) -> Result<GameInitData, Error> {
     })
 }
 
-#[tauri::command]
+#[command]
 pub fn request_latest_contenders() -> Result<Contestants, Error> {
     let connection = Connection::open(PERM_TEAM_PLAYERS)?;
     let game_id = connection.query_row_and_then(
@@ -89,4 +89,10 @@ pub fn request_latest_contenders() -> Result<Contestants, Error> {
         },
     )?;
     Ok(retrieve_contenders(&connection, &game_id)?)
+}
+
+
+#[command]
+pub fn request_teams() -> Result<Vec<Team>, Error> {
+   Ok(retrieve_teams()?)
 }
