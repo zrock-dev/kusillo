@@ -13,7 +13,6 @@ export default function Match() {
     const location = useLocation();
     const {gameId} = location.state;
     const [maxScore, setMaxScore] = useState(3);
-    const hasFetchedContenders = useRef(false);
 
     const [scoreA, setScoreA] = useState(0);
     const [scoreB, setScoreB] = useState(0);
@@ -24,11 +23,11 @@ export default function Match() {
     const [canOpenSpectatorWindow, setCanOpenSpectatorWindow] = useState(false);
 
     useEffect(() => {
-        if (!hasFetchedContenders.current) {
+        console.debug("Current game id value is: ", gameId)
+        if (gameId > -1){
             updateContenders()
-            hasFetchedContenders.current = true;
         }
-    }, []);
+    }, [gameId]);
 
 
     listen(

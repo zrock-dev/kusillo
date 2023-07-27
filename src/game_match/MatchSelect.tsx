@@ -1,23 +1,13 @@
 import * as React from 'react';
 import {invoke} from "@tauri-apps/api/tauri";
 import {useNavigate} from "react-router-dom";
-import {Box, Button, Container, Typography} from '@mui/material';
+import {Box, Container, Typography} from '@mui/material';
+import TeamListSelection from "./TeamListSelection";
 
 export default function MatchSelect() {
     const navigate = useNavigate();
-    const [gameId, setGameId] = React.useState(-1);
-    const hasMadeMatch = React.useRef(false);
 
-    function start_match() {
-        invoke('create_new_game', {teamAId: 1, teamBId: 2})
-            .then((id) => {
-                setGameId(id as number)
-            })
-            .catch((error) => {
-                console.error(error)
-                navigate("/error")
-            })
-
+    function startClock() {
         invoke('create_clock')
             .catch((error) => {
                 console.error(error)
@@ -25,23 +15,32 @@ export default function MatchSelect() {
             })
     }
 
-    React.useEffect(() => {
-        if (!hasMadeMatch.current) {
-            hasMadeMatch.current = true;
-            start_match()
-        }
-    }, [])
+    function handleMatchStart(teamAId, teamBId) {
+        let gameId = -1;
+        invoke('create_new_game', {teamAId: teamAId, teamBId: teamBId})
+            .then((id) => {
+                gameId = id as number
+            })
+            .catch((error) => {
+                console.error(error)
+                navigate("/error")
+            })
+            .finally(() => {
+                startClock()
+                navigate("/match", {state: {gameId}})
+            })
+    }
 
     return (
         <Container>
             <Box sx={{display: 'flex'}}>
                 <Typography variant="h2" component="div">
-                    Kusillo
+                    Match Selection
                 </Typography>
             </Box>
-            <Button onClick={() => navigate("/match", {state: {gameId}})}>
-                Match
-            </Button>
+            <TeamListSelection
+                handleMatchStart={handleMatchStart}
+            />
         </Container>
     );
 }

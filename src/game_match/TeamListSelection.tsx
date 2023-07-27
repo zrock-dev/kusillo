@@ -45,7 +45,7 @@ function TeamsList({teams, handler}) {
     )
 }
 
-function TeamListSelection() {
+function TeamListSelection({ handleMatchStart }) {
     const defaultTeam = {
         name: "",
         id: -1.
@@ -62,6 +62,8 @@ function TeamListSelection() {
 
     const hasRequested = useRef(false)
     const [areTeamsLoaded, setAreTeamsLoaded] = useState(false)
+
+    const [canStartMatch, setCanStartMatch] = useState(true);
 
     useEffect(() => {
         if (!hasRequested.current) {
@@ -97,9 +99,6 @@ function TeamListSelection() {
         }
     }
 
-    function handleMatchStart() {
-    }
-
     function handleItemClick(team) {
         if (contestants.length < 2) {
             contestants.push(team)
@@ -109,12 +108,13 @@ function TeamListSelection() {
         }
 
         updateContestants()
+        setCanStartMatch(contestants.length < 2)
     }
 
     if (!areTeamsLoaded) {
         return (
             <Box>
-                Daddy we are loading
+                Loading...
             </Box>
         )
     }
@@ -152,7 +152,11 @@ function TeamListSelection() {
                             justifyContent: 'center',
                         }}
                     >
-                        <Button onClick={handleMatchStart} variant={"contained"}>
+                        <Button
+                            onClick={() => {handleMatchStart(teamA.id, teamB.id)}}
+                            variant={"contained"}
+                            disabled={canStartMatch}
+                        >
                             Start Match
                         </Button>
                     </Box>
