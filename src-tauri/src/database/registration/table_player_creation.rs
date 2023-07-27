@@ -2,7 +2,7 @@ use rusqlite::{Connection};
 use crate::database::utils::create_table;
 
 pub const TEMP_TEAM_PLAYERS : &str = "temp_team_players.db";
-pub const PERM_TEAM_PLAYERS : &str = "team_players.db";
+pub const PERM_TEAM_PLAYERS : &str = "teams.db";
 
 
 pub fn create_db(name: &str){
