@@ -1,24 +1,11 @@
-import {
-    Box,
-    Button,
-    Checkbox,
-    Container,
-    IconButton,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemIcon,
-    ListItemText,
-    Stack,
-    Typography
-} from "@mui/material";
-import CommentIcon from '@mui/icons-material/Comment';
+import {Box, Button, Container, List, ListItem, ListItemButton, ListItemText, Stack, Typography} from "@mui/material";
 import {invoke} from "@tauri-apps/api/tauri";
 import {useNavigate} from "react-router-dom";
 import React, {useEffect, useRef, useState} from "react";
+import Grid2 from "@mui/material/Unstable_Grid2";
 
-function ChosenTeamCard({ teamName }){
-    return(
+function ChosenTeamCard({teamName}) {
+    return (
         <Box
             sx={{
                 display: 'flex',
@@ -27,7 +14,7 @@ function ChosenTeamCard({ teamName }){
             }}
         >
             <Typography
-                variant={"h5"}
+                variant={"h2"}
                 align={"center"}
             >
                 {teamName}
@@ -36,9 +23,9 @@ function ChosenTeamCard({ teamName }){
     )
 }
 
-function TeamsList({ teams, handler}){
-    return(
-        <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+function TeamsList({teams, handler}) {
+    return (
+        <List sx={{width: '100%', bgcolor: 'background.paper'}}>
             {teams.map((team) => {
                 const labelId = `checkbox-list-label-${team.id}`;
 
@@ -46,8 +33,10 @@ function TeamsList({ teams, handler}){
                     <ListItem
                         key={team.id}
                     >
-                        <ListItemButton onClick={() => {handler(team)}}>
-                            <ListItemText id={labelId} primary={`${team.name}`} />
+                        <ListItemButton onClick={() => {
+                            handler(team)
+                        }}>
+                            <ListItemText id={labelId} primary={`${team.name}`}/>
                         </ListItemButton>
                     </ListItem>
                 );
@@ -56,7 +45,7 @@ function TeamsList({ teams, handler}){
     )
 }
 
-function TeamListSelection(){
+function TeamListSelection() {
     const defaultTeam = {
         name: "",
         id: -1.
@@ -75,7 +64,7 @@ function TeamListSelection(){
     const [areTeamsLoaded, setAreTeamsLoaded] = useState(false)
 
     useEffect(() => {
-        if (!hasRequested.current){
+        if (!hasRequested.current) {
             hasRequested.current = false;
             invoke('request_teams')
                 .then((teams: any) => {
@@ -95,7 +84,7 @@ function TeamListSelection(){
 
     }, [contestants]);
 
-    function updateContestants(){
+    function updateContestants() {
         let teamAValue = contestants[0];
         let teamBValue = contestants[1];
 
@@ -108,12 +97,13 @@ function TeamListSelection(){
         }
     }
 
-    function handleMatchStart(){}
+    function handleMatchStart() {
+    }
 
     function handleItemClick(team) {
-        if (contestants.length < 2){
+        if (contestants.length < 2) {
             contestants.push(team)
-        }else {
+        } else {
             contestants.shift()
             contestants.push(team)
         }
@@ -121,7 +111,7 @@ function TeamListSelection(){
         updateContestants()
     }
 
-    if (!areTeamsLoaded){
+    if (!areTeamsLoaded) {
         return (
             <Box>
                 Daddy we are loading
@@ -129,24 +119,45 @@ function TeamListSelection(){
         )
     }
 
-    return(
-        <Container>
-            <Stack direction={"row"}>
-                <TeamsList
-                    teams={teams}
-                    handler={handleItemClick}
-                />
+    return (
+        <Container
+            sx={{
+                marginTop: '200px',
+            }}
+        >
+            <Grid2 container>
+                <Grid2 xs={6} container>
+                    <TeamsList
+                        teams={teams}
+                        handler={handleItemClick}
+                    />
+                </Grid2>
+                <Grid2 xs={6} container>
+                    <Grid2 xs={12}>
+                        <ChosenTeamCard teamName={teamA.name}/>
+                    </Grid2>
+                    <Grid2 xs={12}>
+                        <Typography variant={"h3"} align={"center"}>VS</Typography>
+                    </Grid2>
+                    <Grid2 xs={12}>
+                        <ChosenTeamCard teamName={teamB.name}/>
+                    </Grid2>
+                </Grid2>
 
-                <Stack>
-                    <ChosenTeamCard teamName={ teamA.name }/>
-                    <Typography variant={"h1"}>VS</Typography>
-                    <ChosenTeamCard teamName={ teamB.name }/>
-
-                    <Button onClick={handleMatchStart}>
-                        Start Match
-                    </Button>
-                </Stack>
-            </Stack>
+                <Grid2 xs={12}>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}
+                    >
+                        <Button onClick={handleMatchStart} variant={"contained"}>
+                            Start Match
+                        </Button>
+                    </Box>
+                </Grid2>
+            </Grid2>
         </Container>
     )
 }
