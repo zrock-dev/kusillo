@@ -10,7 +10,7 @@ pub fn get_max_score(game_set: i64) -> i64 {
     }
 }
 
-pub fn is_stage_won(connection: &Connection, game_id: i64, team_id: i64) -> Result<bool, Error>{
+pub fn is_stage_won(connection: &Connection, game_id: i64, team_id: i64, is_up_button: bool) -> Result<bool, Error>{
     let score = retrieve_score_value(&connection, "score_points", &game_id, &team_id)?;
     let game_set = retrieve_game_value(&connection, "set_number", &game_id)?;
     let max_score = get_max_score(game_set);
@@ -19,7 +19,7 @@ pub fn is_stage_won(connection: &Connection, game_id: i64, team_id: i64) -> Resu
         Ok(true)
     } else {
         let on_time = retrieve_game_value(&connection, "on_time", &game_id)?;
-        return Ok(on_time == 0)
+        return Ok(on_time == 0 && is_up_button)
     }
 }
 
