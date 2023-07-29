@@ -15,7 +15,7 @@ export default function MatchSelect() {
             })
     }
 
-    function handleMatchStart(teamAId, teamBId) {
+    function handleMatchStart(teamAId: number, teamBId: number) {
         let gameId = -1;
         invoke('create_new_game', {teamAId: teamAId, teamBId: teamBId})
             .then((id) => {

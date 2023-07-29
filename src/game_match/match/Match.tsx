@@ -1,11 +1,11 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {invoke} from '@tauri-apps/api/tauri';
 import {useLocation, useNavigate} from 'react-router-dom';
 import Side from './Side';
 import {Box, Button, Divider, Stack} from '@mui/material';
 import CountUpTimer from "../clock/CountUpTimer";
 import {listen} from "@tauri-apps/api/event";
-import {enqueueSnackbar} from "notistack";
+import GameTransitionDialog from "../transitions/GameTransition";
 
 export default function Match() {
     const navigate = useNavigate();
@@ -22,24 +22,31 @@ export default function Match() {
     const [isLoading, setIsLoading] = useState(true);
     const [canOpenSpectatorWindow, setCanOpenSpectatorWindow] = useState(false);
 
+    const [dialogStatus, setDialogStatus] = useState(false)
+    const [dialogMessage, setDialogMessage] = useState("")
+
     useEffect(() => {
-        console.debug("Current game id value is: ", gameId)
-        if (gameId > -1){
+        if (gameId == -1) {
             updateContenders()
         }
     }, [gameId]);
 
-
     listen(
         'game_won',
-        (_) => {
-            enqueueSnackbar("Game won", {variant: "success"})
-            navigate('/match-select');
+        (event) => {
+            setDialogStatus(true)
+            // @ts-ignore
+            setDialogMessage(`Game won by: ${event["payload"]["winner_name"]}`)
         })
         .catch((error) => {
             console.error(error);
             navigate('/error');
         })
+
+    function handleAccept(){
+        setDialogStatus(false)
+        navigate('/match-select');
+    }
 
     function updateContenders() {
         invoke('request_contenders', {gameId: gameId})
@@ -61,14 +68,6 @@ export default function Match() {
                 navigate('/error');
             })
         setCanOpenSpectatorWindow(true)
-    }
-
-    function start_clock() {
-        invoke('start_clock')
-            .catch((error) => {
-                console.error(error)
-                navigate("/error")
-            })
     }
 
     if (isLoading) {
@@ -105,6 +104,11 @@ export default function Match() {
                     Spectator window
                 </Button>
             </Stack>
+            <GameTransitionDialog
+                isDialogOpen={dialogStatus}
+                message={dialogMessage}
+                confirmationHandler={handleAccept}
+            />
         </Box>
     );
 }

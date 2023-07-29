@@ -7,12 +7,16 @@ import {invoke} from "@tauri-apps/api/tauri";
 import {useNavigate} from "react-router-dom";
 import TimeOutBox from "../timeout/TimeOutBox";
 import {listen} from "@tauri-apps/api/event";
+import SetTransitionDialog from "../transitions/SetTransition";
 
 // @ts-ignore
 export default function Side({ gameId, teamId, score, setScore, maxScore, setMaxScore }) {
-    const navigate = useNavigate();
-    const [stage, setStage] = useState(0);
-    const [teamName, setTeamName] = useState("");
+    const navigate = useNavigate()
+    const [stage, setStage] = useState(0)
+    const [teamName, setTeamName] = useState("")
+
+    const [confirmationDialogStatus, setConfirmationDialogStatus] = useState(false)
+    const [dialogMessage, setDialogMessage] = useState("")
 
     useEffect(() => {
         initTeamData()
@@ -33,10 +37,16 @@ export default function Side({ gameId, teamId, score, setScore, maxScore, setMax
     listen(
         'stage_update',
         (event) => {
-            let payload = event.payload
+            let payload = event["payload"]
+            // @ts-ignore
             if (payload["team_id"] == teamId) {
+                // @ts-ignore
                 setStage(payload["stage_number"] as number)
+                // @ts-ignore
                 setMaxScore(payload["max_score"] as number)
+
+                setConfirmationDialogStatus(true)
+                setDialogMessage(`Team ${teamName} has won the set #${stage}`)
             }
         })
         .catch((error) => {
@@ -44,8 +54,23 @@ export default function Side({ gameId, teamId, score, setScore, maxScore, setMax
             navigate('/error');
         })
 
+    function handleCancel(){
+        setConfirmationDialogStatus(false)
+        navigate('/match-select');
+    }
+
+    function handleAccept(){
+        setConfirmationDialogStatus(false)
+    }
+
     return (
         <Grid2 container spacing={5}>
+            <SetTransitionDialog
+                isDialogOpen={confirmationDialogStatus}
+                message={dialogMessage}
+                confirmationHandler={handleAccept}
+                cancelHandler={handleCancel}
+            />
             <Grid2 xs={12}>
                 <Typography variant="h2">{teamName}</Typography>
             </Grid2>
@@ -73,9 +98,7 @@ export default function Side({ gameId, teamId, score, setScore, maxScore, setMax
                 />
             </Grid2>
             <Grid2 xs={12}>
-                <TimeOutBox
-                    isMirror={false}
-                />
+                <TimeOutBox/>
             </Grid2>
         </Grid2>
     );
