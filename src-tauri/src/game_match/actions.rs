@@ -4,8 +4,8 @@ use crate::clock::commands::{reset_clock, start_clock, stop_clock};
 use crate::database::game_match_actions::{cash_team_set, retrieve_contenders, retrieve_game_value, retrieve_score_value, update_game_value};
 use crate::database::registration::table_player_creation::PERM_TEAM_PLAYERS;
 use crate::errors::Error;
-use crate::game_match::events::{fire_game_won_event, fire_score_update_event, fire_stage_reset_event, fire_stage_update_event, ScoreUpdatePayload, StageUpdatePayload};
-use crate::game_match::utils::{at_three, at_two, attempt_record_winner, get_max_score, is_stage_won, is_stage_won_on_timeout};
+use crate::game_match::events::{fire_game_won_event, fire_score_update_event, fire_stage_reset_event, fire_stage_update_event, GameUpdatePayload, ScoreUpdatePayload, StageUpdatePayload};
+use crate::game_match::utils::{get_max_score, is_stage_won, is_stage_won_on_timeout, review_game};
 
 pub fn get_score_color(score_points: i64) -> String {
     match score_points {
@@ -57,32 +57,19 @@ pub fn update_team_stage(handle: &AppHandle, team_id: i64, game_id: i64, is_up_b
 pub fn update_game_status(handle: &AppHandle, game_id: i64) -> Result<(), Error> {
     let connection = Connection::open(PERM_TEAM_PLAYERS)?;
     let contenders = retrieve_contenders(&connection, &game_id)?;
-
     let game_set = retrieve_game_value(&connection, "set_number", &game_id)?;
-    let team_a_set_number = retrieve_score_value(&connection, "set_number", &game_id, &contenders.team_a_id)?;
-    let team_b_set_number = retrieve_score_value(&connection, "set_number", &game_id, &contenders.team_b_id)?;
 
-    match game_set {
-        1 => Ok(()),
-        2 => {
-            let help_value = at_two(team_a_set_number, team_b_set_number);
-            let successful_attempt = attempt_record_winner(&connection, game_id, help_value)?;
-            if successful_attempt {
-                fire_game_won_event(handle)?;
-                stop_clock();
-            }
-            Ok(())
+    if game_set == 1 {
+        Ok(())
+
+    }else {
+        let contender = review_game(contenders, game_set);
+        if contender.is_some() {
+            fire_game_won_event(handle, GameUpdatePayload{ winner_name: contender.unwrap().team_name })?;
+            stop_clock();
         }
-        3 => {
-            let help_value = at_three(team_a_set_number, team_b_set_number);
-            let successful_attempt = attempt_record_winner(&connection, game_id, help_value)?;
-            if successful_attempt {
-                fire_game_won_event(handle)?;
-                stop_clock();
-            }
-            Ok(())
-        }
-        _ => panic!("Unexpected game set #{}", game_set)
+
+        Ok(())
     }
 }
 
