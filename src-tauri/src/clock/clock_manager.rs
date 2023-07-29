@@ -100,13 +100,11 @@ pub fn launch_clock_thread(time_sync_sender: Sender<Time>, receiver: Receiver<Cl
 pub fn launch_clock_sync_thread(handle: AppHandle, time_sync_receiver: Receiver<Time>) {
     let connection = Connection::open(PERM_TEAM_PLAYERS).unwrap();
     let game_id = retrieve_latest_game_id(&connection).unwrap();
-    let mut old_minute = 0;
     loop {
         match time_sync_receiver.recv() {
             Ok(time) => {
                 fire_event_time_sync(&time, handle.clone());
-                if old_minute != *&time.minutes && !is_clock_on_time(&connection, game_id, &time) {
-                    old_minute = *&time.minutes;
+                if !is_clock_on_time(&connection, game_id, &time) {
                     pause_clock();
                     handle_timeout(&handle);
                 }
@@ -115,4 +113,3 @@ pub fn launch_clock_sync_thread(handle: AppHandle, time_sync_receiver: Receiver<
         }
     }
 }
-

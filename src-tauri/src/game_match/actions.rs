@@ -34,10 +34,10 @@ pub fn update_team_score(handle: &AppHandle, team_id: i64, game_id: i64) -> Resu
     Ok(())
 }
 
-pub fn update_team_stage(handle: &AppHandle, team_id: i64, game_id: i64) -> Result<bool, Error> {
+pub fn update_team_stage(handle: &AppHandle, team_id: i64, game_id: i64, is_up_button: bool) -> Result<bool, Error> {
     let connection = Connection::open(PERM_TEAM_PLAYERS)?;
 
-    if is_stage_won(&connection, game_id, team_id)? {
+    if is_stage_won(&connection, game_id, team_id, is_up_button)? {
         let stage_number = cash_team_set(&connection, &team_id, &game_id)?;
         let game_set = retrieve_game_value(&connection, "set_number", &game_id)?;
 
