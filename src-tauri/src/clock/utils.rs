@@ -24,10 +24,14 @@ pub fn launch_clock_sync_thread(handle: AppHandle, time_sync_receiver: Receiver<
                 match command {
                     SyncCommands::TimeUpdate(time) => {
                         fire_event_time_sync(&time, handle.clone());
-                        if old_minute != *&time.minutes && !is_clock_on_time(&connection, game_id, &time) {
+                        if old_minute != *&time.minutes {
                             old_minute = *&time.minutes;
-                            pause_clock();
-                            handle_timeout(&handle);
+
+                            if !is_clock_on_time(&connection, game_id, &time) {
+                                old_minute = 0;
+                                pause_clock();
+                                handle_timeout(&handle);
+                            }
                         }
                     }
 

@@ -60,10 +60,9 @@ pub fn launch_clock_thread(handle: AppHandle, receiver: Receiver<ClockCommand>) 
             Ok(command) => {
                 match command {
                     ClockCommand::Start => {
-                        let running = *is_counter_running.lock().unwrap();
-                        if !running {
+                        if !*is_counter_running.lock().unwrap() {
                             *is_counter_running.lock().unwrap() = true;
-                            
+
                             let minutes = Arc::clone(&minutes);
                             let seconds = Arc::clone(&seconds);
                             let running = Arc::clone(&is_counter_running);
