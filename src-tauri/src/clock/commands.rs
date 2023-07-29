@@ -3,7 +3,7 @@ use std::sync::Mutex;
 
 use lazy_static::lazy_static;
 use tauri::{AppHandle, command};
-use crate::clock::clock_manager::{ClockCommand, launch_clock_sync_thread, launch_clock_thread, Time};
+use crate::clock::clock_manager::{ClockCommand, launch_clock_thread, Time};
 
 lazy_static! {
     pub static ref CLOCK_COMMAND_SENDER: Mutex<Sender<ClockCommand>> = Mutex::new(channel().0);
@@ -11,16 +11,11 @@ lazy_static! {
 
 #[command]
 pub fn create_clock(handle: AppHandle) {
-    let (time_sync_sender, time_sync_receiver): (Sender<Time>, Receiver<Time>) = channel();
     let (clock_command_sender, clock_command_receiver): (Sender<ClockCommand>, Receiver<ClockCommand>) = channel();
     *CLOCK_COMMAND_SENDER.lock().unwrap() = clock_command_sender;
 
     std::thread::spawn(move || {
-        launch_clock_thread(time_sync_sender, clock_command_receiver);
-    });
-
-    std::thread::spawn(move || {
-        launch_clock_sync_thread(handle, time_sync_receiver);
+        launch_clock_thread(handle, clock_command_receiver);
     });
 
 }
