@@ -53,10 +53,10 @@ pub fn record_interaction(team_id: i64, game_id: i64, score_points: i64) -> Resu
 }
 
 #[command]
-pub fn handle_score_update(handle: AppHandle, game_id: i64, team_id: i64) -> Result<(), Error> {
+pub fn handle_score_update(handle: AppHandle, game_id: i64, team_id: i64, is_up_button: bool) -> Result<(), Error> {
     update_team_score(&handle, team_id, game_id)?;
 
-    let is_stage_won = update_team_stage(&handle, team_id, game_id)?;
+    let is_stage_won = update_team_stage(&handle, team_id, game_id, is_up_button)?;
     if is_stage_won {
         reset_stage(&handle, game_id)?;
         update_game_status(&handle, game_id)?;
