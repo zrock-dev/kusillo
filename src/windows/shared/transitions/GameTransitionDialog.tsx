@@ -19,8 +19,11 @@ function GameTransitionDialog({ DialogActions }) {
         'game_dialog_status',
         (event: any) => {
             let payload = event["payload"] as any
+
             setIsOpen(payload["status"])
-            setMessage(`Game won by: ${event["payload"]["winner_name"]}`)
+            if(payload["status"]){
+                setMessage(`Game won by: ${payload["winner_name"]}`)
+            }
         })
         .catch((error: any) => {
             console.error(error);

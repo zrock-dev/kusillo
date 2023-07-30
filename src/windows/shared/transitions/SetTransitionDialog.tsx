@@ -15,7 +15,9 @@ function StageTransitionDialog({DialogActions}) {
             let payload = event["payload"] as any
 
             setIsOpen(payload["status"])
-            setMessage(`Team ${payload["team_name"]} has won the set #${payload["game_set"]}`)
+            if(payload["status"]){
+                setMessage(`Team ${payload["team_name"]} has won the set #${payload["game_set"]}`)
+            }
         })
         .catch((error: any) => {
             console.error(error);
