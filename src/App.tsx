@@ -1,12 +1,11 @@
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import * as React from 'react';
 import Home from "./Home";
-import Match from "./windows/operator/game_match/Match";
-import MirrorMatch from "./windows/audience/game_match/Match";
 import TeamRegistrationForm from "./forms/team_registration";
 import ErrorPage from "./errors/error_page";
 import MatchSelect from "./windows/shared/MatchSelect";
 import OperatorWindow from "./windows/operator/OperatorWindow";
+import AudienceWindow from "./windows/audience/AudienceWindow";
 
 function App() {
     return (
@@ -18,7 +17,7 @@ function App() {
                     <Route path="error" element={<ErrorPage/>}/>
                 </Route>
                 <Route path="/operator-window" element={<OperatorWindow/>}/>
-                <Route path="/match-mirror" element={<MirrorMatch/>}/>
+                <Route path="/audience_window" element={<AudienceWindow/>}/>
             </Routes>
         </BrowserRouter>
     );

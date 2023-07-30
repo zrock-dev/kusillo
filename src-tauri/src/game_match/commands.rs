@@ -8,6 +8,7 @@ use crate::database::registration::utils::{retrieve_team_value, retrieve_teams, 
 use crate::errors::Error;
 use crate::game_match::actions::{get_score_color, reset_stage, update_game_status, update_team_score, update_team_stage};
 use crate::game_match::utils::get_max_score;
+use crate::transitions::events::{fire_game_dialog_update_event, fire_stage_dialog_update_event};
 
 #[derive(Serialize)]
 pub struct GameInitData {
@@ -56,13 +57,26 @@ pub fn record_interaction(team_id: i64, game_id: i64, score_points: i64) -> Resu
 pub fn handle_score_update(handle: AppHandle, game_id: i64, team_id: i64, is_up_button: bool) -> Result<(), Error> {
     update_team_score(&handle, team_id, game_id)?;
 
-    let is_stage_won = update_team_stage(&handle, team_id, game_id, is_up_button)?;
-    if is_stage_won {
-        reset_stage(&handle, game_id)?;
-        update_game_status(&handle, game_id)?;
-    }
+    match update_team_stage(&handle, team_id, game_id, is_up_button)? {
+        Some(stage_payload) => {
+            reset_stage(&handle, game_id)?;
 
-    Ok(())
+            match update_game_status(&handle, game_id)? {
+                Some(game_payload) => {
+                    fire_game_dialog_update_event(&handle, game_payload)?;
+                }
+
+                None => {
+                    fire_stage_dialog_update_event(&handle, stage_payload)?;
+                }
+            }
+            Ok(())
+        }
+
+        None => {
+            Ok(())
+        }
+    }
 }
 
 #[command]

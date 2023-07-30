@@ -6,7 +6,7 @@ pub async fn open_spectator_window(handle: AppHandle) {
         let _ = tauri::WindowBuilder::new(
             &handle,
             "spectator",
-            tauri::WindowUrl::App("/match-mirror".into()),
+            tauri::WindowUrl::App("/audience_window".into()),
         ).build()
             .unwrap_or_else(|error| {
                 panic!("{}", error)

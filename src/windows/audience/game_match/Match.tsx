@@ -9,6 +9,7 @@ export default function Match() {
     const navigate = useNavigate();
     const [teamA, setTeamA] = useState(undefined);
     const [teamB, setTeamB] = useState(undefined);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         invoke('request_latest_contenders')
@@ -20,8 +21,12 @@ export default function Match() {
                 console.error(error);
                 navigate('/error');
             })
+            .finally(() => setIsLoading(false));
     }, [])
 
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <Box

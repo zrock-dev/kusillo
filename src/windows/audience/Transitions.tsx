@@ -6,10 +6,10 @@ function Transitions() {
     return (
         <Box>
             <StageTransitionDialog
-                DialogActions={<DialogContent/>}
+                DialogActions={DialogContent}
             />
             <GameTransitionDialog
-                DialogActions={<DialogContent/>}
+                DialogActions={DialogContent}
             />
         </Box>
     )

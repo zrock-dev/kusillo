@@ -26,15 +26,19 @@ function translateColor(color: string): string {
 export default function Side({ team, stageAlign }) {
     const navigate = useNavigate();
 
-    const [stage, setStage] = useState(0);
-    const [scoreColor, setScoreColor] = useState("");
+    const [stage, setStage] = useState(0)
+    const [scoreColor, setScoreColor] = useState("")
     const [score, setScore] = useState(0)
 
-    const [teamName, setTeamName] = useState("");
+    const [teamName, setTeamName] = useState("")
+    const [teamId, setTeamId] = useState(-1)
     const [isDialogOpen, setIsOpen] = useState(false)
 
     useEffect(() => {
-        invoke('request_game_init_data', {teamId: team.id})
+        let id = team["id"]
+        setTeamId(id)
+
+        invoke('request_game_init_data', {teamId: id})
             .then((payload: any) => {
                 setScore(payload["score"] as number)
                 setScoreColor(translateColor(payload["score_color"] as string))
@@ -50,7 +54,7 @@ export default function Side({ team, stageAlign }) {
         'score_update',
         (event: any) => {
             let payload = event["payload"]
-            if (payload["team_id"] == team) {
+            if (payload["team_id"] == teamId) {
                 setScore(payload["score"] as number)
                 setScoreColor(translateColor(payload["score_color"] as string))
             }
@@ -64,7 +68,7 @@ export default function Side({ team, stageAlign }) {
         'stage_update',
         (event: any) => {
             let payload = event["payload"]
-            if (payload["team_id"] == team) {
+            if (payload["team_id"] == teamId) {
                 setStage(payload["stage_number"] as number)
             }
         })
