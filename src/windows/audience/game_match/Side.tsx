@@ -5,7 +5,7 @@ import Grid2 from "@mui/material/Unstable_Grid2";
 import {listen} from '@tauri-apps/api/event'
 import {useNavigate} from "react-router-dom";
 import {invoke} from "@tauri-apps/api/tauri";
-import TimeOutDialog from "../timeout/TimeOutDialog";
+import TimeOutDialog from "../../shared/timeout/TimeOutDialog";
 
 function translateColor(color: string): string {
     switch (color) {
@@ -23,29 +23,37 @@ function translateColor(color: string): string {
 }
 
 // @ts-ignore
-export default function Side({ teamId, score, setScore, stageAlign }) {
-    const [stage, setStage] = useState(0);
-    const [teamName, setTeamName] = useState("");
-    const [scoreColor, setScoreColor] = useState("");
+export default function Side({ team, stageAlign }) {
     const navigate = useNavigate();
+
+    const [stage, setStage] = useState(0)
+    const [scoreColor, setScoreColor] = useState("")
+    const [score, setScore] = useState(0)
+
+    const [teamName, setTeamName] = useState("")
+    const [teamId, setTeamId] = useState(-1)
     const [isDialogOpen, setIsOpen] = useState(false)
 
     useEffect(() => {
-        invoke('request_game_init_data', {teamId: teamId})
+        let id = team["id"]
+        setTeamId(id)
+
+        invoke('request_game_init_data', {teamId: id})
             .then((payload: any) => {
-                setTeamName(payload["team_name"] as string)
                 setScore(payload["score"] as number)
                 setScoreColor(translateColor(payload["score_color"] as string))
             })
             .catch((error => {
                 console.error(error)
             }))
-    }, [teamId])
+
+        setTeamName(team.name)
+    }, [team])
 
     listen(
         'score_update',
-        (event) => {
-            let payload = event.payload
+        (event: any) => {
+            let payload = event["payload"]
             if (payload["team_id"] == teamId) {
                 setScore(payload["score"] as number)
                 setScoreColor(translateColor(payload["score_color"] as string))
@@ -58,8 +66,8 @@ export default function Side({ teamId, score, setScore, stageAlign }) {
 
     listen(
         'stage_update',
-        (event) => {
-            let payload = event.payload
+        (event: any) => {
+            let payload = event["payload"]
             if (payload["team_id"] == teamId) {
                 setStage(payload["stage_number"] as number)
             }
@@ -71,7 +79,7 @@ export default function Side({ teamId, score, setScore, stageAlign }) {
 
     listen(
         'stage_reset',
-        (_) => {
+        () => {
             setScore(0)
             setScoreColor(translateColor("blue"))
         })
@@ -82,7 +90,7 @@ export default function Side({ teamId, score, setScore, stageAlign }) {
 
     listen(
         'game_won',
-        (_) => {
+        () => {
             setStage(0)
             setScore(0)
             setScoreColor(translateColor("blue"))
@@ -93,7 +101,8 @@ export default function Side({ teamId, score, setScore, stageAlign }) {
         })
 
     listen("timeout_status", (event) => {
-        setIsOpen(event.payload as boolean)
+        let payload = event["payload"] as any
+        setIsOpen(payload as boolean)
     })
         .catch((error) => {
             console.error(error)

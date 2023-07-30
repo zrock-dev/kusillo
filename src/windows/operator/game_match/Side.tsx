@@ -3,25 +3,36 @@ import {useEffect, useState} from 'react';
 import {Box, Typography} from "@mui/material";
 import Grid2 from "@mui/material/Unstable_Grid2";
 import Score from "./Score";
-import {invoke} from "@tauri-apps/api/tauri";
 import {useNavigate} from "react-router-dom";
-import TimeOutBox from "../timeout/TimeOutBox";
+import TimeOutBox from "../../shared/timeout/TimeOutBox";
 import {listen} from "@tauri-apps/api/event";
+import { invoke } from '@tauri-apps/api/tauri';
 
 // @ts-ignore
-export default function Side({ gameId, teamId, score, setScore, maxScore, setMaxScore }) {
-    const navigate = useNavigate();
-    const [stage, setStage] = useState(0);
-    const [teamName, setTeamName] = useState("");
+export default function Side({ gameId, team}) {
+    const navigate = useNavigate()
+
+    const [stage, setStage] = useState(0)
+    const [maxScore, setMaxScore] = useState(3)
+
+    const [teamName, setTeamName] = useState("")
+    const [teamId, setTeamId] = useState(-1)
+
+    const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
-        initTeamData()
+        let id = team["id"] as number
+        setTeamId(id)
+        setTeamName(team["name"])
+        requestMaxScore(id)
+
+        setIsLoading(false)
     }, [])
 
-    function initTeamData() {
-        invoke('request_game_init_data', {teamId: teamId})
+    function requestMaxScore(id: number) {
+        // TODO: The backend has to make an stage update when the side is being initialized
+        invoke('request_game_init_data', {teamId: id})
             .then((payload: any) => {
-                setTeamName(payload["team_name"] as string)
                 setMaxScore(payload["max_score"] as number)
             })
             .catch((error => {
@@ -32,17 +43,27 @@ export default function Side({ gameId, teamId, score, setScore, maxScore, setMax
 
     listen(
         'stage_update',
-        (event) => {
-            let payload = event.payload
+        (event: any) => {
+            let payload = event["payload"]
+
             if (payload["team_id"] == teamId) {
-                setStage(payload["stage_number"] as number)
-                setMaxScore(payload["max_score"] as number)
+                let set_number = payload["stage_number"] as number
+                setStage(set_number)
             }
+            setMaxScore(payload["max_score"] as number)
         })
         .catch((error) => {
             console.error(error);
             navigate('/error');
         })
+
+    if (isLoading){
+        return (
+            <Box>
+                Loading...
+            </Box>
+        )
+    }
 
     return (
         <Grid2 container spacing={5}>
@@ -67,15 +88,12 @@ export default function Side({ gameId, teamId, score, setScore, maxScore, setMax
                 <Score
                     gameId={gameId}
                     teamId={teamId}
-                    score={score}
-                    setScore={setScore}
+                    // TODO: Why can't the Score handle the maxScore itself?
                     maxScore={maxScore}
                 />
             </Grid2>
             <Grid2 xs={12}>
-                <TimeOutBox
-                    isMirror={false}
-                />
+                <TimeOutBox/>
             </Grid2>
         </Grid2>
     );

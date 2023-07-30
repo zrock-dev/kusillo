@@ -7,7 +7,7 @@ import TeamListSelection from "./TeamListSelection";
 export default function MatchSelect() {
     const navigate = useNavigate();
 
-    function startClock() {
+    function create_clock() {
         invoke('create_clock')
             .catch((error) => {
                 console.error(error)
@@ -15,19 +15,15 @@ export default function MatchSelect() {
             })
     }
 
-    function handleMatchStart(teamAId, teamBId) {
-        let gameId = -1;
+    function handleMatchStart(teamAId: number, teamBId: number) {
         invoke('create_new_game', {teamAId: teamAId, teamBId: teamBId})
-            .then((id) => {
-                gameId = id as number
-            })
             .catch((error) => {
                 console.error(error)
                 navigate("/error")
             })
             .finally(() => {
-                startClock()
-                navigate("/match", {state: {gameId}})
+                create_clock()
+                navigate("/operator-window")
             })
     }
 

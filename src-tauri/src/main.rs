@@ -10,6 +10,7 @@ mod game_match;
 pub mod clock;
 pub mod timeout;
 pub mod errors;
+mod transitions;
 
 #[tokio::main]
 async fn main() {
@@ -38,6 +39,9 @@ async fn main() {
             spectator_commands::open_spectator_window,
             game_match::commands::request_latest_contenders,
             game_match::commands::request_teams,
+            transitions::commands::request_game_dialog_close,
+            transitions::commands::request_stage_dialog_close,
+
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

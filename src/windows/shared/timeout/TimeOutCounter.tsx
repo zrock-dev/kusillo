@@ -1,6 +1,6 @@
 import {useNavigate} from "react-router-dom";
 import React, {useEffect, useState} from "react";
-import {padWithZeros} from "../../Utils";
+import {padWithZeros} from "../../../Utils";
 import {invoke} from "@tauri-apps/api/tauri";
 import {Box, Dialog, DialogContent, Stack, Typography} from "@mui/material";
 
@@ -36,7 +36,7 @@ function TimeOutCounter({ isDialogOpen, handleDialogClose}) {
             const intervalId = setInterval(() => {
                 currentTime.seconds = currentTime.seconds + 1
                 updateTimeBox()
-                if (currentTime.seconds >= 60) {
+                if (currentTime.seconds >= 5) {
                     resetTimer()
                     clearInterval(intervalId)
                     resumeMatchTimer()

@@ -3,28 +3,30 @@ import {Box, Divider, Stack} from '@mui/material';
 import React, {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {invoke} from "@tauri-apps/api/tauri";
-import CountUpTimer from "../clock/CountUpTimer";
-import {listen} from "@tauri-apps/api/event";
+import CountUpTimer from "../../shared/clock/CountUpTimer";
 
 export default function Match() {
     const navigate = useNavigate();
-    const [teamAId, setTeamAId] = useState(-1);
-    const [scoreA, setScoreA] = useState(0);
-    const [teamBId, setTeamBId] = useState(-1);
-    const [scoreB, setScoreB] = useState(0);
+    const [teamA, setTeamA] = useState(undefined);
+    const [teamB, setTeamB] = useState(undefined);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         invoke('request_latest_contenders')
             .then((contenders: any) => {
-                setTeamAId(contenders["team_a_id"])
-                setTeamBId(contenders["team_b_id"])
+                setTeamA(contenders["team_a"])
+                setTeamB(contenders["team_b"])
             })
             .catch((error) => {
                 console.error(error);
                 navigate('/error');
             })
+            .finally(() => setIsLoading(false));
     }, [])
 
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <Box
@@ -40,16 +42,12 @@ export default function Match() {
                 <Divider flexItem/>
                 <Stack direction="row" spacing={5}>
                     <Side
-                        teamId={teamAId}
-                        score={scoreA}
-                        setScore={setScoreA}
+                        team={teamA}
                         stageAlign={"left"}
                     />
 
                     <Side
-                        teamId={teamBId}
-                        score={scoreB}
-                        setScore={setScoreB}
+                        team={teamB}
                         stageAlign={"right"}
                     />
                 </Stack>

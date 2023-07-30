@@ -23,7 +23,6 @@ pub fn create_team() -> Result<i64, Error> {
 
     connection.execute("INSERT INTO teams (name, category) VALUES (NULL, NULL)", ())?;
     let id: i64 = connection.last_insert_rowid();
-    println!("A team entry has been created with ID: {}", id);
 
     Ok(id)
 }

@@ -1,12 +1,25 @@
 use rusqlite::{Connection, params};
 use crate::errors::Error;
 use serde::Serialize;
+use crate::database::registration::utils::retrieve_team;
 
 #[derive(Serialize)]
-pub struct Contestants{
+pub struct Contenders {
     pub game_id: i64,
-    pub team_a_id: i64,
-    pub team_b_id: i64,
+    pub team_a: Contender,
+    pub team_b: Contender,
+}
+
+#[derive(Serialize)]
+pub struct Contender {
+    pub id: i64,
+    pub name: String,
+    pub set_points: i64,
+}
+
+struct AuxContenders{
+    team_a_id: i64,
+    team_b_id: i64,
 }
 
 pub fn record_winner(connection: &Connection, game_id: &i64, team_id: &i64) -> Result<(), Error> {
@@ -57,20 +70,23 @@ pub fn update_game_value(connection: &Connection, game_id: &i64, column_name: &s
     Ok(())
 }
 
-pub fn retrieve_contenders(connection: &Connection, game_id: &i64) -> Result<Contestants, Error> {
-    let contestants = connection.query_row_and_then(
-        "SELECT rowid, team_a_id, team_b_id FROM game WHERE rowid = ?1",
-        [game_id],
+pub fn retrieve_contenders(connection: &Connection, game_id: &i64) -> Result<Contenders, Error> {
+    let aux_contenders = connection.query_row_and_then(
+        "SELECT team_a_id, team_b_id FROM game WHERE rowid = ?1",
+        [&game_id],
         |row| {
-            Ok::<Contestants, Error>(Contestants {
-                game_id: row.get(0)?,
-                team_a_id: row.get(1)?,
-                team_b_id: row.get(2)?,
+            Ok::<AuxContenders, Error>(AuxContenders {
+                team_a_id: row.get(0)?,
+                team_b_id: row.get(1)?,
             })
         },
     )?;
 
-    Ok(contestants)
+    Ok(Contenders{
+        game_id: game_id.clone(),
+        team_a: retrieve_team(&aux_contenders.team_a_id, &game_id)?,
+        team_b: retrieve_team(&aux_contenders.team_b_id, &game_id)?,
+    })
 }
 
 pub fn insert_into_score(connection: &Connection, game_id: &i64, team_id: &i64, score_points: &i64, current_stage: &i64) -> Result<(), Error> {
