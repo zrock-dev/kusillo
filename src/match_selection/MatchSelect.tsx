@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {invoke} from "@tauri-apps/api/tauri";
 import {useNavigate} from "react-router-dom";
-import {Box, Container, Typography} from '@mui/material';
+import {Box, Container, Divider, Typography} from '@mui/material';
 import TeamListSelection from './TeamListSelection';
 
 export default function MatchSelect() {
@@ -28,15 +28,15 @@ export default function MatchSelect() {
     }
 
     return (
-        <Container>
-            <Box sx={{display: 'flex'}}>
-                <Typography variant="h2" component="div">
-                    Match Selection
-                </Typography>
-            </Box>
+        <Box>
+            <Typography variant="h2" align={"center"}>
+                Match Selection
+            </Typography>
+            <Divider/>
+
             <TeamListSelection
                 handleMatchStart={handleMatchStart}
             />
-        </Container>
+        </Box>
     );
 }

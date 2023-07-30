@@ -111,7 +111,7 @@ function Home() {
     return (
         <Box sx={{display: 'flex'}}>
             <CssBaseline/>
-            <AppBar position="fixed" open={open}>
+            <AppBar open={open}>
                 <Toolbar>
                     <IconButton
                         color="inherit"
@@ -136,7 +136,6 @@ function Home() {
                         boxSizing: 'border-box',
                     },
                 }}
-                variant="persistent"
                 anchor="left"
                 open={open}
             >

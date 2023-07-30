@@ -1,11 +1,11 @@
 import {
     Box,
     Button,
-    Container,
     List,
     ListItem,
     ListItemButton,
     ListItemText,
+    Stack,
     Typography
 } from "@mui/material";
 import {invoke} from "@tauri-apps/api/tauri";
@@ -113,54 +113,59 @@ function TeamListSelection({handleMatchStart}) {
     }
 
     return (
-        <Container
+        <Box
             sx={{
-                marginTop: '10px',
+                marginTop: '50px',
             }}
         >
             <Grid2 container>
-                <Grid2 xs={6} container>
-                    <TeamsList
-                        teams={teams}
-                        handler={handleItemClick}
-                    />
-                </Grid2>
-
-                <Grid2 xs={6} container>
-                    <Grid2 xs={12}>
-                        <ChosenTeamCard teamName={teamA.name}/>
-                    </Grid2>
-                    <Grid2 xs={12}>
-                        <Typography variant={"h3"} align={"center"}>
-                            VS
-                        </Typography>
-                    </Grid2>
-                    <Grid2 xs={12}>
-                        <ChosenTeamCard teamName={teamB.name}/>
-                    </Grid2>
-                </Grid2>
-
-                <Grid2 xs={12}>
+                <Grid2 xs={6} >
                     <Box
                         sx={{
                             display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
+                            alignItems: 'left',
+                            justifyContent: 'left',
                         }}
                     >
-                        <Button
-                            onClick={() => {
-                                handleMatchStart(teamA.id, teamB.id)
-                            }}
-                            variant={"contained"}
-                            disabled={canStartMatch}
-                        >
-                            Start Match
-                        </Button>
+                        <TeamsList
+                            teams={teams}
+                            handler={handleItemClick}
+                        />
                     </Box>
                 </Grid2>
+
+                <Grid2 xs={6}>
+                    <Box
+                        sx={{
+                            width: '95%',
+                        }}
+                    >
+                        <Stack
+                            direction={"column"}
+                            spacing={3}
+                        >
+                            <ChosenTeamCard teamName={teamA.name}/>
+                            <Typography variant={"h3"} align={"center"}>
+                                VS
+                            </Typography>
+                            <ChosenTeamCard teamName={teamB.name}/>
+                        </Stack>
+                    </Box>
+                </Grid2>
+
+                <Grid2 xs={12}>
+                    <Button
+                        onClick={() => {
+                            handleMatchStart(teamA.id, teamB.id)
+                        }}
+                        variant={"contained"}
+                        disabled={canStartMatch}
+                    >
+                        Start Match
+                    </Button>
+                </Grid2>
             </Grid2>
-        </Container>
+        </Box>
     )
 }
 

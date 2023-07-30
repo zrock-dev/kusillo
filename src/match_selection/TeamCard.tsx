@@ -20,15 +20,7 @@ function ChosenTeamCard({teamName}) {
     };
 
     return (
-        <Box
-            sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                height: 240,
-                width: 500,
-            }}
-        >
+        <Box>
             <Grid2 container>
                <Grid2 xs={12}>
                    <Stack>
@@ -36,7 +28,7 @@ function ChosenTeamCard({teamName}) {
                        <div style={style}/>
                    </Stack>
                </Grid2>
-                
+
                 <Grid2 xs={12}>
                     <Box
                         sx={{
@@ -46,7 +38,7 @@ function ChosenTeamCard({teamName}) {
                         }}
                     >
                         <Typography
-                            variant="h2"
+                            variant="h4"
                             align="left"
                         >
                             {teamName}
