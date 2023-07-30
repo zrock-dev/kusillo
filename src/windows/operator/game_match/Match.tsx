@@ -4,6 +4,7 @@ import {useNavigate} from 'react-router-dom';
 import Side from './Side';
 import {Box, Button, Divider, Stack} from '@mui/material';
 import CountUpTimer from "../../shared/clock/CountUpTimer";
+import StartMatchDialog from "../utils/StartMatchDialog";
 
 export default function Match() {
     const navigate = useNavigate();
@@ -15,7 +16,7 @@ export default function Match() {
     const [isLoading, setIsLoading] = useState(true);
 
     const [isAudienceWindowOpen, setIsAudienceWindowOpen] = useState(false);
-    const [isMatchStarted, setIsMatchStarted] = useState(false)
+    const [isMatchStartDialogOpen, setIsMatchStartDialogOpen] = useState(true)
 
     useEffect(() => {
         updateContenders()
@@ -46,8 +47,8 @@ export default function Match() {
     }
 
     function handleStartMatch() {
+        setIsMatchStartDialogOpen(false)
         startClock()
-        setIsMatchStarted(true)
     }
 
     function startClock() {
@@ -64,6 +65,11 @@ export default function Match() {
 
     return (
         <Box>
+            <StartMatchDialog
+                open={isMatchStartDialogOpen}
+                setOpen={setIsMatchStartDialogOpen}
+                continueHandler={handleStartMatch}
+            />
             <Stack>
                 <CountUpTimer isMirror={false}/>
                 <Divider flexItem/>
@@ -83,13 +89,6 @@ export default function Match() {
                     disabled={isAudienceWindowOpen}
                 >
                     Open Spectator Window
-                </Button>
-
-                <Button
-                    onClick={handleStartMatch}
-                    disabled={isMatchStarted}
-                >
-                    Start Match
                 </Button>
             </Stack>
         </Box>
