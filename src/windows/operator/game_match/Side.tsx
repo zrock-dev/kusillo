@@ -4,7 +4,7 @@ import {Box, Typography} from "@mui/material";
 import Grid2 from "@mui/material/Unstable_Grid2";
 import Score from "./Score";
 import {useNavigate} from "react-router-dom";
-import TimeOutBox from "../timeout/TimeOutBox";
+import TimeOutBox from "../../shared/timeout/TimeOutBox";
 import {listen} from "@tauri-apps/api/event";
 import { invoke } from '@tauri-apps/api/tauri';
 

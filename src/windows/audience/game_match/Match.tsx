@@ -3,7 +3,7 @@ import {Box, Divider, Stack} from '@mui/material';
 import React, {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {invoke} from "@tauri-apps/api/tauri";
-import CountUpTimer from "../clock/CountUpTimer";
+import CountUpTimer from "../../shared/clock/CountUpTimer";
 
 export default function Match() {
     const navigate = useNavigate();
@@ -37,12 +37,12 @@ export default function Match() {
                 <Divider flexItem/>
                 <Stack direction="row" spacing={5}>
                     <Side
-                        teamId={teamA}
+                        team={teamA}
                         stageAlign={"left"}
                     />
 
                     <Side
-                        teamId={teamB}
+                        team={teamB}
                         stageAlign={"right"}
                     />
                 </Stack>

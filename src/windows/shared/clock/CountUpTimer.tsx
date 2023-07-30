@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import TimeBox from "./TimeBox";
-import {padWithZeros} from "../../Utils";
+import {padWithZeros} from "../../../Utils";
 import {useNavigate} from "react-router-dom";
 import {listen} from "@tauri-apps/api/event";
 import {invoke} from "@tauri-apps/api/tauri";
@@ -19,7 +19,6 @@ function CountUpTimer({isMirror}) {
         minutes: 0,
     }
 
-    let timerId
     const hasRequested = useRef(false)
 
     useEffect(() => {
@@ -28,6 +27,7 @@ function CountUpTimer({isMirror}) {
         } else {
             if (!hasRequested.current) {
                 hasRequested.current = !hasRequested.current;
+                // TODO: Cannot start the timer from here, but instead when the user chooses to start the set/match
                 startBackendTimer()
                 requestCurrentTime()
             }
@@ -49,7 +49,7 @@ function CountUpTimer({isMirror}) {
         }
     }
 
-    function synchronizeClock(payload) {
+    function synchronizeClock(payload: any) {
         currentTime.minutes = payload["minutes"] as number
         currentTime.seconds = payload["seconds"] as number
     }
@@ -66,15 +66,15 @@ function CountUpTimer({isMirror}) {
             })
     }
 
-    listen("time-sync", (event) => {
-        timeUpdateListener(event.payload)
+    listen("time-sync", (event: any) => {
+        timeUpdateListener(event["payload"])
     })
         .catch((error) => {
             console.error(error)
             navigate("/error")
         })
 
-    function timeUpdateListener(payload) {
+    function timeUpdateListener(payload: any) {
         synchronizeClock(payload)
         updateCurrentTime()
         updateTimeBox()

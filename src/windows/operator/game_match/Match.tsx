@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {invoke} from '@tauri-apps/api/tauri';
-import {useLocation, useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import Side from './Side';
 import {Box, Button, Divider, Stack} from '@mui/material';
-import CountUpTimer from "../clock/CountUpTimer";
+import CountUpTimer from "../../shared/clock/CountUpTimer";
 
 export default function Match() {
     const navigate = useNavigate();

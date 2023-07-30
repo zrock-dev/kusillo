@@ -1,6 +1,6 @@
 import {useNavigate} from "react-router-dom";
 import React, {useEffect, useState} from "react";
-import {padWithZeros} from "../../Utils";
+import {padWithZeros} from "../../../Utils";
 import {invoke} from "@tauri-apps/api/tauri";
 import {Box, Dialog, DialogContent, Stack, Typography} from "@mui/material";
 

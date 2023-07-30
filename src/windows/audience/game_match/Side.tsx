@@ -5,7 +5,7 @@ import Grid2 from "@mui/material/Unstable_Grid2";
 import {listen} from '@tauri-apps/api/event'
 import {useNavigate} from "react-router-dom";
 import {invoke} from "@tauri-apps/api/tauri";
-import TimeOutDialog from "../timeout/TimeOutDialog";
+import TimeOutDialog from "../../shared/timeout/TimeOutDialog";
 
 function translateColor(color: string): string {
     switch (color) {
@@ -23,7 +23,7 @@ function translateColor(color: string): string {
 }
 
 // @ts-ignore
-export default function Side({ teamId, stageAlign }) {
+export default function Side({ team, stageAlign }) {
     const navigate = useNavigate();
 
     const [stage, setStage] = useState(0);
@@ -34,7 +34,7 @@ export default function Side({ teamId, stageAlign }) {
     const [isDialogOpen, setIsOpen] = useState(false)
 
     useEffect(() => {
-        invoke('request_game_init_data', {teamId: teamId})
+        invoke('request_game_init_data', {teamId: team.id})
             .then((payload: any) => {
                 setScore(payload["score"] as number)
                 setScoreColor(translateColor(payload["score_color"] as string))
@@ -42,13 +42,15 @@ export default function Side({ teamId, stageAlign }) {
             .catch((error => {
                 console.error(error)
             }))
-    }, [teamId])
+
+        setTeamName(team.name)
+    }, [team])
 
     listen(
         'score_update',
-        (event) => {
-            let payload = event.payload
-            if (payload["team_id"] == teamId) {
+        (event: any) => {
+            let payload = event["payload"]
+            if (payload["team_id"] == team) {
                 setScore(payload["score"] as number)
                 setScoreColor(translateColor(payload["score_color"] as string))
             }
@@ -60,9 +62,9 @@ export default function Side({ teamId, stageAlign }) {
 
     listen(
         'stage_update',
-        (event) => {
-            let payload = event.payload
-            if (payload["team_id"] == teamId) {
+        (event: any) => {
+            let payload = event["payload"]
+            if (payload["team_id"] == team) {
                 setStage(payload["stage_number"] as number)
             }
         })
@@ -73,7 +75,7 @@ export default function Side({ teamId, stageAlign }) {
 
     listen(
         'stage_reset',
-        (_) => {
+        () => {
             setScore(0)
             setScoreColor(translateColor("blue"))
         })
@@ -84,7 +86,7 @@ export default function Side({ teamId, stageAlign }) {
 
     listen(
         'game_won',
-        (_) => {
+        () => {
             setStage(0)
             setScore(0)
             setScoreColor(translateColor("blue"))
