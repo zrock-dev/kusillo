@@ -32,7 +32,6 @@ async fn main() {
                 timeout::commands::request_timeout,
                 timeout::commands::request_timeout_finish,
             game_match::commands::create_new_game,
-            game_match::commands::request_contenders,
             game_match::commands::record_interaction,
             game_match::commands::handle_score_update,
             game_match::commands::request_game_init_data,

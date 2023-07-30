@@ -40,12 +40,6 @@ pub fn create_new_game(team_a_id: i64, team_b_id: i64) -> Result<i64, Error> {
 }
 
 #[command]
-pub fn request_contenders(game_id: i64) -> Result<Contenders, Error> {
-    let connection = Connection::open(PERM_TEAM_PLAYERS)?;
-    Ok(retrieve_contenders(&connection, &game_id)?)
-}
-
-#[command]
 pub fn record_interaction(team_id: i64, game_id: i64, score_points: i64) -> Result<(), Error> {
     let connection = Connection::open(PERM_TEAM_PLAYERS)?;
     let current_stage = retrieve_score_value(&connection, "set_number", &game_id, &team_id)?;

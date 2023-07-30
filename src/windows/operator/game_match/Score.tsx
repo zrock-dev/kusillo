@@ -66,7 +66,7 @@ export default function Score({gameId, teamId, maxScore}) {
     const navigate = useNavigate();
 
     const [scoreColor, setScoreColor] = useState("");
-    const [score, setScore] = useState(-1)
+    const [score, setScore] = useState(0)
 
     const [canScoreUp3, setCanScoreUp3] = useState(true);
     const [canScoreUp2, setCanScoreUp2] = useState(true);
