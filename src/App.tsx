@@ -3,7 +3,7 @@ import * as React from 'react';
 import Home from "./Home";
 import TeamRegistrationForm from "./forms/team_registration";
 import ErrorPage from "./errors/error_page";
-import MatchSelect from "./windows/shared/MatchSelect";
+import MatchSelect from "./match_selection/MatchSelect";
 import OperatorWindow from "./windows/operator/OperatorWindow";
 import AudienceWindow from "./windows/audience/AudienceWindow";
 

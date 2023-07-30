@@ -24,6 +24,7 @@ import {styled, useTheme} from '@mui/material/styles';
 
 const drawerWidth = 240;
 
+// @ts-ignore
 const Main = ({open}) => {
     return (
         <main

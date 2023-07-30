@@ -2,7 +2,7 @@ import * as React from 'react';
 import {invoke} from "@tauri-apps/api/tauri";
 import {useNavigate} from "react-router-dom";
 import {Box, Container, Typography} from '@mui/material';
-import TeamListSelection from "./TeamListSelection";
+import TeamListSelection from './TeamListSelection';
 
 export default function MatchSelect() {
     const navigate = useNavigate();
