@@ -16,7 +16,7 @@ pub fn retrieve_team(team_id: &i64, game_id: &i64) -> Result<Contender, Error> {
     let set_points = retrieve_score_value(&connection, "set_number", &game_id, &team_id)?;
 
     Ok(Contender{
-        id: team_id,
+        id: *team_id,
         name: team_name,
         set_points,
     })

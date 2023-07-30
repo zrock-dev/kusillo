@@ -33,7 +33,7 @@ pub fn fire_stage_update_event(handle: &AppHandle, payload: StageUpdatePayload) 
 }
 
 pub fn fire_game_won_event(handle: &AppHandle, payload: GameUpdatePayload) -> Result<(), Error> {
-    handle.emit_all("game_won", (payload))?;
+    handle.emit_all("game_won", payload)?;
     Ok(())
 }
 

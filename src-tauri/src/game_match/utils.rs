@@ -1,5 +1,5 @@
 use rusqlite::Connection;
-use crate::database::game_match_actions::{Contender, Contenders, record_winner, retrieve_contenders, retrieve_game_value, retrieve_score_value};
+use crate::database::game_match_actions::{Contender, Contenders, retrieve_contenders, retrieve_game_value, retrieve_score_value};
 use crate::errors::Error;
 
 pub fn get_max_score(game_set: i64) -> i64 {
@@ -83,13 +83,4 @@ pub fn at_two(contenders: Contenders) -> Option<Contender> {
     } else {
         None
     }
-}
-
-pub fn attempt_record_winner(connection: &Connection, game_id: i64, value: i64) -> Result<bool, Error>{
-    if value > -1 {
-        record_winner(connection, &game_id, &value)?;
-        return Ok(true)
-    }
-
-    Ok(false)
 }

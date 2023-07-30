@@ -18,7 +18,6 @@ pub struct Contender {
 }
 
 struct AuxContenders{
-    game_id: i64,
     team_a_id: i64,
     team_b_id: i64,
 }
@@ -73,13 +72,12 @@ pub fn update_game_value(connection: &Connection, game_id: &i64, column_name: &s
 
 pub fn retrieve_contenders(connection: &Connection, game_id: &i64) -> Result<Contenders, Error> {
     let aux_contenders = connection.query_row_and_then(
-        "SELECT rowid, team_a_id, team_b_id FROM game WHERE rowid = ?1",
+        "SELECT team_a_id, team_b_id FROM game WHERE rowid = ?1",
         [&game_id],
         |row| {
             Ok::<AuxContenders, Error>(AuxContenders {
-                game_id: row.get(0)?,
-                team_a_id: row.get(1)?,
-                team_b_id: row.get(2)?,
+                team_a_id: row.get(0)?,
+                team_b_id: row.get(1)?,
             })
         },
     )?;
@@ -87,7 +85,7 @@ pub fn retrieve_contenders(connection: &Connection, game_id: &i64) -> Result<Con
     Ok(Contenders{
         game_id: game_id.clone(),
         team_a: retrieve_team(&aux_contenders.team_a_id, &game_id)?,
-        team_b: retrieve_team(&aux_contenders.team_a_id, &game_id)?,
+        team_b: retrieve_team(&aux_contenders.team_b_id, &game_id)?,
     })
 }
 

@@ -13,7 +13,9 @@ export default function Match() {
     const [gameId, setGameId] = useState(-1)
 
     const [isLoading, setIsLoading] = useState(true);
-    const [canOpenSpectatorWindow, setCanOpenSpectatorWindow] = useState(false);
+
+    const [isAudienceWindowOpen, setIsAudienceWindowOpen] = useState(false);
+    const [isMatchStarted, setIsMatchStarted] = useState(false)
 
     useEffect(() => {
         updateContenders()
@@ -40,7 +42,20 @@ export default function Match() {
                 navigate('/error');
             })
 
-        setCanOpenSpectatorWindow(true)
+        setIsAudienceWindowOpen(true)
+    }
+
+    function handleStartMatch() {
+        startClock()
+        setIsMatchStarted(true)
+    }
+
+    function startClock() {
+        invoke('start_clock')
+            .catch((error) => {
+                console.error(error);
+                navigate('/error');
+            })
     }
 
     if (isLoading) {
@@ -65,9 +80,16 @@ export default function Match() {
 
                 <Button
                     onClick={handleOpenSpectatorWindow}
-                    disabled={canOpenSpectatorWindow}
+                    disabled={isAudienceWindowOpen}
                 >
-                    Spectator window
+                    Open Spectator Window
+                </Button>
+
+                <Button
+                    onClick={handleStartMatch}
+                    disabled={isMatchStarted}
+                >
+                    Start Match
                 </Button>
             </Stack>
         </Box>

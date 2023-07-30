@@ -1,7 +1,7 @@
 use rusqlite::Connection;
 use tauri::AppHandle;
-use crate::clock::commands::{reset_clock, start_clock, stop_clock};
-use crate::database::game_match_actions::{cash_team_set, retrieve_contenders, retrieve_game_value, retrieve_score_value, update_game_value};
+use crate::clock::commands::{reset_clock, stop_clock};
+use crate::database::game_match_actions::{cash_team_set, record_winner, retrieve_contenders, retrieve_game_value, retrieve_score_value, update_game_value};
 use crate::database::registration::table_player_creation::PERM_TEAM_PLAYERS;
 use crate::database::registration::utils::retrieve_team_value;
 use crate::errors::Error;
@@ -74,9 +74,11 @@ pub fn update_game_status(handle: &AppHandle, game_id: i64) -> Result<(), Error>
     }else {
         let contender = review_game(contenders, game_set);
         if contender.is_some() {
-            let game_update_payload = GameUpdatePayload { winner_name: contender.unwrap().name };
-            let game_dialog_payload = GameDialogPayload { status: true, winner_name: Some(contender.unwrap().name)};
+            let contender = contender.unwrap();
+            let game_update_payload = GameUpdatePayload { winner_name: contender.name.clone() };
+            let game_dialog_payload = GameDialogPayload { status: true, winner_name: Some(contender.name.clone())};
 
+            record_winner(&connection, &game_id, &contender.id)?;
             fire_game_won_event(handle, game_update_payload)?;
             fire_game_dialog_update_event(handle, game_dialog_payload)?;
             stop_clock();
@@ -90,7 +92,6 @@ pub fn reset_stage(handle: &AppHandle, game_id: i64) -> Result<(), Error> {
     let connection = Connection::open(PERM_TEAM_PLAYERS)?;
     update_game_value(&connection, &game_id, "on_time", 1)?;
     reset_clock();
-    start_clock();
     fire_stage_reset_event(handle)?;
     Ok(())
 }

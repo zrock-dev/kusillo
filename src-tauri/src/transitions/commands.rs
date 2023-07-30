@@ -1,4 +1,5 @@
 use tauri::{AppHandle, command};
+use crate::clock::commands::start_clock;
 use crate::errors::Error;
 use crate::transitions::events::{fire_game_dialog_update_event, fire_stage_dialog_update_event, GameDialogPayload, StageDialogPayload};
 
@@ -22,5 +23,6 @@ pub fn request_stage_dialog_close(handle: AppHandle) -> Result<(), Error> {
     };
 
     fire_stage_dialog_update_event(&handle, payload)?;
+    start_clock();
     Ok(())
 }
