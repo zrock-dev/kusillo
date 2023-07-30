@@ -80,6 +80,7 @@ pub fn request_game_init_data(team_id: i64) -> Result<GameInitData, Error> {
 #[command]
 pub fn request_latest_contenders() -> Result<Contenders, Error> {
     let connection = Connection::open(PERM_TEAM_PLAYERS)?;
+    // TODO: game id should be obtained through a function in the DB folder
     let game_id = connection.query_row_and_then(
         "SELECT rowid FROM game ORDER BY rowid DESC LIMIT 1",
         [],

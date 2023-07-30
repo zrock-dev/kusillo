@@ -6,7 +6,6 @@ import Score from "./Score";
 import {useNavigate} from "react-router-dom";
 import TimeOutBox from "../timeout/TimeOutBox";
 import {listen} from "@tauri-apps/api/event";
-import SetTransitionDialog from "../transitions/SetTransition";
 import { invoke } from '@tauri-apps/api/tauri';
 
 // @ts-ignore
@@ -19,9 +18,6 @@ export default function Side({ gameId, team}) {
     const [teamName, setTeamName] = useState("")
     const [teamId, setTeamId] = useState(-1)
 
-    const [stageDialogStatus, setStageDialogStatus] = useState(false)
-    const [stageDialogMessage, setStageDialogMessage] = useState("")
-
     useEffect(() => {
         setTeamId(team["id"])
         setTeamName(team["name"])
@@ -29,6 +25,7 @@ export default function Side({ gameId, team}) {
     }, [])
 
     function requestMaxScore() {
+        // TODO: The backend has to make an stage update when the side is being initialized
         invoke('request_game_init_data', {teamId: teamId})
             .then((payload: any) => {
                 setMaxScore(payload["max_score"] as number)
@@ -41,16 +38,13 @@ export default function Side({ gameId, team}) {
 
     listen(
         'stage_update',
-        (event) => {
-            let payload = event["payload"] as any
+        (event: any) => {
+            let payload = event["payload"]
 
             if (payload["team_id"] == teamId) {
                 let set_number = payload["stage_number"] as number
-                setStageDialogStatus(true)
                 setStage(set_number)
-                setStageDialogMessage(`Team ${teamName} has won the set #${set_number}`)
             }
-            // @ts-ignore
             setMaxScore(payload["max_score"] as number)
         })
         .catch((error) => {
@@ -58,24 +52,8 @@ export default function Side({ gameId, team}) {
             navigate('/error');
         })
 
-    function handleCancel(){
-        setStageDialogStatus(false)
-        navigate('/match-select');
-    }
-
-    function handleAccept(){
-        setStageDialogStatus(false)
-    }
-
     return (
         <Grid2 container spacing={5}>
-            // TODO: Transition dialog should be handled by the match
-            <SetTransitionDialog
-                isDialogOpen={stageDialogStatus}
-                message={stageDialogMessage}
-                confirmationHandler={handleAccept}
-                cancelHandler={handleCancel}
-            />
             <Grid2 xs={12}>
                 <Typography variant="h2">{teamName}</Typography>
             </Grid2>

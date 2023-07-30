@@ -4,20 +4,17 @@ import React, {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {invoke} from "@tauri-apps/api/tauri";
 import CountUpTimer from "../clock/CountUpTimer";
-import {listen} from "@tauri-apps/api/event";
 
 export default function Match() {
     const navigate = useNavigate();
-    const [teamAId, setTeamAId] = useState(-1);
-    const [scoreA, setScoreA] = useState(0);
-    const [teamBId, setTeamBId] = useState(-1);
-    const [scoreB, setScoreB] = useState(0);
+    const [teamA, setTeamA] = useState(undefined);
+    const [teamB, setTeamB] = useState(undefined);
 
     useEffect(() => {
         invoke('request_latest_contenders')
             .then((contenders: any) => {
-                setTeamAId(contenders["team_a_id"])
-                setTeamBId(contenders["team_b_id"])
+                setTeamA(contenders["team_a"])
+                setTeamB(contenders["team_b"])
             })
             .catch((error) => {
                 console.error(error);
@@ -40,16 +37,12 @@ export default function Match() {
                 <Divider flexItem/>
                 <Stack direction="row" spacing={5}>
                     <Side
-                        teamId={teamAId}
-                        score={scoreA}
-                        setScore={setScoreA}
+                        teamId={teamA}
                         stageAlign={"left"}
                     />
 
                     <Side
-                        teamId={teamBId}
-                        score={scoreB}
-                        setScore={setScoreB}
+                        teamId={teamB}
                         stageAlign={"right"}
                     />
                 </Stack>

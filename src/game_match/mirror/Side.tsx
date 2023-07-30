@@ -23,17 +23,19 @@ function translateColor(color: string): string {
 }
 
 // @ts-ignore
-export default function Side({ teamId, score, setScore, stageAlign }) {
-    const [stage, setStage] = useState(0);
-    const [teamName, setTeamName] = useState("");
-    const [scoreColor, setScoreColor] = useState("");
+export default function Side({ teamId, stageAlign }) {
     const navigate = useNavigate();
+
+    const [stage, setStage] = useState(0);
+    const [scoreColor, setScoreColor] = useState("");
+    const [score, setScore] = useState(0)
+
+    const [teamName, setTeamName] = useState("");
     const [isDialogOpen, setIsOpen] = useState(false)
 
     useEffect(() => {
         invoke('request_game_init_data', {teamId: teamId})
             .then((payload: any) => {
-                setTeamName(payload["team_name"] as string)
                 setScore(payload["score"] as number)
                 setScoreColor(translateColor(payload["score_color"] as string))
             })
@@ -93,7 +95,8 @@ export default function Side({ teamId, score, setScore, stageAlign }) {
         })
 
     listen("timeout_status", (event) => {
-        setIsOpen(event.payload as boolean)
+        let payload = event["payload"] as any
+        setIsOpen(payload as boolean)
     })
         .catch((error) => {
             console.error(error)

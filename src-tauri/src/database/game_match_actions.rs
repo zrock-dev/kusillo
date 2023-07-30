@@ -5,6 +5,7 @@ use crate::database::registration::utils::retrieve_team;
 
 #[derive(Serialize)]
 pub struct Contenders {
+    pub game_id: i64,
     pub team_a: Contender,
     pub team_b: Contender,
 }
@@ -84,6 +85,7 @@ pub fn retrieve_contenders(connection: &Connection, game_id: &i64) -> Result<Con
     )?;
 
     Ok(Contenders{
+        game_id: game_id.clone(),
         team_a: retrieve_team(&aux_contenders.team_a_id, &game_id)?,
         team_b: retrieve_team(&aux_contenders.team_a_id, &game_id)?,
     })
