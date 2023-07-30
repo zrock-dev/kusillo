@@ -11,8 +11,8 @@ pub struct Contenders {
 
 #[derive(Serialize)]
 pub struct Contender {
-    pub team_id: i64,
-    pub team_name: String,
+    pub id: i64,
+    pub name: String,
     pub set_points: i64,
 }
 

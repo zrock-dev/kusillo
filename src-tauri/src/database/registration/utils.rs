@@ -12,12 +12,12 @@ pub struct Team {
 
 pub fn retrieve_team(team_id: &i64, game_id: &i64) -> Result<Contender, Error> {
     let connection = Connection::open(PERM_TEAM_PLAYERS)?;
-    let team_name = retrieve_team_value(&connection, "name", &team_id)?; 
+    let team_name = retrieve_team_value(&connection, "name", &team_id)?;
     let set_points = retrieve_score_value(&connection, "set_number", &game_id, &team_id)?;
 
     Ok(Contender{
-        team_id,
-        team_name,
+        id: team_id,
+        name: team_name,
         set_points,
     })
 }

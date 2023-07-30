@@ -3,29 +3,34 @@ import {useEffect, useState} from 'react';
 import {Box, Typography} from "@mui/material";
 import Grid2 from "@mui/material/Unstable_Grid2";
 import Score from "./Score";
-import {invoke} from "@tauri-apps/api/tauri";
 import {useNavigate} from "react-router-dom";
 import TimeOutBox from "../timeout/TimeOutBox";
 import {listen} from "@tauri-apps/api/event";
 import SetTransitionDialog from "../transitions/SetTransition";
+import { invoke } from '@tauri-apps/api/tauri';
 
 // @ts-ignore
-export default function Side({ gameId, teamId, score, setScore, maxScore, setMaxScore }) {
+export default function Side({ gameId, team}) {
     const navigate = useNavigate()
-    const [stage, setStage] = useState(0)
-    const [teamName, setTeamName] = useState("")
 
-    const [confirmationDialogStatus, setConfirmationDialogStatus] = useState(false)
-    const [dialogMessage, setDialogMessage] = useState("")
+    const [stage, setStage] = useState(0)
+    const [maxScore, setMaxScore] = useState(3)
+
+    const [teamName, setTeamName] = useState("")
+    const [teamId, setTeamId] = useState(-1)
+
+    const [stageDialogStatus, setStageDialogStatus] = useState(false)
+    const [stageDialogMessage, setStageDialogMessage] = useState("")
 
     useEffect(() => {
-        initTeamData()
+        setTeamId(team["id"])
+        setTeamName(team["name"])
+        requestMaxScore()
     }, [])
 
-    function initTeamData() {
+    function requestMaxScore() {
         invoke('request_game_init_data', {teamId: teamId})
             .then((payload: any) => {
-                setTeamName(payload["team_name"] as string)
                 setMaxScore(payload["max_score"] as number)
             })
             .catch((error => {
@@ -37,17 +42,16 @@ export default function Side({ gameId, teamId, score, setScore, maxScore, setMax
     listen(
         'stage_update',
         (event) => {
-            let payload = event["payload"]
-            // @ts-ignore
-            if (payload["team_id"] == teamId) {
-                // @ts-ignore
-                setStage(payload["stage_number"] as number)
-                // @ts-ignore
-                setMaxScore(payload["max_score"] as number)
+            let payload = event["payload"] as any
 
-                setConfirmationDialogStatus(true)
-                setDialogMessage(`Team ${teamName} has won the set #${stage}`)
+            if (payload["team_id"] == teamId) {
+                let set_number = payload["stage_number"] as number
+                setStageDialogStatus(true)
+                setStage(set_number)
+                setStageDialogMessage(`Team ${teamName} has won the set #${set_number}`)
             }
+            // @ts-ignore
+            setMaxScore(payload["max_score"] as number)
         })
         .catch((error) => {
             console.error(error);
@@ -55,19 +59,20 @@ export default function Side({ gameId, teamId, score, setScore, maxScore, setMax
         })
 
     function handleCancel(){
-        setConfirmationDialogStatus(false)
+        setStageDialogStatus(false)
         navigate('/match-select');
     }
 
     function handleAccept(){
-        setConfirmationDialogStatus(false)
+        setStageDialogStatus(false)
     }
 
     return (
         <Grid2 container spacing={5}>
+            // TODO: Transition dialog should be handled by the match
             <SetTransitionDialog
-                isDialogOpen={confirmationDialogStatus}
-                message={dialogMessage}
+                isDialogOpen={stageDialogStatus}
+                message={stageDialogMessage}
                 confirmationHandler={handleAccept}
                 cancelHandler={handleCancel}
             />
@@ -92,8 +97,7 @@ export default function Side({ gameId, teamId, score, setScore, maxScore, setMax
                 <Score
                     gameId={gameId}
                     teamId={teamId}
-                    score={score}
-                    setScore={setScore}
+                    // TODO: Why can't the Score handle the maxScore itself?
                     maxScore={maxScore}
                 />
             </Grid2>

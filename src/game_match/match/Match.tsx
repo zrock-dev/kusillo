@@ -9,21 +9,18 @@ import GameTransitionDialog from "../transitions/GameTransition";
 
 export default function Match() {
     const navigate = useNavigate();
-
     const location = useLocation();
-    const {gameId} = location.state;
-    const [maxScore, setMaxScore] = useState(3);
 
-    const [scoreA, setScoreA] = useState(0);
-    const [scoreB, setScoreB] = useState(0);
-    const [teamAId, setTeamAId] = useState(-1);
-    const [teamBId, setTeamBId] = useState(-1);
+    const {gameId} = location.state;
+    const [teamA, setTeamA] = useState(undefined);
+    const [teamB, setTeamB] = useState(undefined);
 
     const [isLoading, setIsLoading] = useState(true);
     const [canOpenSpectatorWindow, setCanOpenSpectatorWindow] = useState(false);
 
-    const [dialogStatus, setDialogStatus] = useState(false)
-    const [dialogMessage, setDialogMessage] = useState("")
+    const [gameDialogStatus, setGameDialogStatus] = useState(false)
+    const [gameDialogMessage, setGameDialogMessage] = useState("")
+
 
     useEffect(() => {
         if (gameId == -1) {
@@ -34,9 +31,9 @@ export default function Match() {
     listen(
         'game_won',
         (event) => {
-            setDialogStatus(true)
+            setGameDialogStatus(true)
             // @ts-ignore
-            setDialogMessage(`Game won by: ${event["payload"]["winner_name"]}`)
+            setGameDialogMessage(`Game won by: ${event["payload"]["winner_name"]}`)
         })
         .catch((error) => {
             console.error(error);
@@ -44,15 +41,15 @@ export default function Match() {
         })
 
     function handleAccept(){
-        setDialogStatus(false)
+        setGameDialogStatus(false)
         navigate('/match-select');
     }
 
     function updateContenders() {
         invoke('request_contenders', {gameId: gameId})
             .then((contestants: any) => {
-                setTeamAId(contestants["team_a_id"] as number);
-                setTeamBId(contestants["team_b_id"] as number);
+                setTeamA(contestants["team_a"]);
+                setTeamB(contestants["team_b"]);
             })
             .catch((error) => {
                 console.error(error);
@@ -62,11 +59,12 @@ export default function Match() {
     }
 
     function handleOpenSpectatorWindow() {
-        invoke('open_spectator_window', {teamAId: teamAId, teamBId: teamBId})
+        invoke('open_spectator_window', {gameId: gameId})
             .catch((error) => {
                 console.error(error);
                 navigate('/error');
             })
+
         setCanOpenSpectatorWindow(true)
     }
 
@@ -82,21 +80,14 @@ export default function Match() {
                 <Stack direction="row">
                     <Side
                         gameId={gameId}
-                        teamId={teamAId}
-                        score={scoreA}
-                        setScore={setScoreA}
-                        maxScore={maxScore}
-                        setMaxScore={setMaxScore}
+                        team={teamA}
                     />
                     <Side
                         gameId={gameId}
-                        teamId={teamBId}
-                        score={scoreB}
-                        setScore={setScoreB}
-                        maxScore={maxScore}
-                        setMaxScore={setMaxScore}
+                        team={teamB}
                     />
                 </Stack>
+
                 <Button
                     onClick={handleOpenSpectatorWindow}
                     disabled={canOpenSpectatorWindow}
@@ -104,9 +95,10 @@ export default function Match() {
                     Spectator window
                 </Button>
             </Stack>
+
             <GameTransitionDialog
-                isDialogOpen={dialogStatus}
-                message={dialogMessage}
+                isDialogOpen={gameDialogStatus}
+                message={gameDialogMessage}
                 confirmationHandler={handleAccept}
             />
         </Box>

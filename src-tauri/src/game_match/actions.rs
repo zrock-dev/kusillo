@@ -65,7 +65,7 @@ pub fn update_game_status(handle: &AppHandle, game_id: i64) -> Result<(), Error>
     }else {
         let contender = review_game(contenders, game_set);
         if contender.is_some() {
-            fire_game_won_event(handle, GameUpdatePayload{ winner_name: contender.unwrap().team_name })?;
+            fire_game_won_event(handle, GameUpdatePayload{ winner_name: contender.unwrap().name })?;
             stop_clock();
         }
 
