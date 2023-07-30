@@ -89,7 +89,7 @@ export default function Score({gameId, teamId, maxScore}) {
 
     useEffect(() => {
         initTeamData()
-    }, [])
+    }, [teamId])
 
     useEffect(() => {
         recordInteraction(score)

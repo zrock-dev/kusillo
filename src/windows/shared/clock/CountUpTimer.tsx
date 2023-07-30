@@ -27,8 +27,6 @@ function CountUpTimer({isMirror}) {
         } else {
             if (!hasRequested.current) {
                 hasRequested.current = !hasRequested.current;
-                // TODO: Cannot start the timer from here, but instead when the user chooses to start the set/match
-                startBackendTimer()
                 requestCurrentTime()
             }
         }
@@ -78,14 +76,6 @@ function CountUpTimer({isMirror}) {
         synchronizeClock(payload)
         updateCurrentTime()
         updateTimeBox()
-    }
-
-    function startBackendTimer() {
-        invoke('start_clock')
-            .catch((error) => {
-                console.error(error)
-                navigate("/error")
-            })
     }
 
     return (

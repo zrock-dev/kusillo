@@ -27,8 +27,8 @@ pub fn is_stage_won_on_timeout(connection: &Connection, game_id: i64) -> Result<
     let contenders = retrieve_contenders(&connection, &game_id).unwrap();
     let team_a_id = contenders.team_a.set_points;
     let team_b_id = contenders.team_b.set_points;
-    let score_a = retrieve_score_value(&connection, "score_points", &game_id, &team_a_id).unwrap();
-    let score_b = retrieve_score_value(&connection, "score_points", &game_id, &team_b_id).unwrap();
+    let score_a = retrieve_score_value(&connection, "score_points", &game_id, &team_a_id)?;
+    let score_b = retrieve_score_value(&connection, "score_points", &game_id, &team_b_id)?;
 
     let mut result = false;
     let mut winner_id = 0;

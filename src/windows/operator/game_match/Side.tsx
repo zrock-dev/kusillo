@@ -18,15 +18,20 @@ export default function Side({ gameId, team}) {
     const [teamName, setTeamName] = useState("")
     const [teamId, setTeamId] = useState(-1)
 
+    const [isLoading, setIsLoading] = useState(true)
+
     useEffect(() => {
-        setTeamId(team["id"])
+        let id = team["id"] as number
+        setTeamId(id)
         setTeamName(team["name"])
-        requestMaxScore()
+        requestMaxScore(id)
+
+        setIsLoading(false)
     }, [])
 
-    function requestMaxScore() {
+    function requestMaxScore(id: number) {
         // TODO: The backend has to make an stage update when the side is being initialized
-        invoke('request_game_init_data', {teamId: teamId})
+        invoke('request_game_init_data', {teamId: id})
             .then((payload: any) => {
                 setMaxScore(payload["max_score"] as number)
             })
@@ -51,6 +56,14 @@ export default function Side({ gameId, team}) {
             console.error(error);
             navigate('/error');
         })
+
+    if (isLoading){
+        return (
+            <Box>
+                Loading...
+            </Box>
+        )
+    }
 
     return (
         <Grid2 container spacing={5}>

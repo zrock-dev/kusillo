@@ -1,6 +1,6 @@
 use rusqlite::Connection;
 use tauri::AppHandle;
-use crate::clock::commands::{reset_clock, stop_clock};
+use crate::clock::commands::{pause_clock, reset_clock, stop_clock};
 use crate::database::game_match_actions::{cash_team_set, record_winner, retrieve_contenders, retrieve_game_value, retrieve_score_value, update_game_value};
 use crate::database::registration::table_player_creation::PERM_TEAM_PLAYERS;
 use crate::database::registration::utils::retrieve_team_value;
@@ -91,6 +91,7 @@ pub fn update_game_status(handle: &AppHandle, game_id: i64) -> Result<(), Error>
 pub fn reset_stage(handle: &AppHandle, game_id: i64) -> Result<(), Error> {
     let connection = Connection::open(PERM_TEAM_PLAYERS)?;
     update_game_value(&connection, &game_id, "on_time", 1)?;
+    pause_clock();
     reset_clock();
     fire_stage_reset_event(handle)?;
     Ok(())

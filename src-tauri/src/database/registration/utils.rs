@@ -24,7 +24,7 @@ pub fn retrieve_team(team_id: &i64, game_id: &i64) -> Result<Contender, Error> {
 
 
 pub fn retrieve_team_value(connection: &Connection, column_name: &str, team_id: &i64) -> Result<String, Error> {
-    let query = format!("SELECT {} FROM teams WHERE team_id = ?1", column_name);
+    let query = format!("SELECT {} FROM teams WHERE rowid = ?1", column_name);
     let value = connection.query_row_and_then(
         query.as_str(),
         [team_id],
