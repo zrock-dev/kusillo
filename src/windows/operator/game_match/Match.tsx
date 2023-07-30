@@ -67,7 +67,6 @@ export default function Match() {
         <Box>
             <StartMatchDialog
                 open={isMatchStartDialogOpen}
-                setOpen={setIsMatchStartDialogOpen}
                 continueHandler={handleStartMatch}
             />
             <Stack>

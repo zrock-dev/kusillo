@@ -6,6 +6,7 @@ import {listen} from '@tauri-apps/api/event'
 import {useNavigate} from "react-router-dom";
 import {invoke} from "@tauri-apps/api/tauri";
 import TimeOutDialog from "../../shared/timeout/TimeOutDialog";
+import TeamCard from "../../../match_selection/TeamCard";
 
 function translateColor(color: string): string {
     switch (color) {
@@ -30,7 +31,6 @@ export default function Side({ team, stageAlign }) {
     const [scoreColor, setScoreColor] = useState("")
     const [score, setScore] = useState(0)
 
-    const [teamName, setTeamName] = useState("")
     const [teamId, setTeamId] = useState(-1)
     const [isDialogOpen, setIsOpen] = useState(false)
 
@@ -47,7 +47,6 @@ export default function Side({ team, stageAlign }) {
                 console.error(error)
             }))
 
-        setTeamName(team.name)
     }, [team])
 
     listen(
@@ -112,12 +111,10 @@ export default function Side({ team, stageAlign }) {
     return (
         <Grid2 container spacing={3}>
             <Grid2 xs={12}>
-                <Typography
-                    variant="h2"
-                    align={"center"}
-                >
-                    {teamName}
-                </Typography>
+                <TeamCard
+                    teamName={team["name"]}
+                    teamColor={team["color"]}
+                />
             </Grid2>
 
             <Grid2 xs={12} mt={5}>

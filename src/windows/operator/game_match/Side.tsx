@@ -7,6 +7,7 @@ import {useNavigate} from "react-router-dom";
 import TimeOutBox from "../../shared/timeout/TimeOutBox";
 import {listen} from "@tauri-apps/api/event";
 import { invoke } from '@tauri-apps/api/tauri';
+import TeamCard from "../../../match_selection/TeamCard";
 
 // @ts-ignore
 export default function Side({ gameId, team}) {
@@ -15,15 +16,12 @@ export default function Side({ gameId, team}) {
     const [stage, setStage] = useState(0)
     const [maxScore, setMaxScore] = useState(3)
 
-    const [teamName, setTeamName] = useState("")
     const [teamId, setTeamId] = useState(-1)
-
     const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
         let id = team["id"] as number
         setTeamId(id)
-        setTeamName(team["name"])
         requestMaxScore(id)
 
         setIsLoading(false)
@@ -68,7 +66,10 @@ export default function Side({ gameId, team}) {
     return (
         <Grid2 container spacing={5}>
             <Grid2 xs={12}>
-                <Typography variant="h2">{teamName}</Typography>
+                <TeamCard
+                    teamName={team["name"]}
+                    teamColor={team["color"]}
+                />
             </Grid2>
 
             <Grid2 xs={12}>
