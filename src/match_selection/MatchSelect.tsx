@@ -7,9 +7,11 @@ import {
     Typography
 } from '@mui/material';
 import TeamListSelection from './TeamListSelection';
+import AudienceWindowTrigger from "../windows/operator/utils/AudienceWindowTrigger";
 
 export default function MatchSelect() {
     const navigate = useNavigate();
+    const [isGameStarted, setIsGameStarted] = React.useState(false)
 
     function create_clock() {
         invoke('create_clock')
@@ -20,6 +22,7 @@ export default function MatchSelect() {
     }
 
     function handleMatchStart(contenders: any) {
+        setIsGameStarted(true)
         let teamA = contenders["teamA"]
         let teamB = contenders["teamB"]
         invoke('create_new_game', {
@@ -47,6 +50,10 @@ export default function MatchSelect() {
 
             <TeamListSelection
                 handleMatchStart={handleMatchStart}
+            />
+
+            <AudienceWindowTrigger
+                isGameStarted={isGameStarted}
             />
         </Box>
     );

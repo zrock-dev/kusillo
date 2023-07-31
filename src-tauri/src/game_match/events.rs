@@ -37,7 +37,6 @@ pub fn fire_game_won_event(handle: &AppHandle, payload: GameUpdatePayload) -> Re
     Ok(())
 }
 
-
 pub fn fire_stage_reset_event(handle: &AppHandle) -> Result<(), Error> {
     handle.emit_all("stage_reset", ())?;
     Ok(())
