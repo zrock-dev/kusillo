@@ -5,6 +5,7 @@ import {useNavigate} from "react-router-dom";
 import {invoke} from "@tauri-apps/api/tauri";
 import CountUpTimer from "../../shared/clock/CountUpTimer";
 import Grid2 from '@mui/material/Unstable_Grid2';
+import { listen } from '@tauri-apps/api/event';
 
 export default function Match() {
     const navigate = useNavigate();
@@ -12,7 +13,17 @@ export default function Match() {
     const [teamB, setTeamB] = useState(undefined);
     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
+    listen(
+        'sync_audience_window',
+        (event: any) => {
+            requestLatestContenders()
+        })
+        .catch((error) => {
+            console.error(error);
+            navigate('/error');
+        })
+
+    function requestLatestContenders(){
         invoke('request_latest_contenders')
             .then((contenders: any) => {
                 setTeamA(contenders["team_a"])
@@ -23,7 +34,7 @@ export default function Match() {
                 navigate('/error');
             })
             .finally(() => setIsLoading(false));
-    }, [])
+    }
 
     if (isLoading) {
         return <div>Loading...</div>;

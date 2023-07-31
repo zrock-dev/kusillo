@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {invoke} from '@tauri-apps/api/tauri';
 import {useNavigate} from 'react-router-dom';
 import Side from './Side';
-import {Box, Button, Divider, Stack} from '@mui/material';
+import {Box, Divider, Stack} from '@mui/material';
 import CountUpTimer from "../../shared/clock/CountUpTimer";
 import StartMatchDialog from "../utils/StartMatchDialog";
 import Grid2 from '@mui/material/Unstable_Grid2';
@@ -16,7 +16,6 @@ export default function Match() {
 
     const [isLoading, setIsLoading] = useState(true);
 
-    const [isAudienceWindowOpen, setIsAudienceWindowOpen] = useState(false);
     const [isMatchStartDialogOpen, setIsMatchStartDialogOpen] = useState(true)
 
     useEffect(() => {
@@ -35,16 +34,6 @@ export default function Match() {
                 navigate('/error');
             })
             .finally(() => setIsLoading(false));
-    }
-
-    function handleOpenSpectatorWindow() {
-        invoke('open_spectator_window')
-            .catch((error) => {
-                console.error(error);
-                navigate('/error');
-            })
-
-        setIsAudienceWindowOpen(true)
     }
 
     function handleStartMatch() {
@@ -95,13 +84,6 @@ export default function Match() {
                             />
                         </Grid2>
                     </Grid2>
-
-                    <Button
-                        onClick={handleOpenSpectatorWindow}
-                        disabled={isAudienceWindowOpen}
-                    >
-                        Open Spectator Window
-                    </Button>
                 </Box>
             </Stack>
         </Box>

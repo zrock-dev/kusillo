@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {useEffect, useState} from 'react';
 import {Box, Paper, Stack, Typography} from "@mui/material";
-import Grid2 from "@mui/material/Unstable_Grid2";
 import {listen} from '@tauri-apps/api/event'
 import {useNavigate} from "react-router-dom";
 import {invoke} from "@tauri-apps/api/tauri";
