@@ -25,8 +25,9 @@ pub fn is_stage_won(connection: &Connection, game_id: i64, team_id: i64, is_up_b
 
 pub fn is_stage_won_on_timeout(connection: &Connection, game_id: i64) -> Result<(i64, bool), Error>{
     let contenders = retrieve_contenders(&connection, &game_id).unwrap();
-    let team_a_id = contenders.team_a.set_points;
-    let team_b_id = contenders.team_b.set_points;
+    let team_a_id = contenders.team_a.id;
+    let team_b_id = contenders.team_b.id;
+
     let score_a = retrieve_score_value(&connection, "score_points", &game_id, &team_a_id)?;
     let score_b = retrieve_score_value(&connection, "score_points", &game_id, &team_b_id)?;
 

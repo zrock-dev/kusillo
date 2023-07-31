@@ -8,7 +8,7 @@ use crate::database::registration::table_player_creation::PERM_TEAM_PLAYERS;
 use crate::database::registration::utils::retrieve_team_value;
 use crate::errors::Error;
 use crate::game_match::events::{fire_game_won_event, fire_score_update_event, fire_stage_reset_event, fire_stage_update_event, GameUpdatePayload, ScoreUpdatePayload, StageUpdatePayload};
-use crate::game_match::utils::{get_max_score, is_stage_won, is_stage_won_on_timeout, review_game};
+use crate::game_match::utils::{get_max_score, is_stage_won, review_game};
 use crate::transitions::events::{GameDialogPayload, StageDialogPayload};
 
 pub fn get_score_color(score_points: i64) -> String {
@@ -96,26 +96,4 @@ pub fn reset_stage(handle: &AppHandle, game_id: i64) -> Result<(), Error> {
     update_game_value(&connection, &game_id, "on_time", 1)?;
     fire_stage_reset_event(handle)?;
     Ok(())
-}
-
-pub fn update_team_stage_on_timeout(handle: &AppHandle, connection: &Connection, game_id: i64) -> Result<bool, Error> {
-    let (team_id, is_stage_won) = is_stage_won_on_timeout(&connection, game_id)?;
-
-    if is_stage_won {
-        let stage_number = cash_team_set(&connection, &team_id, &game_id)?;
-        let game_set = retrieve_game_value(&connection, "set_number", &game_id)?;
-
-        let stage_update_payload = StageUpdatePayload {
-            team_id,
-            stage_number,
-            max_score: get_max_score(game_set),
-        };
-        fire_stage_update_event(handle, stage_update_payload)?;
-
-        Ok(true)
-    } else {
-        update_game_value(&connection, &game_id, "on_time", 0)?;
-
-        Ok(false)
-    }
 }
