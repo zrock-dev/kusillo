@@ -1,11 +1,13 @@
 import * as React from 'react';
 import {useEffect, useState} from 'react';
-import {Box, Paper, Typography} from "@mui/material";
+import {Box, Paper, Stack, Typography} from "@mui/material";
 import Grid2 from "@mui/material/Unstable_Grid2";
 import {listen} from '@tauri-apps/api/event'
 import {useNavigate} from "react-router-dom";
 import {invoke} from "@tauri-apps/api/tauri";
 import TimeOutDialog from "../../shared/timeout/TimeOutDialog";
+import TeamCard from "../../../match_selection/TeamCard";
+import {padWithZeros} from "../../../Utils";
 
 function translateColor(color: string): string {
     switch (color) {
@@ -23,14 +25,13 @@ function translateColor(color: string): string {
 }
 
 // @ts-ignore
-export default function Side({ team, stageAlign }) {
+export default function Side({team, stageAlign}) {
     const navigate = useNavigate();
 
     const [stage, setStage] = useState(0)
     const [scoreColor, setScoreColor] = useState("")
     const [score, setScore] = useState(0)
 
-    const [teamName, setTeamName] = useState("")
     const [teamId, setTeamId] = useState(-1)
     const [isDialogOpen, setIsOpen] = useState(false)
 
@@ -47,7 +48,6 @@ export default function Side({ team, stageAlign }) {
                 console.error(error)
             }))
 
-        setTeamName(team.name)
     }, [team])
 
     listen(
@@ -110,47 +110,41 @@ export default function Side({ team, stageAlign }) {
         })
 
     return (
-        <Grid2 container spacing={3}>
-            <Grid2 xs={12}>
-                <Typography
-                    variant="h2"
-                    align={"center"}
-                >
-                    {teamName}
-                </Typography>
-            </Grid2>
-
-            <Grid2 xs={12} mt={5}>
-                <Typography align={stageAlign} variant="h6">STAGE</Typography>
-                <Typography align={stageAlign} variant="h3"> {stage}</Typography>
-            </Grid2>
-
-            <Grid2 xs={12} mt={5}>
-                <Paper
-                    sx={{backgroundColor: scoreColor}}
-                >
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                        }}
-                    >
-                        <Typography
-                            align={"center"}
-                            variant="h1"
-                        >
-                            {score}
-                        </Typography>
-                    </Box>
-                </Paper>
-            </Grid2>
-
-            <Grid2 xs={12}>
-                <TimeOutDialog
-                    isDialogOpen={isDialogOpen}
+        <Box>
+            <Stack direction={"column"} spacing={2}>
+                <TeamCard
+                    teamName={team["name"]}
+                    teamColor={team["color"]}
                 />
-            </Grid2>
-        </Grid2>
+
+                <Stack direction={'column'}>
+                    <Typography align={stageAlign} variant="h4">STAGE</Typography>
+                    <Typography align={stageAlign} variant="h2">
+                        {padWithZeros(stage, 2)}
+                    </Typography>
+                </Stack>
+
+                <Box
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    }}
+                >
+                    <Paper
+                        sx={{backgroundColor: scoreColor}}
+                    >
+                            <span style={{
+                                fontSize: 240
+                            }}>
+                                {padWithZeros(score, 2)}
+                            </span>
+                    </Paper>
+                </Box>
+            </Stack>
+            <TimeOutDialog
+                isDialogOpen={isDialogOpen}
+            />
+        </Box>
     );
 }

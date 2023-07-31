@@ -8,7 +8,8 @@ pub const PERM_TEAM_PLAYERS : &str = "team_players.db";
 pub fn create_db(name: &str){
         let connection = Connection::open(name)
             .expect(&format!("Unable to create a database for: {}", name));
-    
+    connection.execute("PRAGMA foreign_keys = ON", []).expect("Unable to turn on FK");
+
     create_table(
         &connection,
         "CREATE TABLE IF NOT EXISTS players (

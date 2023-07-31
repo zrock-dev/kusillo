@@ -1,7 +1,9 @@
 use rusqlite::Connection;
 use tauri::AppHandle;
+
 use crate::clock::commands::{pause_clock, reset_clock, stop_clock};
-use crate::database::game_match_actions::{cash_team_set, record_winner, retrieve_contenders, retrieve_game_value, retrieve_score_value, update_game_value};
+use crate::database::game_match::actions::{cash_team_set, record_winner, retrieve_contenders, retrieve_game_value, retrieve_score_value, update_game_value};
+use crate::database::game_match::contenders::retrieve_contenders_value_i64;
 use crate::database::registration::table_player_creation::PERM_TEAM_PLAYERS;
 use crate::database::registration::utils::retrieve_team_value;
 use crate::errors::Error;
@@ -36,19 +38,20 @@ pub fn update_team_score(handle: &AppHandle, team_id: i64, game_id: i64) -> Resu
     Ok(())
 }
 
-pub fn update_team_stage(handle: &AppHandle, team_id: i64, game_id: i64, is_up_button: bool) -> Result<Option<StageDialogPayload>, Error> {
+pub fn update_team_stage(handle: &AppHandle, contender_id: i64, game_id: i64, is_up_button: bool) -> Result<Option<StageDialogPayload>, Error> {
     let connection = Connection::open(PERM_TEAM_PLAYERS)?;
 
-    if is_stage_won(&connection, game_id, team_id, is_up_button)? {
-        let stage_number = cash_team_set(&connection, &team_id, &game_id)?;
+    if is_stage_won(&connection, game_id, contender_id, is_up_button)? {
+        let stage_number = cash_team_set(&connection, &contender_id, &game_id)?;
         let game_set = retrieve_game_value(&connection, "set_number", &game_id)?;
 
         let stage_update_payload = StageUpdatePayload {
-            team_id,
+            team_id: contender_id,
             stage_number,
             max_score: get_max_score(game_set),
         };
 
+        let team_id = retrieve_contenders_value_i64(&connection, &contender_id, "team_id")?;
         let stage_dialog_payload = StageDialogPayload {
             status: true,
             team_name: Some(retrieve_team_value(&connection, "name", &team_id)?),
@@ -69,12 +72,11 @@ pub fn update_game_status(handle: &AppHandle, game_id: i64) -> Result<Option<Gam
 
     if game_set == 1 {
         Ok(None)
-
-    }else {
+    } else {
         match review_game(contenders, game_set) {
             Some(contender) => {
                 let game_update_payload = GameUpdatePayload { winner_name: contender.name.clone() };
-                let game_dialog_payload = GameDialogPayload { status: true, winner_name: Some(contender.name.clone())};
+                let game_dialog_payload = GameDialogPayload { status: true, winner_name: Some(contender.name.clone()) };
 
                 record_winner(&connection, &game_id, &contender.id)?;
                 fire_game_won_event(handle, game_update_payload)?;
@@ -99,7 +101,7 @@ pub fn reset_stage(handle: &AppHandle, game_id: i64) -> Result<(), Error> {
 pub fn update_team_stage_on_timeout(handle: &AppHandle, connection: &Connection, game_id: i64) -> Result<bool, Error> {
     let (team_id, is_stage_won) = is_stage_won_on_timeout(&connection, game_id)?;
 
-    if  is_stage_won{
+    if is_stage_won {
         let stage_number = cash_team_set(&connection, &team_id, &game_id)?;
         let game_set = retrieve_game_value(&connection, "set_number", &game_id)?;
 
@@ -111,10 +113,9 @@ pub fn update_team_stage_on_timeout(handle: &AppHandle, connection: &Connection,
         fire_stage_update_event(handle, stage_update_payload)?;
 
         Ok(true)
-    }else {
+    } else {
         update_game_value(&connection, &game_id, "on_time", 0)?;
 
         Ok(false)
     }
-
 }

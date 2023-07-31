@@ -1,5 +1,5 @@
 use rusqlite::Connection;
-use crate::database::game_match_actions::{Contender, Contenders, retrieve_contenders, retrieve_game_value, retrieve_score_value};
+use crate::database::game_match::actions::{Contender, Contenders, retrieve_contenders, retrieve_game_value, retrieve_score_value};
 use crate::errors::Error;
 
 pub fn get_max_score(game_set: i64) -> i64 {
