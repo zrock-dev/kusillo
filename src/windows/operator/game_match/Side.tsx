@@ -64,38 +64,48 @@ export default function Side({ gameId, team}) {
     }
 
     return (
-        <Grid2 container spacing={5}>
-            <Grid2 xs={12}>
-                <TeamCard
-                    teamName={team["name"]}
-                    teamColor={team["color"]}
-                />
-            </Grid2>
+        <Box
+            sx={{
+                width: '95%',
+            }}
+        >
+            <Grid2>
+                <Grid2 xs={12}>
+                    <TeamCard
+                        teamName={team["name"]}
+                        teamColor={team["color"]}
+                    />
+                </Grid2>
 
-            <Grid2 xs={12}>
-                <Typography variant="h6">STAGE</Typography>
-                <Box
-                    sx={{
-                        width: 60,
-                        height: 60,
-                        display: 'flex',
-                    }}
-                >
-                    <Typography variant="h3"> {stage}</Typography>
-                </Box>
-            </Grid2>
+                <Grid2 xs={12}>
+                    <Typography
+                        variant="h6"
+                    >
+                        STAGE
+                    </Typography>
+                    <Box
+                        sx={{
+                            width: 60,
+                            height: 60,
+                            display: 'flex',
+                        }}
+                    >
+                        <Typography variant="h3"> {stage}</Typography>
+                    </Box>
+                </Grid2>
 
-            <Grid2 xs>
-                <Score
-                    gameId={gameId}
-                    teamId={teamId}
-                    // TODO: Why can't the Score handle the maxScore itself?
-                    maxScore={maxScore}
-                />
+                <Grid2 xs>
+                    <Score
+                        gameId={gameId}
+                        teamId={teamId}
+                        // TODO: Why can't the Score handle the maxScore itself?
+                        maxScore={maxScore}
+                    />
+                </Grid2>
+                <Grid2 xs={12}>
+                    <TimeOutBox/>
+                </Grid2>
             </Grid2>
-            <Grid2 xs={12}>
-                <TimeOutBox/>
-            </Grid2>
-        </Grid2>
+        </Box>
     );
 }

@@ -5,6 +5,7 @@ import Side from './Side';
 import {Box, Button, Divider, Stack} from '@mui/material';
 import CountUpTimer from "../../shared/clock/CountUpTimer";
 import StartMatchDialog from "../utils/StartMatchDialog";
+import Grid2 from '@mui/material/Unstable_Grid2';
 
 export default function Match() {
     const navigate = useNavigate();
@@ -72,23 +73,36 @@ export default function Match() {
             <Stack>
                 <CountUpTimer isMirror={false}/>
                 <Divider flexItem/>
-                <Stack direction="row">
-                    <Side
-                        gameId={gameId}
-                        team={teamA}
-                    />
-                    <Side
-                        gameId={gameId}
-                        team={teamB}
-                    />
-                </Stack>
 
-                <Button
-                    onClick={handleOpenSpectatorWindow}
-                    disabled={isAudienceWindowOpen}
+                <Box
+                    sx={{
+                        marginTop: '10%',
+                        marginLeft: '10%',
+                        marginRight: '10%',
+                    }}
                 >
-                    Open Spectator Window
-                </Button>
+                    <Grid2 container>
+                        <Grid2 xs={6}>
+                            <Side
+                                gameId={gameId}
+                                team={teamA}
+                            />
+                        </Grid2>
+                        <Grid2 xs={6}>
+                            <Side
+                                gameId={gameId}
+                                team={teamB}
+                            />
+                        </Grid2>
+                    </Grid2>
+
+                    <Button
+                        onClick={handleOpenSpectatorWindow}
+                        disabled={isAudienceWindowOpen}
+                    >
+                        Open Spectator Window
+                    </Button>
+                </Box>
             </Stack>
         </Box>
     );

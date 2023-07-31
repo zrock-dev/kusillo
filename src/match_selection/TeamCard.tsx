@@ -8,7 +8,7 @@ function TeamCard({ teamName, teamColor}) {
 
     const style = {
         backgroundColor: teamColor,
-        height: '30px',
+        height: '50px',
         width: '100%',
     };
 

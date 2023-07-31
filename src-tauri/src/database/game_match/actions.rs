@@ -90,8 +90,8 @@ pub fn retrieve_contenders(connection: &Connection, game_id: &i64) -> Result<Con
 
     Ok(Contenders{
         game_id: *game_id,
-        team_a: retrieve_team(&aux_contenders.team_a_id)?,
-        team_b: retrieve_team(&aux_contenders.team_b_id)?,
+        team_a: retrieve_team(&aux_contenders.team_a_id, game_id)?,
+        team_b: retrieve_team(&aux_contenders.team_b_id, game_id)?,
     })
 }
 

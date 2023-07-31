@@ -4,6 +4,7 @@ import React, {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {invoke} from "@tauri-apps/api/tauri";
 import CountUpTimer from "../../shared/clock/CountUpTimer";
+import Grid2 from '@mui/material/Unstable_Grid2';
 
 export default function Match() {
     const navigate = useNavigate();
@@ -31,26 +32,29 @@ export default function Match() {
     return (
         <Box
             sx={{
-                marginTop: '200px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
+                marginTop: '5%',
+                marginLeft: '5%',
+                marginRight: '5%',
             }}
         >
             <Stack>
                 <CountUpTimer isMirror={true}/>
                 <Divider flexItem/>
-                <Stack direction="row" spacing={5}>
-                    <Side
-                        team={teamA}
-                        stageAlign={"left"}
-                    />
+                <Grid2 container spacing={5} >
+                   <Grid2 xs={6}>
+                       <Side
+                           team={teamA}
+                           stageAlign={"right"}
+                       />
+                   </Grid2>
 
-                    <Side
-                        team={teamB}
-                        stageAlign={"right"}
-                    />
-                </Stack>
+                    <Grid2 xs={6}>
+                        <Side
+                            team={teamB}
+                            stageAlign={"left"}
+                        />
+                    </Grid2>
+                </Grid2>
             </Stack>
         </Box>
     );
