@@ -22,6 +22,7 @@ export default function MatchSelect() {
     }
 
     function handleMatchStart(contenders: any) {
+        setIsGameStarted(true)
         let teamA = contenders["teamA"]
         let teamB = contenders["teamB"]
         invoke('create_new_game', {
@@ -32,7 +33,6 @@ export default function MatchSelect() {
         })
             .then(() => {
                 create_clock()
-                setIsGameStarted(true)
                 navigate("/operator-window")
             })
             .catch((error) => {
@@ -53,7 +53,7 @@ export default function MatchSelect() {
             />
 
             <AudienceWindowTrigger
-                matchStatus={isGameStarted}
+                isGameStarted={isGameStarted}
             />
         </Box>
     );

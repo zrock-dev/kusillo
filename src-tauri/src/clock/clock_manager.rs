@@ -24,7 +24,7 @@ pub enum ClockCommand {
 
 fn start_counter(minutes: Arc<Mutex<i32>>, seconds: Arc<Mutex<i32>>, running: Arc<Mutex<bool>>, sender: Sender<SyncCommands>) {
     loop {
-        thread::sleep(Duration::from_millis(50));
+        thread::sleep(Duration::from_millis(1000));
         if !*running.lock().unwrap() {
             break;
         }
