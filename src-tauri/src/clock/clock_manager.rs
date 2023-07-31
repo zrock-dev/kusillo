@@ -1,16 +1,12 @@
 use std::sync::{Arc, Mutex};
-use std::sync::mpsc::{Receiver, Sender};
+use std::sync::mpsc::{channel, Receiver, Sender};
 use std::thread;
 use std::time::Duration;
-use rusqlite::Connection;
 
 use serde::Serialize;
 use tauri::AppHandle;
-use crate::clock::actions::{handle_timeout, is_clock_on_time};
-use crate::clock::commands::pause_clock;
-use crate::clock::events::fire_event_time_sync;
-use crate::database::game_match_actions::retrieve_latest_game_id;
-use crate::database::registration::table_player_creation::PERM_TEAM_PLAYERS;
+
+use crate::clock::utils::{launch_clock_sync_thread, SyncCommands};
 
 #[derive(Serialize)]
 pub struct Time {
@@ -26,55 +22,76 @@ pub enum ClockCommand {
     GetCurrentTime(Sender<Time>),
 }
 
-fn start_counter(minutes: Arc<Mutex<i32>>, seconds: Arc<Mutex<i32>>, running: Arc<Mutex<bool>>, sender: Sender<Time>) {
-    thread::spawn(move || {
-        loop {
-            thread::sleep(Duration::from_millis(1000));
-            if !*running.lock().unwrap() {
-                break;
-            }
-
-            *seconds.lock().unwrap() += 1;
-            if *seconds.lock().unwrap() == 60 {
-                *minutes.lock().unwrap() += 1;
-                *seconds.lock().unwrap() = 0;
-            }
-
-            let time = Time {
-                minutes: *minutes.lock().unwrap(),
-                seconds: *seconds.lock().unwrap(),
-            };
-            sender.send(time).unwrap();
+fn start_counter(minutes: Arc<Mutex<i32>>, seconds: Arc<Mutex<i32>>, running: Arc<Mutex<bool>>, sender: Sender<SyncCommands>) {
+    loop {
+        thread::sleep(Duration::from_millis(1000));
+        if !*running.lock().unwrap() {
+            break;
         }
-    });
+
+        *seconds.lock().unwrap() += 1;
+        if *seconds.lock().unwrap() == 60 {
+            *minutes.lock().unwrap() += 1;
+            *seconds.lock().unwrap() = 0;
+        }
+
+        let time = Time {
+            minutes: *minutes.lock().unwrap(),
+            seconds: *seconds.lock().unwrap(),
+        };
+        sender.send(SyncCommands::TimeUpdate(time)).unwrap();
+    }
 }
 
-pub fn launch_clock_thread(time_sync_sender: Sender<Time>, receiver: Receiver<ClockCommand>) {
+pub fn launch_clock_thread(handle: AppHandle, receiver: Receiver<ClockCommand>) {
     let minutes = Arc::new(Mutex::new(0));
     let seconds = Arc::new(Mutex::new(0));
 
-    let running = Arc::new(Mutex::new(false));
+    let (time_sync_sender, time_sync_receiver): (Sender<SyncCommands>, Receiver<SyncCommands>) = channel();
+    let clock_sync_thread = thread::spawn(move || {
+        launch_clock_sync_thread(handle, time_sync_receiver)
+    });
+
+    let mut clock_counter_thread: Option<thread::JoinHandle<()>> = None;
+    let is_counter_running = Arc::new(Mutex::new(false));
+
     loop {
         match receiver.recv() {
             Ok(command) => {
                 match command {
                     ClockCommand::Start => {
-                        *running.lock().unwrap() = true;
-                        start_counter(Arc::clone(&minutes), Arc::clone(&seconds), Arc::clone(&running), time_sync_sender.clone());
+                        if !*is_counter_running.lock().unwrap() {
+                            *is_counter_running.lock().unwrap() = true;
+
+                            let minutes = Arc::clone(&minutes);
+                            let seconds = Arc::clone(&seconds);
+                            let running = Arc::clone(&is_counter_running);
+                            let sender = time_sync_sender.clone();
+
+                            clock_counter_thread = Some(thread::spawn(move || {
+                                start_counter(minutes, seconds, running, sender)
+                            }));
+
+                        }
                     }
 
                     ClockCommand::Pause => {
-                        *running.lock().unwrap() = false;
+                        *is_counter_running.lock().unwrap() = false;
+                        if let Some(thread) = clock_counter_thread.take() {
+                            thread.join().unwrap();
+                        }
                     }
 
                     ClockCommand::Reset => {
                         *minutes.lock().unwrap() = 0;
                         *seconds.lock().unwrap() = 0;
 
-                        time_sync_sender.send(Time {
-                            minutes: *minutes.lock().unwrap(),
-                            seconds: *seconds.lock().unwrap(),
-                        }).unwrap();
+                        time_sync_sender.send(SyncCommands::TimeUpdate(
+                            Time {
+                                minutes: *minutes.lock().unwrap(),
+                                seconds: *seconds.lock().unwrap(),
+                            }
+                        )).unwrap();
                     }
 
                     ClockCommand::GetCurrentTime(reply_sender) => {
@@ -87,28 +104,13 @@ pub fn launch_clock_thread(time_sync_sender: Sender<Time>, receiver: Receiver<Cl
                     }
 
                     ClockCommand::Stop => {
-                        *running.lock().unwrap() = false;
+                        *is_counter_running.lock().unwrap() = false;
+                        time_sync_sender.send(SyncCommands::Stop).unwrap();
+                        clock_sync_thread
+                            .join()
+                            .expect("Clock Sync thread can't be joined");
                         break;
                     }
-                }
-            }
-            Err(_) => { break; }
-        }
-    }
-}
-
-pub fn launch_clock_sync_thread(handle: AppHandle, time_sync_receiver: Receiver<Time>) {
-    let connection = Connection::open(PERM_TEAM_PLAYERS).unwrap();
-    let game_id = retrieve_latest_game_id(&connection).unwrap();
-    let mut old_minute = 0;
-    loop {
-        match time_sync_receiver.recv() {
-            Ok(time) => {
-                fire_event_time_sync(&time, handle.clone());
-                if old_minute != *&time.minutes && !is_clock_on_time(&connection, game_id, &time) {
-                    old_minute = *&time.minutes;
-                    pause_clock();
-                    handle_timeout(&handle);
                 }
             }
             Err(_) => { break; }

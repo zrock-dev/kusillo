@@ -25,7 +25,7 @@ function createButtons(variants: any, interactionFn: any) {
             onClick={() => interactionFn(value)}
             data-value={value}
         >
-            {value}
+            {value["operation"]}
         </Button>
     ));
 }
@@ -57,10 +57,16 @@ function translateColor(color: string): string {
     }
 }
 
+enum ButtonOperationType {
+    UP, DOWN
+}
+
 // @ts-ignore
-export default function Score({gameId, teamId, score, setScore, maxScore}) {
+export default function Score({gameId, teamId, maxScore}) {
     const navigate = useNavigate();
+
     const [scoreColor, setScoreColor] = useState("");
+    const [score, setScore] = useState(0)
 
     const [canScoreUp3, setCanScoreUp3] = useState(true);
     const [canScoreUp2, setCanScoreUp2] = useState(true);
@@ -69,19 +75,21 @@ export default function Score({gameId, teamId, score, setScore, maxScore}) {
     const [canScoreDown2, setCanScoreDown2] = useState(true);
     const [canScoreDown1, setCanScoreDown1] = useState(true);
     const upButtons = [
-        {isDisabled: canScoreUp1, value: +1, setter: setCanScoreUp1},
-        {isDisabled: canScoreUp2, value: +2, setter: setCanScoreUp2},
-        {isDisabled: canScoreUp3, value: +3, setter: setCanScoreUp3},
+        {isDisabled: canScoreUp1, value: {operation: +1, operationType: ButtonOperationType.UP}, setter: setCanScoreUp1},
+        {isDisabled: canScoreUp2, value: {operation: +2, operationType: ButtonOperationType.UP}, setter: setCanScoreUp2},
+        {isDisabled: canScoreUp3, value: {operation: +3, operationType: ButtonOperationType.UP}, setter: setCanScoreUp3},
     ];
     const downButtons = [
-        {isDisabled: canScoreDown1, value: -1, setter: setCanScoreDown1},
-        {isDisabled: canScoreDown2, value: -2, setter: setCanScoreDown2},
-        {isDisabled: canScoreDown3, value: -3, setter: setCanScoreDown3},
+        {isDisabled: canScoreDown1, value: {operation: -1, operationType: ButtonOperationType.DOWN}, setter: setCanScoreDown1},
+        {isDisabled: canScoreDown2, value: {operation: -2, operationType: ButtonOperationType.DOWN}, setter: setCanScoreDown2},
+        {isDisabled: canScoreDown3, value: {operation: -3, operationType: ButtonOperationType.DOWN}, setter: setCanScoreDown3},
     ];
+
+    const [currentButtonType, setCurrentButtonType] = useState(ButtonOperationType.DOWN);
 
     useEffect(() => {
         initTeamData()
-    }, [])
+    }, [teamId])
 
     useEffect(() => {
         recordInteraction(score)
@@ -90,16 +98,17 @@ export default function Score({gameId, teamId, score, setScore, maxScore}) {
     }, [score]);
 
     function checkInteractions() {
-        checkButtons(upButtons, (value: number): boolean => {
-            return (score + value) > maxScore
+        checkButtons(upButtons, (value: any): boolean => {
+            return (score + value["operation"]) > maxScore
         });
-        checkButtons(downButtons, (value: number): boolean => {
-            return (score + value) < 0
+        checkButtons(downButtons, (value: any): boolean => {
+            return (score + value["operation"]) < 0
         });
     }
 
-    function handleInteraction(value: number) {
-        setScore(score + value);
+    function handleInteraction(value: any) {
+        setCurrentButtonType(value["operationType"])
+        setScore(score + value["operation"]);
     }
 
     function recordInteraction(score: number) {
@@ -111,7 +120,8 @@ export default function Score({gameId, teamId, score, setScore, maxScore}) {
     }
 
     function handleScoreUpdate(){
-        invoke('handle_score_update', { gameId: gameId, teamId: teamId })
+        let isButtonUp = (currentButtonType == ButtonOperationType.UP)
+        invoke('handle_score_update', { gameId: gameId, teamId: teamId, isUpButton: isButtonUp })
             .catch((error => {
                 console.error(error)
                 navigate("/error")
@@ -121,8 +131,10 @@ export default function Score({gameId, teamId, score, setScore, maxScore}) {
     listen(
         'score_update',
         (event) => {
-            let payload = event.payload
+            let payload = event["payload"]
+            // @ts-ignore
             if (payload["team_id"] == teamId) {
+                // @ts-ignore
                 setScoreColor(translateColor(payload["score_color"] as string))
             }
         })
