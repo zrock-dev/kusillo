@@ -5,7 +5,7 @@ use crate::clock::actions::{handle_timeout, is_clock_on_time};
 use crate::clock::clock_manager::Time;
 use crate::clock::commands::pause_clock;
 use crate::clock::events::fire_event_time_sync;
-use crate::database::game_match_actions::retrieve_latest_game_id;
+use crate::database::game_match::actions::retrieve_latest_game_id;
 use crate::database::registration::table_player_creation::PERM_TEAM_PLAYERS;
 
 pub enum SyncCommands {

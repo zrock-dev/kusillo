@@ -1,6 +1,7 @@
 use rusqlite::Connection;
 use serde::Serialize;
-use crate::database::game_match_actions::{Contender, retrieve_score_value};
+use crate::database::game_match::actions::{Contender};
+use crate::database::game_match::contenders::{retrieve_contenders_value_i64, retrieve_contenders_value_string};
 use crate::database::registration::table_player_creation::PERM_TEAM_PLAYERS;
 use crate::errors::Error;
 
@@ -10,15 +11,18 @@ pub struct Team {
     pub name: String,
 }
 
-pub fn retrieve_team(team_id: &i64, game_id: &i64) -> Result<Contender, Error> {
+pub fn retrieve_team(contender_id: &i64) -> Result<Contender, Error> {
     let connection = Connection::open(PERM_TEAM_PLAYERS)?;
-    let team_name = retrieve_team_value(&connection, "name", &team_id)?;
-    let set_points = retrieve_score_value(&connection, "set_number", &game_id, &team_id)?;
 
-    Ok(Contender{
-        id: *team_id,
+    let team_id = retrieve_contenders_value_i64(&connection, &contender_id, "team_id")?;
+    let team_name = retrieve_team_value(&connection, "name", &team_id)?;
+    let team_color = retrieve_contenders_value_string(&connection, &contender_id, "color")?;
+
+    Ok(Contender {
+        id: *contender_id,
         name: team_name,
-        set_points,
+        set_points: 0,
+        color: team_color,
     })
 }
 

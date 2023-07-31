@@ -1,4 +1,4 @@
-use rusqlite::{Connection, params};
+use rusqlite::{Connection, OptionalExtension, params};
 use crate::errors::Error;
 use serde::Serialize;
 use crate::database::registration::utils::retrieve_team;
@@ -15,6 +15,7 @@ pub struct Contender {
     pub id: i64,
     pub name: String,
     pub set_points: i64,
+    pub color: String,
 }
 
 struct AuxContenders{
@@ -30,19 +31,24 @@ pub fn record_winner(connection: &Connection, game_id: &i64, team_id: &i64) -> R
     Ok(())
 }
 
-pub fn retrieve_score_value(connection: &Connection, column_name: &str, game_id: &i64, team_id: &i64) -> Result<i64, Error> {
-    let query = format!("SELECT {} FROM score WHERE game_id = ?1 AND team_id = ?2 ORDER BY rowid DESC LIMIT 1", column_name);
-    let value = connection.query_row_and_then(
+pub fn retrieve_score_value(connection: &Connection, column_name: &str, game_id: &i64, contender_id: &i64) -> Result<i64, Error> {
+    let query = format!("SELECT {} FROM score WHERE game_id = ?1 AND contender_id = ?2 ORDER BY rowid DESC LIMIT 1", column_name);
+    let value = connection.query_row(
         query.as_str(),
-        [game_id, team_id],
+        [game_id, contender_id],
         |row| {
-            Ok::<i64, Error>(
-                row.get(0)?
-            )
+            row.get(0)
         },
-    )?;
+    ).optional();
 
-    Ok(value)
+   match value.unwrap() {
+       Some(score) => {
+           Ok(score)
+       }
+       None => {
+           Ok(0)
+       }
+   }
 }
 
 pub fn retrieve_game_value(connection: &Connection, column_name: &str, game_id: &i64) -> Result<i64, Error> {
@@ -72,7 +78,7 @@ pub fn update_game_value(connection: &Connection, game_id: &i64, column_name: &s
 
 pub fn retrieve_contenders(connection: &Connection, game_id: &i64) -> Result<Contenders, Error> {
     let aux_contenders = connection.query_row_and_then(
-        "SELECT team_a_id, team_b_id FROM game WHERE rowid = ?1",
+        "SELECT contender_a_id, contender_b_id FROM game WHERE rowid = ?1",
         [&game_id],
         |row| {
             Ok::<AuxContenders, Error>(AuxContenders {
@@ -83,16 +89,16 @@ pub fn retrieve_contenders(connection: &Connection, game_id: &i64) -> Result<Con
     )?;
 
     Ok(Contenders{
-        game_id: game_id.clone(),
-        team_a: retrieve_team(&aux_contenders.team_a_id, &game_id)?,
-        team_b: retrieve_team(&aux_contenders.team_b_id, &game_id)?,
+        game_id: *game_id,
+        team_a: retrieve_team(&aux_contenders.team_a_id)?,
+        team_b: retrieve_team(&aux_contenders.team_b_id)?,
     })
 }
 
 pub fn insert_into_score(connection: &Connection, game_id: &i64, team_id: &i64, score_points: &i64, current_stage: &i64) -> Result<(), Error> {
     connection.execute(
         "INSERT INTO
-            score (game_id, set_number, score_points, team_id, timestamp)
+            score (game_id, set_number, score_points, contender_id, timestamp)
             VALUES (
                  ?1, ?2, ?3, ?4,
                  (SELECT DATETIME())

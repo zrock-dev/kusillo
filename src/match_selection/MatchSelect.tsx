@@ -28,13 +28,13 @@ export default function MatchSelect() {
             teamBId: teamB.id,
             teamBColor: teamB.color
         })
+            .then(() => {
+                create_clock()
+                navigate("/operator-window")
+            })
             .catch((error) => {
                 console.error(error)
                 navigate("/error")
-            })
-            .finally(() => {
-                create_clock()
-                navigate("/operator-window")
             })
     }
 
