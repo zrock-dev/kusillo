@@ -8,18 +8,17 @@ const AudienceWindowTrigger = React.memo(({ isGameStarted }: { isGameStarted: an
     const [isAudienceWindowOpen, setIsAudienceWindowOpen] = useState(false);
 
     useEffect(() => {
-        console.debug("Verifying window status");
         invoke("is_audience_window_open")
             .then((isAudienceWindowOpen: any) => {
-                console.debug("Is audience window open? :", isAudienceWindowOpen);
                 if (isAudienceWindowOpen) {
                     checkOnAudienceWindow();
                     setIsAudienceWindowOpen(true);
                 }
             })
             .catch((error) => {
-                console.error(error);
-                navigate("/error");
+                console.error(error)
+                let errorMessage = encodeURIComponent(error)
+                navigate(`/error?message=${errorMessage}`)
             });
     }, [isGameStarted]);
 
@@ -29,8 +28,9 @@ const AudienceWindowTrigger = React.memo(({ isGameStarted }: { isGameStarted: an
                 checkOnAudienceWindow();
             })
             .catch((error: any) => {
-                console.error(error);
-                navigate("/error");
+                console.error(error)
+                let errorMessage = encodeURIComponent(error)
+                navigate(`/error?message=${errorMessage}`)
             });
 
         setIsAudienceWindowOpen(true);
@@ -38,8 +38,9 @@ const AudienceWindowTrigger = React.memo(({ isGameStarted }: { isGameStarted: an
 
     function checkOnAudienceWindow() {
         invoke("check_on_audience_window").catch((error) => {
-            console.error(error);
-            navigate("/error");
+            console.error(error)
+            let errorMessage = encodeURIComponent(error)
+            navigate(`/error?message=${errorMessage}`)
         });
     }
 

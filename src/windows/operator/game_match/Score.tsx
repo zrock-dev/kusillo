@@ -75,14 +75,38 @@ export default function Score({gameId, teamId, maxScore}) {
     const [canScoreDown2, setCanScoreDown2] = useState(true);
     const [canScoreDown1, setCanScoreDown1] = useState(true);
     const upButtons = [
-        {isDisabled: canScoreUp1, value: {operation: +1, operationType: ButtonOperationType.UP}, setter: setCanScoreUp1},
-        {isDisabled: canScoreUp2, value: {operation: +2, operationType: ButtonOperationType.UP}, setter: setCanScoreUp2},
-        {isDisabled: canScoreUp3, value: {operation: +3, operationType: ButtonOperationType.UP}, setter: setCanScoreUp3},
+        {
+            isDisabled: canScoreUp1,
+            value: {operation: +1, operationType: ButtonOperationType.UP},
+            setter: setCanScoreUp1
+        },
+        {
+            isDisabled: canScoreUp2,
+            value: {operation: +2, operationType: ButtonOperationType.UP},
+            setter: setCanScoreUp2
+        },
+        {
+            isDisabled: canScoreUp3,
+            value: {operation: +3, operationType: ButtonOperationType.UP},
+            setter: setCanScoreUp3
+        },
     ];
     const downButtons = [
-        {isDisabled: canScoreDown1, value: {operation: -1, operationType: ButtonOperationType.DOWN}, setter: setCanScoreDown1},
-        {isDisabled: canScoreDown2, value: {operation: -2, operationType: ButtonOperationType.DOWN}, setter: setCanScoreDown2},
-        {isDisabled: canScoreDown3, value: {operation: -3, operationType: ButtonOperationType.DOWN}, setter: setCanScoreDown3},
+        {
+            isDisabled: canScoreDown1,
+            value: {operation: -1, operationType: ButtonOperationType.DOWN},
+            setter: setCanScoreDown1
+        },
+        {
+            isDisabled: canScoreDown2,
+            value: {operation: -2, operationType: ButtonOperationType.DOWN},
+            setter: setCanScoreDown2
+        },
+        {
+            isDisabled: canScoreDown3,
+            value: {operation: -3, operationType: ButtonOperationType.DOWN},
+            setter: setCanScoreDown3
+        },
     ];
 
     const [currentButtonType, setCurrentButtonType] = useState(ButtonOperationType.DOWN);
@@ -115,16 +139,18 @@ export default function Score({gameId, teamId, maxScore}) {
         invoke('record_interaction', {teamId: teamId, gameId: gameId, scorePoints: score})
             .catch((error => {
                 console.error(error)
-                navigate("/error")
+                let errorMessage = encodeURIComponent(error.message)
+                navigate(`/error?message=${errorMessage}`)
             }))
     }
 
-    function handleScoreUpdate(){
+    function handleScoreUpdate() {
         let isButtonUp = (currentButtonType == ButtonOperationType.UP)
-        invoke('handle_score_update', { gameId: gameId, teamId: teamId, isUpButton: isButtonUp })
+        invoke('handle_score_update', {gameId: gameId, teamId: teamId, isUpButton: isButtonUp})
             .catch((error => {
                 console.error(error)
-                navigate("/error")
+                let errorMessage = encodeURIComponent(error)
+                navigate(`/error?message=${errorMessage}`)
             }))
     }
 
@@ -139,8 +165,9 @@ export default function Score({gameId, teamId, maxScore}) {
             }
         })
         .catch((error) => {
-            console.error(error);
-            navigate('/error');
+            console.error(error)
+            let errorMessage = encodeURIComponent(error)
+            navigate(`/error?message=${errorMessage}`)
         })
 
     function initTeamData() {
@@ -150,7 +177,8 @@ export default function Score({gameId, teamId, maxScore}) {
             })
             .catch((error => {
                 console.error(error)
-                navigate("/error")
+                let errorMessage = encodeURIComponent(error)
+                navigate(`/error?message=${errorMessage}`)
             }))
     }
 
@@ -161,8 +189,9 @@ export default function Score({gameId, teamId, maxScore}) {
             setScoreColor(translateColor("blue"))
         })
         .catch((error) => {
-            console.error(error);
-            navigate('/error');
+            console.error(error)
+            let errorMessage = encodeURIComponent(error)
+            navigate(`/error?message=${errorMessage}`)
         })
 
     return (

@@ -105,7 +105,8 @@ export default function Side({team, stageAlign}) {
     })
         .catch((error) => {
             console.error(error)
-            navigate("/error")
+            let errorMessage = encodeURIComponent(error.message)
+navigate(`/error?message=${errorMessage}`)
         })
 
     return (

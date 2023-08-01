@@ -35,7 +35,8 @@ export default function Side({ gameId, team}) {
             })
             .catch((error => {
                 console.error(error)
-                navigate("/error")
+                let errorMessage = encodeURIComponent(error)
+                navigate(`/error?message=${errorMessage}`)
             }))
     }
 
@@ -51,8 +52,9 @@ export default function Side({ gameId, team}) {
             setMaxScore(payload["max_score"] as number)
         })
         .catch((error) => {
-            console.error(error);
-            navigate('/error');
+            console.error(error)
+            let errorMessage = encodeURIComponent(error)
+            navigate(`/error?message=${errorMessage}`)
         })
 
     if (isLoading){

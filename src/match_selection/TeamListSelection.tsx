@@ -71,7 +71,8 @@ function TeamListSelection({handleMatchStart}: any) {
                 })
                 .catch((error) => {
                     console.error(error)
-                    navigate("/error")
+                    let errorMessage = encodeURIComponent(error)
+                    navigate(`/error?message=${errorMessage}`)
                 })
                 .finally(() => {
                     setAreTeamsLoaded(true)
