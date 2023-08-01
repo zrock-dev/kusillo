@@ -1,6 +1,6 @@
 import Side from './Side';
 import {Box, Divider, Stack} from '@mui/material';
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {invoke} from "@tauri-apps/api/tauri";
 import CountUpTimer from "../../shared/clock/CountUpTimer";
@@ -56,6 +56,7 @@ export default function Match() {
                        <Side
                            team={teamA}
                            stageAlign={"right"}
+                           nameAlignment={"left"}
                        />
                    </Grid2>
 
@@ -63,6 +64,7 @@ export default function Match() {
                         <Side
                             team={teamB}
                             stageAlign={"left"}
+                            nameAlignment={"right"}
                         />
                     </Grid2>
                 </Grid2>
