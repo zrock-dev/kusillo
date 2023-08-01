@@ -60,7 +60,8 @@ function CountUpTimer({isMirror}) {
             })
             .catch((error) => {
                 console.error(error)
-                navigate("/error")
+                let errorMessage = encodeURIComponent(error)
+                navigate(`/error?message=${errorMessage}`)
             })
     }
 
@@ -69,7 +70,8 @@ function CountUpTimer({isMirror}) {
     })
         .catch((error) => {
             console.error(error)
-            navigate("/error")
+            let errorMessage = encodeURIComponent(error)
+            navigate(`/error?message=${errorMessage}`)
         })
 
     function timeUpdateListener(payload: any) {

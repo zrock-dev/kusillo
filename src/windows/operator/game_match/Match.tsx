@@ -30,8 +30,9 @@ export default function Match() {
                 setTeamB(contestants["team_b"]);
             })
             .catch((error) => {
-                console.error(error);
-                navigate('/error');
+                console.error(error)
+                let errorMessage = encodeURIComponent(error)
+                navigate(`/error?message=${errorMessage}`)
             })
             .finally(() => setIsLoading(false));
     }
@@ -44,8 +45,9 @@ export default function Match() {
     function startClock() {
         invoke('start_clock')
             .catch((error) => {
-                console.error(error);
-                navigate('/error');
+                console.error(error)
+                let errorMessage = encodeURIComponent(error)
+                navigate(`/error?message=${errorMessage}`)
             })
     }
 

@@ -27,7 +27,8 @@ function TimeOutBox() {
         invoke('request_timeout' )
             .catch((error) => {
                 console.error(error)
-                navigate("/error")
+                let errorMessage = encodeURIComponent(error)
+                navigate(`/error?message=${errorMessage}`)
             })
     }
 
@@ -35,16 +36,18 @@ function TimeOutBox() {
         invoke('request_timeout_finish' )
             .catch((error) => {
                 console.error(error)
-                navigate("/error")
+                let errorMessage = encodeURIComponent(error)
+                navigate(`/error?message=${errorMessage}`)
             })
     }
 
     listen("timeout_status", (event) => {
-        setIsOpen(event.payload as boolean)
+        setIsOpen(event["payload"] as boolean)
     })
         .catch((error) => {
             console.error(error)
-            navigate("/error")
+            let errorMessage = encodeURIComponent(error)
+            navigate(`/error?message=${errorMessage}`)
         })
 
     const label = {inputProps: {'aria-label': 'Checkbox demo'}};

@@ -53,7 +53,8 @@ function TimeOutCounter({ isDialogOpen, handleDialogClose}) {
         invoke('pause_clock')
             .catch((error) => {
                 console.error(error)
-                navigate("/error")
+                let errorMessage = encodeURIComponent(error)
+                navigate(`/error?message=${errorMessage}`)
             })
     }
 
@@ -61,7 +62,8 @@ function TimeOutCounter({ isDialogOpen, handleDialogClose}) {
         invoke('start_clock')
             .catch((error) => {
                 console.error(error)
-                navigate("/error")
+                let errorMessage = encodeURIComponent(error)
+                navigate(`/error?message=${errorMessage}`)
             })
     }
 

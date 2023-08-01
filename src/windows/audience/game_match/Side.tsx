@@ -24,7 +24,7 @@ function translateColor(color: string): string {
 }
 
 // @ts-ignore
-export default function Side({team, stageAlign}) {
+export default function Side({team, stageAlign, nameAlignment}) {
     const navigate = useNavigate();
 
     const [stage, setStage] = useState(0)
@@ -105,7 +105,8 @@ export default function Side({team, stageAlign}) {
     })
         .catch((error) => {
             console.error(error)
-            navigate("/error")
+            let errorMessage = encodeURIComponent(error.message)
+navigate(`/error?message=${errorMessage}`)
         })
 
     return (
@@ -114,6 +115,7 @@ export default function Side({team, stageAlign}) {
                 <TeamCard
                     teamName={team["name"]}
                     teamColor={team["color"]}
+                    alignment={nameAlignment}
                 />
 
                 <Stack direction={'column'}>
