@@ -17,7 +17,8 @@ export default function MatchSelect() {
         invoke('create_clock')
             .catch((error) => {
                 console.error(error)
-                navigate("/error")
+                let errorMessage = encodeURIComponent(error)
+                navigate(`/error?message=${errorMessage}`)
             })
     }
 
@@ -37,7 +38,8 @@ export default function MatchSelect() {
             })
             .catch((error) => {
                 console.error(error)
-                navigate("/error")
+                let errorMessage = encodeURIComponent(error)
+                navigate(`/error?message=${errorMessage}`)
             })
     }
 

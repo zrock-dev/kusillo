@@ -1,10 +1,10 @@
 import React, {useEffect, useRef, useState} from 'react';
-import { useFormik } from 'formik';
+import {useFormik} from 'formik';
 import {validationSchema} from "./validations/team_schema";
 import Grid2 from "@mui/material/Unstable_Grid2";
 import PlayerRegistrationList from "./player_registration";
-import { invoke } from "@tauri-apps/api/tauri";
-import { useNavigate } from "react-router-dom";
+import {invoke} from "@tauri-apps/api/tauri";
+import {useNavigate} from "react-router-dom";
 import {
     Button,
     MenuItem,
@@ -13,7 +13,7 @@ import {
     TextField, Container, Stack
 } from '@mui/material';
 
-import { enqueueSnackbar } from 'notistack';
+import {enqueueSnackbar} from 'notistack';
 
 
 export default function TeamRegistrationForm() {
@@ -26,19 +26,20 @@ export default function TeamRegistrationForm() {
             try {
                 const id: number = await invoke('create_team');
                 setTeamIdentifier(id);
-            } catch (error) {
-                enqueueSnackbar(`${error}`, {variant: "error"})
-                navigate("/error")
+            } catch (error: any) {
+                console.error(error)
+                let errorMessage = encodeURIComponent(error)
+                navigate(`/error?message=${errorMessage}`)
             }
         };
 
-        if (!hasRequested.current){
+        if (!hasRequested.current) {
             hasRequested.current = true;
             fetchData();
         }
     }, []);
 
-    async function submitToDatabase(values){
+    async function submitToDatabase(values) {
         try {
             let can_submit = await invoke("can_submit_team", {teamId: teamIdentifier});
 
@@ -47,12 +48,13 @@ export default function TeamRegistrationForm() {
                 await invoke("update_team", {name: teamName, category: teamCategory, teamId: teamIdentifier});
                 enqueueSnackbar(`Team: ${teamName}, has been registered`, {variant: "info"})
                 navigate("/");
-            }else {
+            } else {
                 enqueueSnackbar("Team size is invalid", {variant: "warning"})
             }
-        }
-        catch (error){
-            enqueueSnackbar(`${error}`, {variant: "error"})
+        } catch (error: any) {
+            console.error(error)
+            let errorMessage = encodeURIComponent(error)
+            navigate(`/error?message=${errorMessage}`)
         }
     }
 
@@ -62,7 +64,9 @@ export default function TeamRegistrationForm() {
             teamCategory: '',
         },
         validationSchema: validationSchema,
-        onSubmit: (values) => {submitToDatabase(values)},
+        onSubmit: (values) => {
+            submitToDatabase(values)
+        },
     });
 
     const handleCancel = () => {
@@ -72,7 +76,9 @@ export default function TeamRegistrationForm() {
                 navigate("/");
             })
             .catch((error) => {
-                enqueueSnackbar(`${error}`, {variant: "error"})
+                console.error(error)
+                let errorMessage = encodeURIComponent(error)
+                navigate(`/error?message=${errorMessage}`)
             });
     }
 
@@ -118,7 +124,7 @@ export default function TeamRegistrationForm() {
                     </Grid2>
 
                     <Grid2>
-                        <PlayerRegistrationList id = { teamIdentifier } />
+                        <PlayerRegistrationList id={teamIdentifier}/>
                     </Grid2>
 
                     <Grid2 xs={12}>
@@ -128,7 +134,7 @@ export default function TeamRegistrationForm() {
                             alignItems="center"
                             spacing={4}
                         >
-                            <Button  color="primary" variant="contained" onClick={handleCancel}>
+                            <Button color="primary" variant="contained" onClick={handleCancel}>
                                 Cancel
                             </Button>
                             <Button color="primary" variant="contained" type="submit">

@@ -26,8 +26,9 @@ function GameTransitionDialog({ DialogActions }) {
             }
         })
         .catch((error: any) => {
-            console.error(error);
-            navigate('/error');
+            console.error(error)
+            let errorMessage = encodeURIComponent(error)
+            navigate(`/error?message=${errorMessage}`)
         })
 
     return (
