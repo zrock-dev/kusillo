@@ -1,10 +1,9 @@
 import React from 'react';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
 
 // @ts-ignore
-function TeamCard({ teamName, teamColor, alignment: nameAlignment}) {
+function TeamCard({ teamName, teamColor, alignment}) {
     let fontColor = 'white'
 
     if (teamColor == '#ffffff'){
@@ -19,7 +18,7 @@ function TeamCard({ teamName, teamColor, alignment: nameAlignment}) {
     const fontStyle = {
         fontSize: 70,
         color: fontColor,
-        align: nameAlignment
+        align: alignment
     }
 
     return (

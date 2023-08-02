@@ -24,10 +24,9 @@ function translateColor(color: string): string {
 }
 
 // @ts-ignore
-export default function Side({team, stageAlign, nameAlignment}) {
+export default function Side({team, nameAlignment}) {
     const navigate = useNavigate();
 
-    const [stage, setStage] = useState(0)
     const [scoreColor, setScoreColor] = useState("")
     const [score, setScore] = useState(0)
 
@@ -64,19 +63,6 @@ export default function Side({team, stageAlign, nameAlignment}) {
         })
 
     listen(
-        'stage_update',
-        (event: any) => {
-            let payload = event["payload"]
-            if (payload["team_id"] == teamId) {
-                setStage(payload["stage_number"] as number)
-            }
-        })
-        .catch((error) => {
-            console.error(error);
-            navigate('/error');
-        })
-
-    listen(
         'stage_reset',
         () => {
             setScore(0)
@@ -90,7 +76,6 @@ export default function Side({team, stageAlign, nameAlignment}) {
     listen(
         'game_won',
         () => {
-            setStage(0)
             setScore(0)
             setScoreColor(translateColor("blue"))
         })
@@ -115,15 +100,8 @@ export default function Side({team, stageAlign, nameAlignment}) {
                 <TeamCard
                     teamName={team["name"]}
                     teamColor={team["color"]}
-                    alignment={"center"}
+                    alignment={nameAlignment}
                 />
-
-                {/*<Stack direction={'row'}>*/}
-                {/*    <Typography align={"center"} variant="h5">STAGE</Typography>*/}
-                {/*    <Typography align={"center"} variant="h2">*/}
-                {/*        {padWithZeros(stage, 2)}*/}
-                {/*    </Typography>*/}
-                {/*</Stack>*/}
 
                 <Score
                     fontColor={scoreColor}
