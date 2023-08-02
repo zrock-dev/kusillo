@@ -45,15 +45,15 @@ function ButtonGroupWrapper({buttons, interactionFn}) {
 function translateColor(color: string): string {
     switch (color) {
         case "blue":
-            return 'info.light';
+            return '#00ffff';
         case "orange":
-            return 'warning.light';
+            return '#ffff00';
         case "pink":
-            return 'secondary.light';
+            return '#ff0000';
         case "red":
-            return 'error.light';
+            return '#ff0000';
         default:
-            return 'info.light';
+            return '#ffffff';
     }
 }
 

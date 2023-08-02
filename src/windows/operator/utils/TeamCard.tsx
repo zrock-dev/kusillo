@@ -4,7 +4,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
 // @ts-ignore
-function TeamCard({ teamName, teamColor, alignment: nameAlignment}) {
+function TeamCard({ teamName, teamColor}) {
 
     const style = {
         backgroundColor: teamColor,
@@ -25,7 +25,7 @@ function TeamCard({ teamName, teamColor, alignment: nameAlignment}) {
             >
                 <Typography
                     variant="h4"
-                    align={nameAlignment}
+                    align={'center'}
                 >
                     {teamName}
                 </Typography>

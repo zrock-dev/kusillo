@@ -15,7 +15,7 @@ export default function Match() {
 
     listen(
         'sync_audience_window',
-        (event: any) => {
+        () => {
             requestLatestContenders()
         })
         .catch((error) => {
@@ -43,7 +43,6 @@ export default function Match() {
     return (
         <Box
             sx={{
-                marginTop: '5%',
                 marginLeft: '5%',
                 marginRight: '5%',
             }}
@@ -55,7 +54,6 @@ export default function Match() {
                    <Grid2 xs={6}>
                        <Side
                            team={teamA}
-                           stageAlign={"right"}
                            nameAlignment={"left"}
                        />
                    </Grid2>
@@ -63,7 +61,6 @@ export default function Match() {
                     <Grid2 xs={6}>
                         <Side
                             team={teamB}
-                            stageAlign={"left"}
                             nameAlignment={"right"}
                         />
                     </Grid2>
