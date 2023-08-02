@@ -50,6 +50,19 @@ function TimeOutBox() {
             navigate(`/error?message=${errorMessage}`)
         })
 
+    listen(
+        'stage_reset',
+        (_) => {
+            setBox1(false)
+            setBox2(false)
+            setBox3(false)
+        })
+        .catch((error) => {
+            console.error(error)
+            let errorMessage = encodeURIComponent(error)
+            navigate(`/error?message=${errorMessage}`)
+        })
+
     const label = {inputProps: {'aria-label': 'Checkbox demo'}};
 
     return (
