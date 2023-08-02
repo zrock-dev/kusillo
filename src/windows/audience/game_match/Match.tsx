@@ -43,7 +43,6 @@ export default function Match() {
     return (
         <Box
             sx={{
-                marginTop: '5%',
                 marginLeft: '5%',
                 marginRight: '5%',
             }}

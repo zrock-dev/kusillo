@@ -7,7 +7,7 @@ import {useNavigate} from "react-router-dom";
 import TimeOutBox from "../../shared/timeout/TimeOutBox";
 import {listen} from "@tauri-apps/api/event";
 import { invoke } from '@tauri-apps/api/tauri';
-import TeamCard from "../../../match_selection/TeamCard";
+import TeamCard from "../utils/TeamCard";
 
 // @ts-ignore
 export default function Side({ gameId, team}) {
