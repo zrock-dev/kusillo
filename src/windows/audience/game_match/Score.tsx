@@ -1,3 +1,4 @@
+import { Box } from "@mui/material";
 import {padWithZeros} from "../../../Utils";
 
 function Score({fontColor, score}: any) {
@@ -15,12 +16,13 @@ function Score({fontColor, score}: any) {
     }
 
     return (
-        <div style={style}>
-
+        <Box
+            sx={style}
+        >
             <span style={fontStyle}>
                 {padWithZeros(score, 2)}
             </span>
-        </div>
+        </Box>
     );
 }
 
